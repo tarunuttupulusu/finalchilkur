@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, Star, Flame, X, ChevronLeft, ChevronRight, Leaf, ShoppingBag, Loader2 } from 'lucide-react';
 import type { Dish } from '../components/DishCard';
@@ -416,6 +416,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
 
 // ─── Menu Page ──────────────────────────────────────────────────────────────────
 export const Menu: React.FC = () => {
+  const router = useRouter();
   const [menuCategories, setMenuCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -427,28 +428,54 @@ export const Menu: React.FC = () => {
 
   const [showAllHeadings, setShowAllHeadings] = useState(false);
 
-  // Fetch live menu categories and dishes from the DB
-  useEffect(() => {
-    async function loadMenu() {
-      try {
-        const res = await fetch('/api/cms/menu', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-store, max-age=0'
-          }
-        });
-        const data = await res.json();
-        if (data.success) {
-          setMenuCategories(data.categories);
+  // Fetch live menu categories and dishes from the DB (no cache)
+  const loadMenu = React.useCallback(async () => {
+    try {
+      const res = await fetch('/api/cms/menu', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
         }
-      } catch (error) {
-        console.error('Failed to load menu:', error);
-      } finally {
-        setLoading(false);
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMenuCategories(data.categories);
       }
+    } catch (error) {
+      console.error('Failed to load menu:', error);
+    } finally {
+      setLoading(false);
     }
-    loadMenu();
   }, []);
+
+  useEffect(() => {
+    loadMenu();
+  }, [loadMenu]);
+
+  // 1. Force Client-Side Router Route Refresh & Dynamic Polling
+  // Refreshes Next.js client-side cache tree silently on window focus or 5-second interval heartbeat
+  useEffect(() => {
+    const handleFocus = () => {
+      router.refresh();
+      loadMenu();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+    
+    // Background polling interval to fetch fresh DB state silently
+    const interval = setInterval(() => {
+      loadMenu();
+      router.refresh();
+    }, 5000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+      clearInterval(interval);
+    };
+  }, [router, loadMenu]);
 
   // Flatten active dishes for search, filtering, and deep-linking
   const allDishes = useMemo(() => {
