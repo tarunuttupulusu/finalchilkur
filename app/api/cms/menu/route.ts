@@ -131,6 +131,7 @@ export async function POST(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
@@ -176,6 +177,7 @@ export async function POST(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
@@ -225,6 +227,7 @@ export async function PUT(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
@@ -266,6 +269,7 @@ export async function PUT(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
@@ -308,6 +312,7 @@ export async function DELETE(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
@@ -326,6 +331,7 @@ export async function DELETE(request: Request) {
       await Promise.all([
         revalidatePath('/menu'),
         revalidatePath('/'),
+        revalidatePath('/api/cms/menu'),
         revalidateTag('menu-items')
       ]);
 
