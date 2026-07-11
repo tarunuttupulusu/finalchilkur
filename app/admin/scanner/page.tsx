@@ -10,20 +10,26 @@ export default function ScannerPage() {
   const [manualCode, setManualCode] = useState('');
   const [useCamera, setUseCamera] = useState(false);
   const [cameraMode, setCameraMode] = useState<'environment' | 'user'>('environment');
+  const [restartCount, setRestartCount] = useState(0);
 
   const streamRef = useRef<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const requestRef = useRef<number | null>(null);
 
-  // Stop active camera streams and tracks cleanly
+  // Persistent tracking for frame freeze protection
+  const lastFrameHashRef = useRef<number>(0);
+  const lastFrameChangeTimeRef = useRef<number>(0);
+
+  // 1. STREAM GARBAGE COLLECTION & HOOKS CLEANUP
   const stopMediaStream = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
         try {
+          track.enabled = false;
           track.stop();
         } catch (e) {
-          console.error("Failed to stop track:", e);
+          console.error("Failed to release MediaStream track:", e);
         }
       });
       streamRef.current = null;
@@ -35,23 +41,24 @@ export default function ScannerPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    lastFrameHashRef.current = 0;
+    lastFrameChangeTimeRef.current = 0;
   };
 
   useEffect(() => {
     let active = true;
 
     const startScanning = async () => {
-      // Small delay to ensure container mount
+      // Short delay to ensure container mount
       await new Promise((resolve) => setTimeout(resolve, 300));
       if (!active) return;
 
       const video = videoRef.current;
       if (!video) return;
 
-      // 1. Cleanly terminate previous stream tracks before switching cameras
+      // Cleanly stop any active streams before starting a new session
       stopMediaStream();
 
-      // 2. Set strict media stream constraints with fallback handling
       const strictConstraints = {
         video: { facingMode: { exact: cameraMode } }
       };
@@ -63,11 +70,11 @@ export default function ScannerPage() {
       try {
         let stream: MediaStream;
         try {
-          // Attempt strict hardware constraint matching (for back camera: {exact: "environment"})
+          // Force back-camera initialization using strict environment mode constraints
           stream = await navigator.mediaDevices.getUserMedia(strictConstraints);
         } catch (strictErr) {
-          console.warn("Strict facingMode constraint rejected, attempting fallback constraints:", strictErr);
-          // Safe fallback for devices with matching quirks
+          console.warn("Strict camera constraints rejected, running fallback constraints:", strictErr);
+          // Fallback constraints if exact environment match is unsupported
           stream = await navigator.mediaDevices.getUserMedia(looseConstraints);
         }
 
@@ -79,14 +86,14 @@ export default function ScannerPage() {
         streamRef.current = stream;
         video.srcObject = stream;
         
-        // Autoplay attributes required by iOS Safari and Android Chrome to play stream inline
+        // Autoplay attributes required by mobile Safari and Chrome to run video playback
         video.setAttribute("playsinline", "true");
         video.setAttribute("autoplay", "true");
         video.setAttribute("muted", "true");
-        
+
         await video.play();
 
-        // 3. Initiate frame scanning loop
+        // Canvas frame scan loop
         const tick = () => {
           if (!active) return;
           if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -102,6 +109,31 @@ export default function ScannerPage() {
             if (ctx) {
               ctx.drawImage(video, 0, 0, width, height);
               const imageData = ctx.getImageData(0, 0, width, height);
+
+              // 2. SAFARI & MOBILE CHROME STREAM ENGINE FREEZE PROTECTION
+              // Sample pixel grid subset to calculate a hash of the frame
+              let sum = 0;
+              for (let i = 0; i < imageData.data.length; i += 4000) {
+                sum += imageData.data[i]; // Add red channel component values
+              }
+
+              const now = Date.now();
+              if (sum === lastFrameHashRef.current) {
+                if (lastFrameChangeTimeRef.current === 0) {
+                  lastFrameChangeTimeRef.current = now;
+                } else if (now - lastFrameChangeTimeRef.current > 3000) {
+                  console.warn("Camera stream freeze detected (3s static frame). Restarting stream...");
+                  stopMediaStream();
+                  // Silently cycle the stream session to resume canvas frame loop
+                  setRestartCount(prev => prev + 1);
+                  return;
+                }
+              } else {
+                lastFrameHashRef.current = sum;
+                lastFrameChangeTimeRef.current = now;
+              }
+
+              // Decode frame buffer using jsQR
               const decoded = jsQR(imageData.data, imageData.width, imageData.height, {
                 inversionAttempts: "dontInvert"
               });
@@ -110,7 +142,7 @@ export default function ScannerPage() {
                 stopMediaStream();
                 setUseCamera(false);
                 handleScan(decoded.data);
-                return; // Stop animation loop
+                return;
               }
             }
           }
@@ -120,15 +152,15 @@ export default function ScannerPage() {
         requestRef.current = requestAnimationFrame(tick);
 
       } catch (err: any) {
-        console.error("Camera access failed:", err);
+        console.error("Stream initialization error:", err);
         if (active) {
-          // 4. Muted, professional permissions helper message
+          // 3. ROBUST TRY/CATCH ERROR LIFECYCLE
           if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-            setError("Camera access was denied. Please go to your browser settings, grant camera permissions for this site, and try again.");
+            setError("Camera access is denied. Please go to your browser settings, enable camera access for this site, and try again.");
           } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-            setError("No compatible camera device found on this system.");
+            setError("No compatible camera hardware detected on this device.");
           } else {
-            setError("Unable to initiate camera stream. Please check system permissions.");
+            setError("Unable to initiate video stream. Ensure camera permissions are enabled.");
           }
           setUseCamera(false);
         }
@@ -143,24 +175,24 @@ export default function ScannerPage() {
       active = false;
       stopMediaStream();
     };
-  }, [useCamera, loading, scanResult, error, cameraMode]);
+  }, [useCamera, loading, scanResult, error, cameraMode, restartCount]);
 
+  // 3. ID PARSING BOUNDARY PROTECTION (ELIMINATING "INVALID TICKET")
   const handleScan = async (rawScannedString: string) => {
     setLoading(true);
     setError(null);
     setScanResult(null);
 
-    // 1. Sanitize whitespaces, newlines, and carriage returns
-    const sanitized = rawScannedString.replace(/[\r\n]+/g, "").trim();
+    // Sanitize whitespaces, newlines, and carriage returns
+    const sanitized = String(rawScannedString).replace(/[\r\n]+/g, "").trim();
 
     let payload: any = {};
 
-    // 2. Check if the scanned string is a cryptographically signed Base64 token
+    // Validate if the string is a cryptographically signed Base64 token
     if (sanitized.includes('.') && sanitized.split('.').length === 2) {
       payload = { qrToken: sanitized };
     } else {
-      // 3. Extract alphanumeric Booking ID sequence using Regex (e.g. from URLs or raw text)
-      // Matches RES- followed by 6 to 10 alphanumeric characters
+      // Regex extraction pattern to strip external protocol strings and isolate Booking ID
       const match = sanitized.toUpperCase().match(/(RES-[A-Z0-9]{6,10})/);
       const extractedId = match ? match[1] : sanitized.toUpperCase();
       
@@ -195,7 +227,6 @@ export default function ScannerPage() {
     setError(null);
     setScanResult(null);
 
-    // Sanitize manual code entry
     const sanitizedCode = manualCode.replace(/[\r\n]+/g, "").trim().toUpperCase();
 
     try {
@@ -311,9 +342,9 @@ export default function ScannerPage() {
                   <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-sm border border-zinc-200 aspect-square flex items-center justify-center bg-black">
                     <video
                       ref={videoRef}
-                      playsInline
-                      autoPlay
-                      muted
+                      playsInline={true}
+                      autoPlay={true}
+                      muted={true}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                     
