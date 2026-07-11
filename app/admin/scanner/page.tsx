@@ -1,95 +1,135 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
 import { QrCode, CheckCircle, XCircle, Loader2, RefreshCw, Keyboard, Camera, ShieldCheck } from 'lucide-react';
+import jsQR from 'jsqr';
 
 export default function ScannerPage() {
   const [scanResult, setScanResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [scanning, setScanning] = useState(false);
   const [manualCode, setManualCode] = useState('');
   const [useCamera, setUseCamera] = useState(false);
   const [cameraMode, setCameraMode] = useState<'environment' | 'user'>('environment');
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+
+  const streamRef = useRef<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const requestRef = useRef<number | null>(null);
+
+  // Stop active camera streams and tracks cleanly
+  const stopMediaStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        try {
+          track.stop();
+        } catch (e) {
+          console.error("Failed to stop track:", e);
+        }
+      });
+      streamRef.current = null;
+    }
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
 
   useEffect(() => {
     let active = true;
-    let scannerInstance: Html5Qrcode | null = null;
 
     const startScanning = async () => {
       // Small delay to ensure container mount
       await new Promise((resolve) => setTimeout(resolve, 300));
       if (!active) return;
 
-      const element = document.getElementById("reader");
-      if (!element) return;
+      const video = videoRef.current;
+      if (!video) return;
+
+      // 1. Cleanly terminate previous stream tracks before switching cameras
+      stopMediaStream();
+
+      // 2. Set strict media stream constraints with fallback handling
+      const strictConstraints = {
+        video: { facingMode: { exact: cameraMode } }
+      };
+
+      const looseConstraints = {
+        video: { facingMode: cameraMode }
+      };
 
       try {
-        // Clean up any running instances and release tracks first
-        if (scannerRef.current) {
-          try {
-            if (scannerRef.current.isScanning) {
-              await scannerRef.current.stop();
-            }
-          } catch (_) {}
-          scannerRef.current.clear();
+        let stream: MediaStream;
+        try {
+          // Attempt strict hardware constraint matching (for back camera: {exact: "environment"})
+          stream = await navigator.mediaDevices.getUserMedia(strictConstraints);
+        } catch (strictErr) {
+          console.warn("Strict facingMode constraint rejected, attempting fallback constraints:", strictErr);
+          // Safe fallback for devices with matching quirks
+          stream = await navigator.mediaDevices.getUserMedia(looseConstraints);
         }
 
-        scannerInstance = new Html5Qrcode("reader");
-        scannerRef.current = scannerInstance;
+        if (!active) {
+          stream.getTracks().forEach(track => track.stop());
+          return;
+        }
 
-        // Strict facingMode matching: try environment (rear) exact constraint first
-        const constraints = cameraMode === 'environment'
-          ? { facingMode: { exact: "environment" } }
-          : { facingMode: "user" };
-
-        await scannerInstance.start(
-          constraints,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
-          },
-          (decodedText) => {
-            if (active) {
-              setScanning(false);
-              setUseCamera(false);
-              handleScan(decodedText);
-              scannerInstance?.stop().catch(console.error);
-            }
-          },
-          () => {} // Silent errors during scanning
-        );
-      } catch (err) {
-        console.warn("Camera exact facingMode failed, attempting fallback:", err);
+        streamRef.current = stream;
+        video.srcObject = stream;
         
-        // Fallback constraint if exact environment mode is rejected by the device browser
-        if (active && cameraMode === 'environment') {
-          try {
-            await scannerInstance?.start(
-              { facingMode: "environment" },
-              {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-              },
-              (decodedText) => {
-                if (active) {
-                  setScanning(false);
-                  setUseCamera(false);
-                  handleScan(decodedText);
-                  scannerInstance?.stop().catch(console.error);
-                }
-              },
-              () => {}
-            );
-            return;
-          } catch (fallbackErr) {
-            console.error("Camera fallback constraint failed:", fallbackErr);
-          }
-        }
+        // Autoplay attributes required by iOS Safari and Android Chrome to play stream inline
+        video.setAttribute("playsinline", "true");
+        video.setAttribute("autoplay", "true");
+        video.setAttribute("muted", "true");
+        
+        await video.play();
 
+        // 3. Initiate frame scanning loop
+        const tick = () => {
+          if (!active) return;
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            const canvas = canvasRef.current || document.createElement('canvas');
+            canvasRef.current = canvas;
+            
+            const width = video.videoWidth;
+            const height = video.videoHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, width, height);
+              const imageData = ctx.getImageData(0, 0, width, height);
+              const decoded = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "dontInvert"
+              });
+
+              if (decoded) {
+                stopMediaStream();
+                setUseCamera(false);
+                handleScan(decoded.data);
+                return; // Stop animation loop
+              }
+            }
+          }
+          requestRef.current = requestAnimationFrame(tick);
+        };
+        
+        requestRef.current = requestAnimationFrame(tick);
+
+      } catch (err: any) {
+        console.error("Camera access failed:", err);
         if (active) {
-          setError("Could not access the selected camera. Please verify camera permissions in your browser settings.");
+          // 4. Muted, professional permissions helper message
+          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            setError("Camera access was denied. Please go to your browser settings, grant camera permissions for this site, and try again.");
+          } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            setError("No compatible camera device found on this system.");
+          } else {
+            setError("Unable to initiate camera stream. Please check system permissions.");
+          }
           setUseCamera(false);
         }
       }
@@ -101,13 +141,7 @@ export default function ScannerPage() {
 
     return () => {
       active = false;
-      if (scannerInstance) {
-        try {
-          if (scannerInstance.isScanning) {
-            scannerInstance.stop().catch(console.error);
-          }
-        } catch (_) {}
-      }
+      stopMediaStream();
     };
   }, [useCamera, loading, scanResult, error, cameraMode]);
 
@@ -166,6 +200,7 @@ export default function ScannerPage() {
   };
 
   const resetScanner = () => {
+    stopMediaStream();
     setScanResult(null);
     setError(null);
     setUseCamera(false);
@@ -254,7 +289,13 @@ export default function ScannerPage() {
                   </div>
 
                   <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-sm border border-zinc-200 aspect-square flex items-center justify-center bg-black">
-                    <div id="reader" className="absolute inset-0 w-full h-full object-cover" />
+                    <video
+                      ref={videoRef}
+                      playsInline
+                      autoPlay
+                      muted
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
                     
                     {/* HUD Overlay Frame */}
                     <div className="absolute inset-8 border border-white/20 rounded-xl pointer-events-none flex items-center justify-center">
@@ -275,7 +316,7 @@ export default function ScannerPage() {
                 /* Manual Ticket Input Form */
                 <form onSubmit={handleManualVerify} className="space-y-6 max-w-md mx-auto py-8">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-brand-dark/70 ml-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 ml-1">
                       Enter Ticket / Booking Reference Code
                     </label>
                     <input 
@@ -284,13 +325,13 @@ export default function ScannerPage() {
                       placeholder="e.g. RES-042382"
                       value={manualCode}
                       onChange={e => setManualCode(e.target.value)}
-                      className="w-full bg-brand-bg border border-brand-dark/10 rounded-2xl py-4 px-5 text-center text-lg font-mono font-black text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-accent transition-all uppercase placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-sm"
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-xl py-4 px-5 text-center text-lg font-mono font-black text-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all uppercase placeholder:normal-case placeholder:font-sans placeholder:font-normal placeholder:text-sm"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-4 bg-brand-dark hover:bg-brand-dark/95 text-[#F6EFE3] font-bold uppercase tracking-widest rounded-2xl shadow-lg transition-all"
+                    className="w-full py-4 bg-zinc-800 hover:bg-zinc-900 text-white font-bold uppercase tracking-widest rounded-2xl shadow-sm border border-zinc-700 transition-all"
                   >
                     Verify Ticket Number
                   </button>
@@ -307,32 +348,32 @@ export default function ScannerPage() {
                 <CheckCircle className="text-green-500" size={56} />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-black text-brand-dark">Ticket Verified!</h2>
-                <p className="text-[#C1440E] font-bold text-xs uppercase tracking-widest mt-1">10% discount applied successfully</p>
+                <h2 className="text-2xl font-display font-black text-zinc-800">Ticket Verified!</h2>
+                <p className="text-emerald-700 font-bold text-xs uppercase tracking-widest mt-1">10% discount applied successfully</p>
               </div>
               
-              <div className="bg-[#F6EFE3]/80 border border-brand-gold/25 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
-                <div className="flex justify-between border-b border-brand-dark/5 pb-2 text-xs">
-                  <span className="font-bold text-brand-dark/50 uppercase">Booking ID</span>
-                  <span className="font-mono font-bold text-brand-dark">{scanResult.reservation.bookingRef}</span>
+              <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
+                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                  <span className="font-bold text-zinc-400 uppercase">Booking ID</span>
+                  <span className="font-mono font-bold text-zinc-800">{scanResult.reservation.bookingRef}</span>
                 </div>
-                <div className="flex justify-between border-b border-brand-dark/5 pb-2 text-xs">
-                  <span className="font-bold text-brand-dark/50 uppercase">Customer</span>
-                  <span className="font-bold text-brand-dark">{scanResult.reservation.customerName}</span>
+                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                  <span className="font-bold text-zinc-400 uppercase">Customer</span>
+                  <span className="font-bold text-zinc-800">{scanResult.reservation.customerName}</span>
                 </div>
-                <div className="flex justify-between border-b border-brand-dark/5 pb-2 text-xs">
-                  <span className="font-bold text-brand-dark/50 uppercase">Guests</span>
-                  <span className="font-bold text-brand-dark">{scanResult.reservation.guests} persons</span>
+                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                  <span className="font-bold text-zinc-400 uppercase">Guests</span>
+                  <span className="font-bold text-zinc-800">{scanResult.reservation.guests} persons</span>
                 </div>
                 <div className="flex justify-between text-xs pt-1">
-                  <span className="font-bold text-brand-dark/50 uppercase">Claim Status</span>
+                  <span className="font-bold text-zinc-400 uppercase">Claim Status</span>
                   <span className="font-black text-green-700 bg-green-100 px-2 py-0.5 rounded uppercase text-[10px]">Verified</span>
                 </div>
               </div>
 
               <button 
                 onClick={resetScanner}
-                className="w-full max-w-xs py-3.5 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent transition-colors shadow-md"
+                className="w-full max-w-xs py-3.5 bg-zinc-800 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-900 border border-zinc-700 transition-colors shadow-sm"
               >
                 Verify Another Ticket
               </button>
@@ -346,14 +387,14 @@ export default function ScannerPage() {
                 <XCircle className="text-red-500" size={56} />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-black text-brand-dark">Invalid Ticket</h2>
+                <h2 className="text-2xl font-display font-black text-zinc-800">Invalid Ticket</h2>
                 <p className="text-red-500 font-bold text-xs uppercase tracking-widest mt-1">Verification Failed</p>
               </div>
-              <p className="text-brand-dark/70 text-sm max-w-sm leading-relaxed">{error}</p>
+              <p className="text-zinc-500 text-xs max-w-sm leading-relaxed">{error}</p>
               
               <button 
                 onClick={resetScanner}
-                className="w-full max-w-xs py-3.5 bg-brand-dark text-white font-bold uppercase tracking-widest rounded-xl hover:bg-brand-accent transition-colors shadow-md"
+                className="w-full max-w-xs py-3.5 bg-zinc-800 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-900 border border-zinc-700 transition-colors shadow-sm"
               >
                 Try Again
               </button>
