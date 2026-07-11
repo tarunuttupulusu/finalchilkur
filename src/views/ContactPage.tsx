@@ -1,42 +1,111 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, Clock, Mail, CheckCircle2 } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from 'react';
+import { MapPin, Phone, Clock, Mail, CheckCircle2, Loader2 } from 'lucide-react';
 
-const BRANCHES = [
+const STATIC_BRANCHES = [
   {
     name: "Moinabad Branch",
     address: "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
     phone: "098494 98681",
     mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
     mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
-    rating: "4.1 ★ (63 reviews)"
+    rating: "4.1 ★ (63 reviews)",
+    openingTime: "11:00",
+    closingTime: "23:00"
   },
   {
-    name: "Chinthal Branch",
+    name: "PRAGATHI NAGAR BRANCH",
     address: "1 2nd floor, HMT Rd, above The Kakatiya Co-operative Bank, Chinthal, Quthbullapur, Hyderabad, Telangana 500037",
     phone: "098494 98681",
     mapEmbedUrl: "https://maps.google.com/maps?q=1%202nd%20floor,%20HMT%20Rd,%20above%20The%20kakatiya%20co-operative%20Bank.LTD,%20beside%20Ridge%20Towers,%20Chinthal,%20Quthbullapur,%20Hyderabad,%20Telangana%20500037&t=&z=15&ie=UTF8&iwloc=&output=embed",
-    mapNavUrl: "https://www.google.com/maps/search/?api=1&query=1+2nd+floor,+HMT+Rd,+above+The+kakatiya+co-operative+Bank.LTD,+beside+Ridge+Towers,+Chinthal,+Quthbullapur,+Hyderabad,+Telangana+500037",
-    rating: "4.3 ★ (19 reviews)"
+    mapNavUrl: "https://maps.app.goo.gl/dt45g7WKVFb1gq8K8",
+    rating: "4.3 ★ (19 reviews)",
+    openingTime: "11:00",
+    closingTime: "23:00"
   }
 ];
 
 export const ContactPage: React.FC = () => {
+  const [branches, setBranches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeBranch, setActiveBranch] = useState(0);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', interest: 'Catering', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadBranches() {
+      try {
+        const res = await fetch('/api/cms/branches');
+        const data = await res.json();
+        if (data.success && data.branches.length > 0) {
+          setBranches(data.branches.map((b: any) => ({
+            name: b.name,
+            address: b.address,
+            phone: b.phone,
+            mapEmbedUrl: b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e' 
+              ? "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              : "https://maps.google.com/maps?q=1%202nd%20floor,%20HMT%20Rd,%20above%20The%20kakatiya%20co-operative%20Bank.LTD,%20beside%20Ridge%20Towers,%20Chinthal,%20Quthbullapur,%20Hyderabad,%20Telangana%20500037&t=&z=15&ie=UTF8&iwloc=&output=embed",
+            mapNavUrl: b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e'
+              ? "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana"
+              : "https://www.google.com/maps/search/?api=1&query=1+2nd+floor,+HMT+Rd,+above+The+kakatiya+co-operative+Bank.LTD,+beside+Ridge+Towers,+Chinthal,+Quthbullapur,+Hyderabad,+Telangana+500037",
+            rating: b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e' ? "4.1 ★ (63 reviews)" : "4.3 ★ (19 reviews)",
+            openingTime: b.openingTime,
+            closingTime: b.closingTime
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to load branches:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadBranches();
+  }, []);
+
+  const displayBranches = branches.length > 0 ? branches : STATIC_BRANCHES;
+  const branch = displayBranches[activeBranch] || displayBranches[0] || {};
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email) {
-      setIsSubmitted(true);
-      setTimeout(() => {
-        setIsSubmitted(false);
+    if (!formData.name || !formData.email) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/cms/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          subject: `Contact Inquiry: ${formData.interest}`,
+          message: formData.message || `No message. Interest: ${formData.interest}`
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsSubmitted(true);
         setFormData({ name: '', email: '', phone: '', interest: 'Catering', message: '' });
-      }, 5000);
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Failed to send contact inquiry:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const branch = BRANCHES[activeBranch];
+  if (loading) {
+    return (
+      <div className="pt-32 pb-24 bg-brand-bg noise-overlay min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-brand-accent mb-4" size={48} />
+        <p className="font-display text-xl font-bold text-brand-dark">Loading Contact Details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-32 pb-24 bg-brand-bg noise-overlay min-h-screen">
@@ -56,7 +125,7 @@ export const ContactPage: React.FC = () => {
         {/* Branch Selector Tabs */}
         <div className="flex justify-center mb-12">
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-lg justify-center px-4">
-            {BRANCHES.map((b, idx) => (
+            {displayBranches.map((b, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveBranch(idx)}
@@ -90,21 +159,23 @@ export const ContactPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                  <Phone className="text-brand-gold mt-1 shrink-0" size={18} />
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#F6EFE3]/50">Phone</h4>
-                    <a href={`tel:${branch.phone.replace(/\s+/g, '')}`} className="text-sm font-semibold hover:text-brand-gold mt-1 block">
-                      {branch.phone}
-                    </a>
+                {branch.phone && (
+                  <div className="flex items-start space-x-4">
+                    <Phone className="text-brand-gold mt-1 shrink-0" size={18} />
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-[#F6EFE3]/50">Phone</h4>
+                      <a href={`tel:${branch.phone.replace(/\s+/g, '')}`} className="text-sm font-semibold hover:text-brand-gold mt-1 block">
+                        {branch.phone}
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex items-start space-x-4">
                   <Clock className="text-brand-gold mt-1 shrink-0" size={18} />
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-widest text-[#F6EFE3]/50">Hours of Operation</h4>
-                    <p className="text-sm mt-1">Daily: 11:00 AM – 11:00 PM</p>
+                    <p className="text-sm mt-1">Daily: {branch.openingTime || '11:00'} AM – {branch.closingTime || '23:00'} PM</p>
                   </div>
                 </div>
 
@@ -118,10 +189,12 @@ export const ContactPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-8 border-t border-[#F6EFE3]/15">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-brand-gold">Google Rating</h4>
-              <p className="font-display text-2xl font-black text-[#F6EFE3] mt-1">{branch.rating}</p>
-            </div>
+            {branch.rating && (
+              <div className="pt-8 border-t border-[#F6EFE3]/15">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-brand-gold">Google Rating</h4>
+                <p className="font-display text-2xl font-black text-[#F6EFE3] mt-1">{branch.rating}</p>
+              </div>
+            )}
           </div>
 
           {/* Form Column */}
@@ -201,9 +274,17 @@ export const ContactPage: React.FC = () => {
 
                 <button 
                   type="submit"
-                  className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-bg font-bold uppercase tracking-wider text-xs py-4 rounded-xl shadow-md transition-colors"
+                  disabled={isSubmitting}
+                  className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-bg font-bold uppercase tracking-wider text-xs py-4 rounded-xl shadow-md transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
                 >
-                  Send Inquiry
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Sending Inquiry...</span>
+                    </>
+                  ) : (
+                    <span>Send Inquiry</span>
+                  )}
                 </button>
               </form>
             )}
@@ -211,17 +292,19 @@ export const ContactPage: React.FC = () => {
         </div>
 
         {/* Embedded styled Map */}
-        <div className="h-[450px] w-full rounded-2xl overflow-hidden border border-brand-dark/10 shadow-md transition-all duration-500">
-          <iframe 
-            title={`${branch.name} Location Map`}
-            src={branch.mapEmbedUrl}
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen={true} 
-            loading="lazy"
-          />
-        </div>
+        {branch.mapEmbedUrl && (
+          <div className="h-[450px] w-full rounded-2xl overflow-hidden border border-brand-dark/10 shadow-md transition-all duration-500">
+            <iframe 
+              title={`${branch.name} Location Map`}
+              src={branch.mapEmbedUrl}
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy"
+            />
+          </div>
+        )}
 
       </div>
     </div>

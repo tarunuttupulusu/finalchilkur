@@ -1,9 +1,9 @@
+"use client";
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Star, Flame, X, ChevronLeft, ChevronRight, Leaf, ShoppingBag } from 'lucide-react';
-import { SIGNATURE_DISHES } from '../utils/menuData';
+import { Search, SlidersHorizontal, Star, Flame, X, ChevronLeft, ChevronRight, Leaf, ShoppingBag, Loader2 } from 'lucide-react';
 import type { Dish } from '../components/DishCard';
 
 // Balaji Santosh Dhaba restaurant page URLs on delivery platforms
@@ -416,14 +416,65 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
 
 // ─── Menu Page ──────────────────────────────────────────────────────────────────
 export const Menu: React.FC = () => {
+  const [menuCategories, setMenuCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [vegFilter, setVegFilter] = useState<'All' | 'Veg' | 'Sweets'>('All');
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const targetCategory = searchParams.get('category') || '';
   const targetDish = searchParams.get('dish') || '';
 
   const [showAllHeadings, setShowAllHeadings] = useState(false);
+
+  // Fetch live menu categories and dishes from the DB
+  useEffect(() => {
+    async function loadMenu() {
+      try {
+        const res = await fetch('/api/cms/menu');
+        const data = await res.json();
+        if (data.success) {
+          setMenuCategories(data.categories);
+        }
+      } catch (error) {
+        console.error('Failed to load menu:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadMenu();
+  }, []);
+
+  // Flatten active dishes for search, filtering, and deep-linking
+  const allDishes = useMemo(() => {
+    const list: Dish[] = [];
+    menuCategories.forEach(cat => {
+      cat.dishes.forEach((d: any) => {
+        // Exclude hidden dishes on public page
+        if (d.isHidden) return;
+        list.push({
+          id: d.id,
+          name: d.name,
+          teluguName: d.teluguName || undefined,
+          description: d.description || '',
+          price: d.price,
+          category: cat.name,
+          image: d.image,
+          rating: d.rating,
+          isVegetarian: d.isVegetarian,
+          isBestseller: d.isBestseller,
+          isChefSpecial: d.isChefSpecial,
+          isSeasonal: d.isSeasonal,
+          isOutOfStock: d.isOutOfStock,
+          images: d.images as string[] | undefined,
+          scheduleDays: d.scheduleDays as string[] | undefined,
+          scheduleTimings: d.scheduleTimings || undefined,
+          isRecommended: d.isRecommended
+        });
+      });
+    });
+    return list;
+  }, [menuCategories]);
 
   // Scroll to highlighted category on load
   useEffect(() => {
@@ -442,9 +493,9 @@ export const Menu: React.FC = () => {
 
   // Auto-open lightbox for deep-linked dish
   useEffect(() => {
-    if (!targetDish) return;
+    if (!targetDish || allDishes.length === 0) return;
     const attempt = (tries = 0) => {
-      const dish = SIGNATURE_DISHES.find(
+      const dish = allDishes.find(
         (d) => d.name.toLowerCase() === targetDish.toLowerCase()
       );
       if (dish) {
@@ -454,21 +505,44 @@ export const Menu: React.FC = () => {
       }
     };
     attempt();
-  }, [targetDish]);
+  }, [targetDish, allDishes]);
 
   const filteredDishes = useMemo(() => {
-    return SIGNATURE_DISHES.filter((dish) => {
+    const currentDay = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
+    const currentTimeStr = new Date().toTimeString().slice(0, 5); // "HH:MM"
+
+    return allDishes.filter((dish) => {
+      // 1. Basic Text Search
       const matchesSearch =
         dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         dish.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (dish.teluguName && dish.teluguName.includes(searchQuery));
+
+      // 2. Veg / Sweets Badge Filter
       const matchesVeg =
         vegFilter === 'All' ||
         (vegFilter === 'Veg' && dish.isVegetarian === true) ||
-        (vegFilter === 'Sweets' && false);
-      return matchesSearch && matchesVeg;
+        (vegFilter === 'Sweets' && dish.category.toLowerCase().includes('sweets'));
+
+      // 3. Scheduling logic (Only show if scheduled day/time matches)
+      let matchesSchedule = true;
+      if (dish.scheduleDays && Array.isArray(dish.scheduleDays) && dish.scheduleDays.length > 0) {
+        matchesSchedule = dish.scheduleDays.includes(currentDay);
+      }
+      if (matchesSchedule && dish.scheduleTimings) {
+        try {
+          const [start, end] = dish.scheduleTimings.split('-');
+          if (start && end) {
+            matchesSchedule = currentTimeStr >= start.trim() && currentTimeStr <= end.trim();
+          }
+        } catch (e) {
+          console.error('Failed to parse timings for', dish.name, e);
+        }
+      }
+
+      return matchesSearch && matchesVeg && matchesSchedule;
     });
-  }, [searchQuery, vegFilter]);
+  }, [allDishes, searchQuery, vegFilter]);
 
   // Group by category, preserving order
   const grouped = useMemo(() => {
@@ -479,6 +553,15 @@ export const Menu: React.FC = () => {
     });
     return map;
   }, [filteredDishes]);
+
+  if (loading) {
+    return (
+      <div className="pt-32 pb-24 bg-brand-bg noise-overlay min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-brand-accent mb-4" size={48} />
+        <p className="font-display text-xl font-bold text-brand-dark">Loading Premium Menu...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-32 pb-24 bg-brand-bg noise-overlay min-h-screen">

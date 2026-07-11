@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { MapPin, Phone, Clock, Compass } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -15,7 +16,7 @@ export const Footer: React.FC = () => {
         
         {/* Brand Info */}
         <div className="flex flex-col space-y-6">
-          <Link to="/" className="flex items-center space-x-2 md:space-x-3 group">
+          <Link href="/" className="flex items-center space-x-2 md:space-x-3 group">
             <img 
               src="/bsd-logo.png" 
               alt="Balaji Chilkur Family Dhaba Logo" 
@@ -82,19 +83,19 @@ export const Footer: React.FC = () => {
           </h4>
           <ul className="space-y-3 font-sans text-sm">
             <li>
-              <Link to="/" className="hover:text-brand-gold transition-colors">Home</Link>
+              <Link href="/" className="hover:text-brand-gold transition-colors">Home</Link>
             </li>
             <li>
-              <Link to="/menu" className="hover:text-brand-gold transition-colors">Interactive Menu</Link>
+              <Link href="/menu" className="hover:text-brand-gold transition-colors">Interactive Menu</Link>
             </li>
             <li>
-              <Link to="/about" className="hover:text-brand-gold transition-colors">Our Heritage</Link>
+              <Link href="/about" className="hover:text-brand-gold transition-colors">Our Heritage</Link>
             </li>
             <li>
-              <Link to="/gallery" className="hover:text-brand-gold transition-colors">Photo Gallery</Link>
+              <Link href="/gallery" className="hover:text-brand-gold transition-colors">Photo Gallery</Link>
             </li>
             <li>
-              <Link to="/contact" className="hover:text-brand-gold transition-colors">Find Us & Contact</Link>
+              <Link href="/contact" className="hover:text-brand-gold transition-colors">Find Us & Contact</Link>
             </li>
           </ul>
         </div>
@@ -131,12 +132,12 @@ export const Footer: React.FC = () => {
             <li className="flex items-start space-x-3">
               <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5" />
               <a 
-                href="https://www.google.com/maps/search/?api=1&query=1+2nd+floor,+HMT+Rd,+above+The+kakatiya+co-operative+Bank.LTD,+beside+Ridge+Towers,+Chinthal,+Quthbullapur,+Hyderabad,+Telangana+500037"
+                href="https://maps.app.goo.gl/dt45g7WKVFb1gq8K8"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-brand-gold transition-colors block text-left"
               >
-                <p className="font-bold text-[#F6EFE3] text-sm">Chinthal Branch</p>
+                <p className="font-bold text-[#F6EFE3] text-sm">PRAGATHI NAGAR BRANCH</p>
                 <p className="text-xs mt-0.5 text-[#F6EFE3]/60">2nd floor, HMT Rd, above Kakatiya Bank, Hyderabad</p>
               </a>
             </li>

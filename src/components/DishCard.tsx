@@ -1,19 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Flame, ShoppingBag } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 export interface Dish {
   id: string;
   name: string;
   teluguName?: string;
   description: string;
-  price: string;
+  price: string | number;
   category: string;
   image: string;
   rating?: number;
   isPopular?: boolean;
   isVegetarian?: boolean;
+  isBestseller?: boolean;
+  isChefSpecial?: boolean;
+  isSeasonal?: boolean;
+  isOutOfStock?: boolean;
+  images?: string[];
+  scheduleDays?: string[];
+  scheduleTimings?: string;
+  isRecommended?: boolean;
 }
 
 interface DishCardProps {
@@ -22,7 +30,7 @@ interface DishCardProps {
 }
 
 export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
-  const navigate = useNavigate();
+  const navigate = useRouter();
 
   const handleOrder = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -30,7 +38,7 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
       onOrderClick(dish);
     } else {
       // Navigate to Menu page with category and dish pre-selected
-      navigate(`/menu?category=${encodeURIComponent(dish.category)}&dish=${encodeURIComponent(dish.name)}`);
+      navigate.push(`/menu?category=${encodeURIComponent(dish.category)}&dish=${encodeURIComponent(dish.name)}`);
     }
   };
 

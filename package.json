@@ -2,29 +2,34 @@
   "name": "app1",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.2",
+    "@tailwindcss/postcss": "^4.3.2",
     "@tailwindcss/vite": "^4.3.2",
     "framer-motion": "^12.42.2",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.23.0",
+    "next": "^16.2.10",
+    "postcss": "^8.5.16",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.1",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
-    "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "prisma": "^6.19.3",
+    "typescript": "~6.0.2"
   }
 }

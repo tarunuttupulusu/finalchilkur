@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Branch {
+  id           String        @id @default(uuid())
+  name         String
+  address      String
+  phone        String
+  totalTables  Int           @map("total_tables")
+  openingTime  String        @map("opening_time")
+  closingTime  String        @map("closing_time")
+  
+  tables       Table[]
+  reservations Reservation[]
+
+  @@map("branches")
+}
+
+enum TableStatus {
+  available
+  occupied
+  reserved
+  maintenance
+}
+
+model Table {
+  id          String      @id @default(uuid())
+  branchId    String      @map("branch_id")
+  tableNumber Int         @map("table_number")
+  capacity    Int
+  status      TableStatus @default(available)
+  
+  branch      Branch      @relation(fields: [branchId], references: [id])
+
+  @@map("tables")
+}
+
+enum ReservationStatus {
+  pending
+  confirmed
+  arrived
+  completed
+  cancelled
+  no_show
+}
+
+model Reservation {
+  id                  String            @id @default(uuid())
+  bookingRef          String            @unique @map("booking_ref")
+  branchId            String            @map("branch_id")
+  customerName        String            @map("customer_name")
+  phone               String
+  email               String?
+  guests              Int
+  date                DateTime          @db.Date
+  time                String            
+  specialInstructions String?           @map("special_instructions")
+  bookedOnline        Boolean           @default(true) @map("booked_online")
+  status              ReservationStatus @default(pending)
+  qrToken             String?           @map("qr_token")
+  qrScannedAt         DateTime?         @map("qr_scanned_at")
+  discountVerified    Boolean           @default(false) @map("discount_verified")
+  createdAt           DateTime          @default(now()) @map("created_at")
+  
+  branch              Branch            @relation(fields: [branchId], references: [id])
+
+  @@map("reservations")
+}
+
+enum OrderStatus {
+  sent
+  confirmed
+  completed
+}
+
+model WhatsAppOrder {
+  id           String      @id @default(uuid())
+  orderRef     String      @unique @map("order_ref")
+  customerName String?     @map("customer_name")
+  phone        String
+  items        Json
+  total        Decimal
+  status       OrderStatus @default(sent)
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  @@map("whatsapp_orders")
+}
+
+model SiteSettings {
+  key   String @id
+  value String
+
+  @@map("site_settings")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  teluguName  String?  @map("telugu_name")
+  description String?
+  order       Int      @default(0)
+  dishes      Dish[]
+
+  @@map("categories")
+}
+
+model Dish {
+  id                  String   @id @default(uuid())
+  name                String   @unique
+  teluguName          String?  @map("telugu_name")
+  description         String?
+  price               String
+  image               String
+  categoryId          String   @map("category_id")
+  isVegetarian        Boolean  @default(true) @map("is_vegetarian")
+  isBestseller        Boolean  @default(false) @map("is_bestseller")
+  isChefSpecial       Boolean  @default(false) @map("is_chef_special")
+  isSeasonal          Boolean  @default(false) @map("is_seasonal")
+  isOutOfStock        Boolean  @default(false) @map("is_out_of_stock")
+  isHidden            Boolean  @default(false) @map("is_hidden")
+  rating              Float    @default(4.5)
+  order               Int      @default(0)
+  images              Json?    // Optional array of additional images
+  scheduleDays        Json?    // Optional weekly schedule e.g., ["Monday", "Wednesday"]
+  scheduleTimings     String?  // Optional timing slot e.g., "12:00-15:00"
+  isRecommended       Boolean  @default(false) @map("is_recommended")
+  lastModifiedAt      DateTime @updatedAt @map("last_modified_at")
+  lastModifiedBy      String?  @map("last_modified_by")
+
+  category            Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("dishes")
+}
+
+model GalleryPhoto {
+  id           String  @id @default(uuid())
+  src          String
+  title        String
+  menuCategory String? @map("menu_category")
+  menuDishName String? @map("menu_dish_name")
+  order        Int     @default(0)
+  altText      String? @map("alt_text")
+  isFeatured   Boolean @default(false) @map("is_featured")
+  albumName    String  @default("General") @map("album_name")
+
+  @@map("gallery_photos")
+}
+
+model Testimonial {
+  id         String   @id @default(uuid())
+  name       String
+  role       String
+  content    String
+  rating     Int      @default(5)
+  source     String   @default("Google Reviews")
+  avatar     String?
+  date       String
+  isApproved Boolean  @default(true) @map("is_approved")
+  order      Int      @default(0)
+
+  @@map("testimonials")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
+
+model Offer {
+  id              String    @id @default(uuid())
+  title           String
+  description     String
+  price           String
+  image           String
+  badge           String
+  cta             String
+  link            String
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  showOnHomepage  Boolean   @default(true) @map("show_on_homepage")
+  displayPriority Int       @default(0) @map("display_priority")
+  branchId        String?   @map("branch_id")
+
+  @@map("offers")
+}
+
+model AdminUserRole {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      String   @default("staff") // "admin", "staff"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("admin_user_roles")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  userEmail  String   @map("user_email")
+  action     String   
+  target     String   
+  prevValue  Json?    @map("prev_value")
+  newValue   Json?    @map("new_value")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

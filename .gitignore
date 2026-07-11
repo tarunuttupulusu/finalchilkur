@@ -28,3 +28,12 @@ dist-ssr
 
 # Local Node environment
 .node/
+
+# Next.js build output
+.next/
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Secrets and environment files
+.env
+.env*.local

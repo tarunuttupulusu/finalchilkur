@@ -1,5 +1,6 @@
+"use client";
 import { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import {  HashRouter as Router, Routes, Route, usePathname  } from 'next/navigation';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -10,7 +11,7 @@ import { ContactPage } from './pages/ContactPage';
 
 // Scroll to top on route change
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const pathname = usePathname();
 
   useEffect(() => {
     window.scrollTo(0, 0);
