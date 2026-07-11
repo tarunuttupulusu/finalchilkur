@@ -258,7 +258,7 @@ export default function ScannerPage() {
                 </div>
                 <div className="flex justify-between border-b border-brand-dark/5 pb-2 text-xs">
                   <span className="font-bold text-brand-dark/50 uppercase">Guests</span>
-                  <span className="font-bold text-brand-dark">{scanResult.reservation.guests} pax</span>
+                  <span className="font-bold text-brand-dark">{scanResult.reservation.guests} persons</span>
                 </div>
                 <div className="flex justify-between text-xs pt-1">
                   <span className="font-bold text-brand-dark/50 uppercase">Claim Status</span>

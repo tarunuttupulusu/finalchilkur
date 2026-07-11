@@ -144,50 +144,50 @@ export default function ReservationsClient({ initialReservations }: { initialRes
   });
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn font-sans">
       {/* Title */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border border-brand-dark/5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-zinc-200">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-brand-accent bg-brand-accent/15 px-3 py-1 rounded-full border border-brand-accent/20">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200">
             Booking & Reservation Database
           </span>
-          <h1 className="text-3xl font-display font-black text-brand-dark mt-3">Reservations Console</h1>
-          <p className="text-brand-dark/60 font-sans text-sm mt-1">Manage dinner slots, manual table bookings, and customer discount verifications.</p>
+          <h1 className="text-2xl font-display font-black text-zinc-800 mt-2">Reservations Console</h1>
+          <p className="text-zinc-500 font-sans text-xs mt-1">Manage dinner slots, manual table bookings, and customer discount verifications.</p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand-accent hover:bg-brand-accent/90 text-white font-bold uppercase tracking-wider text-xs shadow-lg shadow-brand-accent/25 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-900 text-white font-bold uppercase tracking-wider text-xs shadow-sm border border-zinc-700 transition-all"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           <span>Manual Entry</span>
         </button>
       </div>
 
       {/* Filter and Search Bar Row */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-6 rounded-3xl border border-brand-dark/5 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
         {/* Search */}
         <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/40" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
           <input 
             type="text"
             placeholder="Search by name, phone, or booking ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all text-xs"
+            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl py-2.5 pl-10 pr-4 text-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all text-xs"
           />
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex bg-[#ECE3D4]/25 p-1.5 rounded-xl border border-brand-dark/5 overflow-x-auto w-full md:w-auto scrollbar-none">
+        <div className="flex bg-zinc-100 p-1 rounded-xl border border-zinc-200 overflow-x-auto w-full md:w-auto scrollbar-none">
           {(['all', 'pending', 'claimed', 'confirmed', 'completed', 'cancelled'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
-              className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+              className={`px-3.5 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                 statusFilter === tab
-                  ? 'bg-brand-dark text-[#F6EFE3] shadow-md'
-                  : 'text-brand-dark/60 hover:text-brand-dark'
+                  ? 'bg-zinc-800 text-white shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-800'
               }`}
             >
               {tab}
@@ -197,12 +197,12 @@ export default function ReservationsClient({ initialReservations }: { initialRes
       </div>
 
       {/* Database list card */}
-      <div className="bg-white rounded-3xl border border-brand-dark/5 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-brand-dark/5 text-[10px] font-black uppercase tracking-widest text-brand-dark/50 bg-[#F6EFE3]/10">
-                <th className="p-5 pl-6">Ref ID</th>
+              <tr className="border-b border-zinc-200 text-[10px] font-black uppercase tracking-widest text-zinc-400 bg-zinc-50">
+                <th className="p-4 pl-6">Ref ID</th>
                 <th className="p-5">Customer Details</th>
                 <th className="p-5">Date & Time</th>
                 <th className="p-5">Size</th>
@@ -211,42 +211,42 @@ export default function ReservationsClient({ initialReservations }: { initialRes
                 <th className="p-5 pr-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-brand-dark/5 font-sans">
+            <tbody className="divide-y divide-zinc-200 font-sans">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-12 text-center text-brand-dark/40 font-medium">No reservations match the filters.</td>
+                  <td colSpan={7} className="p-12 text-center text-zinc-400 font-medium">No reservations match the filters.</td>
                 </tr>
               ) : (
                 filtered.map((res) => (
-                  <tr key={res.id} className="hover:bg-[#F6EFE3]/15 transition-colors">
-                    <td className="p-5 pl-6 font-mono font-bold text-brand-dark">{res.bookingRef}</td>
+                  <tr key={res.id} className="hover:bg-zinc-50 transition-colors">
+                    <td className="p-5 pl-6 font-mono font-bold text-zinc-800">{res.bookingRef}</td>
                     <td className="p-5">
-                      <div className="font-bold text-brand-dark">{res.customerName}</div>
-                      <div className="text-[10px] text-brand-dark/55 flex items-center gap-1 mt-0.5">
-                        <Phone size={10} className="text-brand-accent" />
+                      <div className="font-bold text-zinc-800">{res.customerName}</div>
+                      <div className="text-[10px] text-zinc-500 flex items-center gap-1 mt-0.5">
+                        <Phone size={10} className="text-zinc-400" />
                         {res.phone}
                       </div>
                     </td>
                     <td className="p-5">
-                      <div className="flex items-center gap-1 font-semibold text-brand-dark">
-                        <Calendar size={12} className="text-brand-gold" />
+                      <div className="flex items-center gap-1 font-semibold text-zinc-800">
+                        <Calendar size={12} className="text-zinc-400" />
                         {new Date(res.date).toLocaleDateString()}
                       </div>
-                      <div className="text-[10px] text-brand-dark/50 mt-0.5">{res.time}</div>
+                      <div className="text-[10px] text-zinc-400 mt-0.5">{res.time}</div>
                     </td>
-                    <td className="p-5 font-bold text-brand-dark">
+                    <td className="p-5 font-bold text-zinc-800">
                       <div className="flex items-center gap-1">
-                        <Users size={12} className="text-brand-accent/50" />
-                        <span>{res.guests} pax</span>
+                        <Users size={12} className="text-zinc-300" />
+                        <span>{res.guests} persons</span>
                       </div>
                     </td>
                     <td className="p-5">
                       <button
                         onClick={() => handleToggleClaim(res.id, res.discountVerified)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-wider border transition-colors ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-wider border transition-all ${
                           res.discountVerified
-                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                            : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-100 hover:bg-emerald-100/50'
+                            : 'bg-zinc-100 text-zinc-800 border-zinc-200 hover:bg-zinc-200'
                         }`}
                       >
                         {res.discountVerified ? (
@@ -266,12 +266,12 @@ export default function ReservationsClient({ initialReservations }: { initialRes
                       <select
                         value={res.status}
                         onChange={(e) => handleUpdateStatus(res.id, e.target.value)}
-                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border focus:outline-none ${
-                          res.status === 'confirmed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                          res.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' :
-                          res.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
-                          res.status === 'arrived' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
-                          'bg-gray-100 text-gray-700 border-gray-200'
+                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border focus:outline-none transition-all ${
+                          res.status === 'confirmed' ? 'bg-sky-50 text-sky-800 border-sky-100' :
+                          res.status === 'completed' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' :
+                          res.status === 'cancelled' ? 'bg-rose-50 text-rose-800 border-rose-100' :
+                          res.status === 'arrived' ? 'bg-zinc-100 text-zinc-800 border-zinc-200' :
+                          'bg-zinc-50 text-zinc-600 border-zinc-200'
                         }`}
                       >
                         <option value="pending">Pending</option>
@@ -281,9 +281,9 @@ export default function ReservationsClient({ initialReservations }: { initialRes
                         <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
-                    <td className="p-5 pr-6 text-right font-sans text-brand-dark/50">
+                    <td className="p-5 pr-6 text-right font-sans text-zinc-400">
                       {res.specialInstructions ? (
-                        <span className="text-[10px] italic border-b border-dashed border-brand-dark/30 cursor-help" title={res.specialInstructions}>
+                        <span className="text-[10px] italic border-b border-dashed border-zinc-300 cursor-help" title={res.specialInstructions}>
                           Has Notes
                         </span>
                       ) : (

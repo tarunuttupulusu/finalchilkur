@@ -192,7 +192,7 @@ export default async function AdminDashboard() {
                         <div className="font-semibold">{res.date.toLocaleDateString()}</div>
                         <div className="text-xs text-brand-dark/50">{res.time}</div>
                       </td>
-                      <td className="p-5 text-sm font-bold text-brand-dark">{res.guests} pax</td>
+                      <td className="p-5 text-sm font-bold text-brand-dark">{res.guests} persons</td>
                       <td className="p-5">
                         {res.discountVerified ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-black uppercase rounded-lg border border-green-100">

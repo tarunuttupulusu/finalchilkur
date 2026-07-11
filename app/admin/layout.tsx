@@ -60,26 +60,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="flex h-screen bg-[#F6EFE3] overflow-hidden font-sans selection:bg-brand-accent selection:text-[#F6EFE3]">
+    <div className="flex h-screen bg-zinc-50 overflow-hidden font-sans selection:bg-zinc-700 selection:text-white">
       {/* Desktop Sidebar */}
-      <aside className="w-72 bg-brand-dark text-[#F6EFE3] flex flex-col border-r border-brand-gold/10 shadow-2xl z-30 hidden lg:flex">
+      <aside className="w-72 bg-zinc-950 text-zinc-100 flex flex-col border-r border-zinc-800/80 shadow-md z-30 hidden lg:flex font-sans">
         {/* Header Branding */}
-        <div className="p-8 border-b border-brand-gold/10 flex items-center gap-4">
-          <div className="relative p-1 bg-[#F6EFE3] rounded-full border border-brand-gold/20 shadow-lg">
-            <img src="/bsd-logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+        <div className="p-6 border-b border-zinc-800/80 flex items-center gap-4">
+          <div className="relative p-1 bg-zinc-800 rounded-full border border-zinc-700 shadow-md">
+            <img src="/bsd-logo.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
           <div>
-            <span className="font-display font-black uppercase tracking-wider text-base leading-tight text-brand-gold drop-shadow-sm">
+            <span className="font-display font-black uppercase tracking-wider text-sm leading-tight text-white drop-shadow-sm">
               Balaji Chilkur
             </span>
-            <p className="text-[10px] uppercase font-bold tracking-widest text-[#F6EFE3]/50 mt-0.5">
+            <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 mt-0.5">
               Admin Portal
             </p>
           </div>
         </div>
         
         {/* Navigation */}
-        <nav className="flex-1 py-8 px-6 flex flex-col gap-2 overflow-y-auto">
+        <nav className="flex-1 py-6 px-4 flex flex-col gap-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
@@ -87,13 +87,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.path}
                 href={item.path}
-                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 font-sans text-sm font-semibold uppercase tracking-wider ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-[11px] font-bold uppercase tracking-wider border ${
                   isActive 
-                    ? 'bg-brand-gold text-brand-dark shadow-xl shadow-brand-gold/10 transform translate-x-1 border border-brand-gold/20' 
-                    : 'text-[#F6EFE3]/70 hover:bg-brand-gold/5 hover:text-brand-gold'
+                    ? 'bg-zinc-800 text-white shadow-sm border-zinc-700' 
+                    : 'text-zinc-400 border-transparent hover:bg-zinc-900/60 hover:text-zinc-200'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-brand-dark' : 'text-[#F6EFE3]/50 group-hover:text-brand-gold'} />
+                <Icon size={14} className={isActive ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-300'} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -101,12 +101,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
         
         {/* User Session Footer */}
-        <div className="p-6 border-t border-brand-gold/10 bg-black/10">
+        <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/20">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:bg-brand-accent hover:text-white transition-all duration-300 font-bold uppercase tracking-wider text-xs"
+            className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-lg bg-zinc-900/50 text-zinc-400 border border-zinc-800 hover:bg-zinc-900 hover:text-zinc-200 transition-all duration-200 font-bold uppercase tracking-wider text-[10px]"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             <span>Sign Out</span>
           </button>
         </div>
@@ -115,24 +115,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Container */}
       <div className="flex-grow flex flex-col overflow-hidden relative">
         {/* Mobile Header Bar */}
-        <header className="lg:hidden w-full bg-brand-dark text-[#F6EFE3] px-6 py-4 flex justify-between items-center border-b border-brand-gold/10 shadow-lg z-30">
+        <header className="lg:hidden w-full bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800 z-30">
           <div className="flex items-center gap-3">
-            <img src="/bsd-logo.png" alt="Logo" className="w-10 h-10 object-contain p-0.5 bg-[#F6EFE3] rounded-full" />
-            <span className="font-display font-black uppercase text-sm tracking-wider text-brand-gold">
+            <img src="/bsd-logo.png" alt="Logo" className="w-8 h-8 object-contain p-0.5 bg-zinc-800 rounded-full border border-zinc-700" />
+            <span className="font-display font-black uppercase text-xs tracking-wider text-white">
               BSD Admin
             </span>
           </div>
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-brand-gold hover:bg-white/5 rounded-xl transition-colors"
+            className="p-2 text-zinc-300 hover:bg-zinc-900 rounded-lg transition-colors"
           >
-            {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+            {mobileMenuOpen ? <X size={20} /> : <MenuIcon size={20} />}
           </button>
         </header>
 
         {/* Content Area */}
         <main className="flex-grow overflow-y-auto p-6 md:p-10 pb-28 lg:pb-10 relative">
-          <div className="absolute inset-0 noise-overlay opacity-[0.015] pointer-events-none" />
+          <div className="absolute inset-0 noise-overlay opacity-[0.01] pointer-events-none" />
           <div className="relative z-10 max-w-7xl mx-auto">
             {children}
           </div>
@@ -142,8 +142,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Drawer (Fallback Navigation) */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 bg-brand-dark/95 z-40 backdrop-blur-md flex flex-col pt-24 px-6 pb-6">
-            <nav className="flex-grow flex flex-col gap-3">
+          <div className="lg:hidden fixed inset-0 bg-zinc-950/95 z-40 backdrop-blur-md flex flex-col pt-24 px-6 pb-6">
+            <nav className="flex-grow flex flex-col gap-2 overflow-y-auto">
               {navItems.map((item) => {
                 const isActive = pathname === item.path;
                 const Icon = item.icon;
@@ -152,27 +152,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={item.path}
                     href={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-semibold uppercase tracking-wider text-sm ${
+                    className={`flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all font-bold uppercase tracking-wider text-xs border ${
                       isActive 
-                        ? 'bg-brand-gold text-brand-dark' 
-                        : 'text-[#F6EFE3]/70 hover:bg-white/5 hover:text-white'
+                        ? 'bg-zinc-800 text-white border-zinc-700' 
+                        : 'text-zinc-400 border-transparent hover:bg-zinc-900 hover:text-zinc-200'
                     }`}
                   >
-                    <Icon size={20} />
+                    <Icon size={16} />
                     <span>{item.name}</span>
                   </Link>
                 );
               })}
             </nav>
-            <div className="mt-auto border-t border-brand-gold/10 pt-6">
+            <div className="mt-auto border-t border-zinc-800 pt-6">
               <button 
                 onClick={() => {
                   setMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-brand-accent text-white font-bold uppercase tracking-widest text-sm shadow-lg shadow-brand-accent/20"
+                className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl bg-zinc-900 text-zinc-300 border border-zinc-800 font-bold uppercase tracking-widest text-xs"
               >
-                <LogOut size={18} />
+                <LogOut size={16} />
                 <span>Logout</span>
               </button>
             </div>
