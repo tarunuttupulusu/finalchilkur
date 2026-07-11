@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
 
@@ -182,6 +183,11 @@ export async function POST(request: Request) {
         body
       );
 
+      if (isPublish) {
+        revalidatePath('/');
+        revalidatePath('/about');
+      }
+
       return NextResponse.json({ success: true });
     }
 
@@ -210,6 +216,9 @@ export async function POST(request: Request) {
       oldParsed,
       value
     );
+
+    revalidatePath('/');
+    revalidatePath('/about');
 
     return NextResponse.json({ success: true, setting });
   } catch (error: any) {
