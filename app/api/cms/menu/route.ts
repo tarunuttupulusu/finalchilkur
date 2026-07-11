@@ -128,9 +128,11 @@ export async function POST(request: Request) {
       });
 
       await logAdminAction(user.id, user.email, 'CREATE_CATEGORY', `Category: ${category.name}`, null, category);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, category });
     } 
@@ -171,9 +173,11 @@ export async function POST(request: Request) {
       });
 
       await logAdminAction(user.id, user.email, 'CREATE_DISH', `Dish: ${dish.name}`, null, dish);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, dish });
     }
@@ -218,9 +222,11 @@ export async function PUT(request: Request) {
       });
 
       await logAdminAction(user.id, user.email, 'UPDATE_CATEGORY', `Category: ${category.name}`, oldVal, category);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, category });
     }
@@ -257,9 +263,11 @@ export async function PUT(request: Request) {
       });
 
       await logAdminAction(user.id, user.email, 'UPDATE_DISH', `Dish: ${dish.name}`, oldVal, dish);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, dish });
     }
@@ -297,9 +305,11 @@ export async function DELETE(request: Request) {
       await prisma.category.delete({ where: { id } });
 
       await logAdminAction(user.id, user.email, 'DELETE_CATEGORY', `Category: ${category.name}`, category, null);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, message: 'Category deleted successfully' });
     }
@@ -313,9 +323,11 @@ export async function DELETE(request: Request) {
       await prisma.dish.delete({ where: { id } });
 
       await logAdminAction(user.id, user.email, 'DELETE_DISH', `Dish: ${dish.name}`, dish, null);
-      revalidatePath('/menu');
-      revalidatePath('/');
-      revalidateTag('menu-items');
+      await Promise.all([
+        revalidatePath('/menu'),
+        revalidatePath('/'),
+        revalidateTag('menu-items')
+      ]);
 
       return NextResponse.json({ success: true, message: 'Dish deleted successfully' });
     }

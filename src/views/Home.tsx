@@ -198,9 +198,10 @@ export const Home: React.FC = () => {
             cache: 'no-store',
             next: { revalidate: 0 },
             headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate',
               'Pragma': 'no-cache',
-              'Expires': '0'
+              'Expires': '0',
+              'X-Cache-Bust': Date.now().toString()
             }
           }),
           fetch('/api/cms/offers?activeOnly=true&homepageOnly=true'),
