@@ -679,25 +679,35 @@ export const Home: React.FC = () => {
             style={{ scrollSnapType: 'none', WebkitOverflowScrolling: 'touch' }}
           >
             <div className="flex space-x-6 shrink-0">
-              {/* Duplicated array to allow seamless scrolling wrap-around loop */}
-              {[...listGallery, ...listGallery].map((photo, index) => (
-                <div 
-                  key={`${photo.id}-${index}`}
-                  className="relative overflow-hidden rounded-2xl bg-brand-dark group aspect-square w-72 md:w-80 shrink-0 shadow-md pointer-events-none"
-                >
-                  <img 
-                    src={photo.src} 
-                    alt={photo.title}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-brand-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                    <p className="font-display font-bold text-[#F6EFE3] text-base leading-tight">
-                      {photo.title}
-                    </p>
+              {(() => {
+                // Drop duplicate photo entries entirely by tracking seen ids
+                const seen = new Set();
+                const uniqueGallery = listGallery.filter(photo => {
+                  if (!photo.id) return false;
+                  if (seen.has(photo.id)) return false;
+                  seen.add(photo.id);
+                  return true;
+                });
+
+                return uniqueGallery.map((photo) => (
+                  <div 
+                    key={photo.id}
+                    className="relative overflow-hidden rounded-2xl bg-brand-dark group aspect-square w-72 md:w-80 shrink-0 shadow-md pointer-events-none"
+                  >
+                    <img 
+                      src={photo.src} 
+                      alt={photo.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-brand-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <p className="font-display font-bold text-[#F6EFE3] text-base leading-tight">
+                        {photo.title}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
           </div>
         </section>
