@@ -50,15 +50,16 @@ export default function ReservationsClient({ initialReservations }: { initialRes
   }
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
+    const discountVerified = (newStatus === 'arrived' || newStatus === 'completed');
     try {
       const res = await fetch('/api/reservations', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status: newStatus })
+        body: JSON.stringify({ id, status: newStatus, discountVerified })
       });
       const data = await res.json();
       if (data.success) {
-        setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+        setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus, discountVerified } : r));
       }
     } catch (e) {
       console.error(e);
@@ -66,15 +67,17 @@ export default function ReservationsClient({ initialReservations }: { initialRes
   };
 
   const handleToggleClaim = async (id: string, currentClaimed: boolean) => {
+    const nextClaimed = !currentClaimed;
+    const nextStatus = nextClaimed ? 'arrived' : 'pending';
     try {
       const res = await fetch('/api/reservations', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, discountVerified: !currentClaimed })
+        body: JSON.stringify({ id, discountVerified: nextClaimed, status: nextStatus })
       });
       const data = await res.json();
       if (data.success) {
-        setReservations(prev => prev.map(r => r.id === id ? { ...r, discountVerified: !currentClaimed } : r));
+        setReservations(prev => prev.map(r => r.id === id ? { ...r, discountVerified: nextClaimed, status: nextStatus } : r));
       }
     } catch (e) {
       console.error(e);
@@ -127,6 +130,19 @@ export default function ReservationsClient({ initialReservations }: { initialRes
     setDate('');
     setTime('19:00');
     setSpecialInstructions('');
+  };
+
+  const isOptionDisabled = (currentStatus: string, optionValue: string) => {
+    if (currentStatus === optionValue) return false;
+    if (currentStatus === 'completed' || currentStatus === 'cancelled') return true;
+    
+    if (currentStatus === 'arrived') {
+      return optionValue === 'pending' || optionValue === 'confirmed';
+    }
+    if (currentStatus === 'confirmed') {
+      return optionValue === 'pending';
+    }
+    return false;
   };
 
   const filtered = reservations.filter((res) => {
@@ -274,11 +290,11 @@ export default function ReservationsClient({ initialReservations }: { initialRes
                           'bg-zinc-50 text-zinc-600 border-zinc-200'
                         }`}
                       >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="arrived">Arrived</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="pending" disabled={isOptionDisabled(res.status, 'pending')}>Pending</option>
+                        <option value="confirmed" disabled={isOptionDisabled(res.status, 'confirmed')}>Confirmed</option>
+                        <option value="arrived" disabled={isOptionDisabled(res.status, 'arrived')}>Arrived/Claimed</option>
+                        <option value="completed" disabled={isOptionDisabled(res.status, 'completed')}>Completed</option>
+                        <option value="cancelled" disabled={isOptionDisabled(res.status, 'cancelled')}>Cancelled</option>
                       </select>
                     </td>
                     <td className="p-5 pr-6 text-right font-sans text-zinc-400">
