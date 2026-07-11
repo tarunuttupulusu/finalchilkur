@@ -181,7 +181,7 @@ export default function MenuCMS() {
     setDishScheduleTimings('');
   };
 
-  const handleEditDishClick = (dish: any) => {
+  const handleEditDishClick = React.useCallback((dish: any) => {
     setEditingDish(dish);
     setDishName(dish.name);
     setDishTeluguName(dish.teluguName || '');
@@ -199,24 +199,27 @@ export default function MenuCMS() {
     setDishScheduleDays(dish.scheduleDays || []);
     setDishScheduleTimings(dish.scheduleTimings || '');
     setIsDishModalOpen(true);
-  };
+  }, []);
 
-  const handleDeleteDish = async (id: string) => {
+  const handleDeleteDish = React.useCallback(async (id: string) => {
     if (!confirm('Are you sure you want to delete this dish?')) return;
     try {
       const res = await fetch(`/api/cms/menu?action=dish&id=${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
-        loadMenuData();
+        setCategories(prev => prev.map(cat => ({
+          ...cat,
+          dishes: cat.dishes.filter((d: any) => d.id !== id)
+        })));
       } else {
         alert(data.error);
       }
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  const handleDuplicateDish = async (dish: any) => {
+  const handleDuplicateDish = React.useCallback(async (dish: any) => {
     if (!confirm(`Duplicate "${dish.name}"?`)) return;
     try {
       const res = await fetch('/api/cms/menu', {
@@ -249,10 +252,10 @@ export default function MenuCMS() {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
   // Toggle quick badges
-  const handleToggleStock = async (dish: any) => {
+  const handleToggleStock = React.useCallback(async (dish: any) => {
     try {
       const res = await fetch('/api/cms/menu', {
         method: 'PUT',
@@ -268,14 +271,20 @@ export default function MenuCMS() {
       });
       const data = await res.json();
       if (data.success) {
-        loadMenuData();
+        setCategories(prev => prev.map(cat => {
+          if (cat.id !== dish.categoryId) return cat;
+          return {
+            ...cat,
+            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isOutOfStock: !dish.isOutOfStock } : d)
+          };
+        }));
       }
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  const handleToggleHide = async (dish: any) => {
+  const handleToggleHide = React.useCallback(async (dish: any) => {
     try {
       const res = await fetch('/api/cms/menu', {
         method: 'PUT',
@@ -291,12 +300,18 @@ export default function MenuCMS() {
       });
       const data = await res.json();
       if (data.success) {
-        loadMenuData();
+        setCategories(prev => prev.map(cat => {
+          if (cat.id !== dish.categoryId) return cat;
+          return {
+            ...cat,
+            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isHidden: !dish.isHidden } : d)
+          };
+        }));
       }
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
   // File Upload Helper
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -405,16 +420,16 @@ export default function MenuCMS() {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Top Header Card */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border border-brand-dark/5">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-brand-accent flex items-center gap-2">
-            <Sparkles size={14} className="text-brand-gold animate-pulse" />
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+            <Sparkles size={12} className="text-zinc-400" />
             Premium Restaurant CMS
           </span>
-          <h1 className="font-display text-3xl font-black text-brand-dark mt-2">
+          <h1 className="font-display text-2xl font-black text-zinc-800 mt-2">
             Menu Management
           </h1>
-          <p className="text-sm text-brand-dark/60 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             Configure dishes, categories, dynamic schedules, pricing, and vegetarian badges.
           </p>
         </div>
@@ -422,16 +437,16 @@ export default function MenuCMS() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-brand-dark/10 hover:border-brand-accent text-brand-dark font-bold uppercase tracking-wider text-xs shadow-sm transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-zinc-700 font-bold uppercase tracking-wider text-[10px] transition-all shadow-sm"
           >
-            <Download size={14} />
+            <Download size={12} />
             <span>Export CSV</span>
           </button>
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white border border-brand-dark/10 hover:border-brand-accent text-brand-dark font-bold uppercase tracking-wider text-xs shadow-sm transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-zinc-700 font-bold uppercase tracking-wider text-[10px] transition-all shadow-sm"
           >
-            <Upload size={14} />
+            <Upload size={12} />
             <span>Import CSV</span>
           </button>
           <button
@@ -441,9 +456,9 @@ export default function MenuCMS() {
               setCategoryDescription('');
               setIsCategoryModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand-dark hover:bg-brand-dark/95 text-white font-bold uppercase tracking-wider text-xs shadow-md transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-850 hover:bg-zinc-900 text-white font-bold uppercase tracking-wider text-[10px] shadow-sm transition-all"
           >
-            <Plus size={14} />
+            <Plus size={12} />
             <span>Add Category</span>
           </button>
           <button
@@ -452,9 +467,9 @@ export default function MenuCMS() {
               if (categories.length > 0) setDishCategoryId(categories[0].id);
               setIsDishModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand-accent hover:bg-brand-accent/90 text-white font-bold uppercase tracking-wider text-xs shadow-lg shadow-brand-accent/20 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-900 text-white font-bold uppercase tracking-wider text-[10px] border border-zinc-700 transition-all shadow-sm"
           >
-            <Plus size={14} />
+            <Plus size={12} />
             <span>Add Food Item</span>
           </button>
         </div>
@@ -462,46 +477,46 @@ export default function MenuCMS() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24">
-          <Loader2 className="animate-spin text-brand-accent mb-4" size={48} />
-          <p className="font-display text-lg font-bold text-brand-dark">Fetching live menu schema...</p>
+          <Loader2 className="animate-spin text-zinc-500 mb-4" size={48} />
+          <p className="font-display text-base font-bold text-zinc-700">Fetching live menu schema...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Categories Sidebar List */}
           <div className="lg:col-span-3 space-y-4">
-            <h2 className="font-display text-lg font-bold text-brand-dark flex items-center gap-2 px-1">
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-2 px-1">
               <span>Categories</span>
-              <span className="text-xs bg-brand-accent/10 text-brand-accent px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full border border-zinc-200">
                 {categories.length}
               </span>
             </h2>
             
-            <div className="bg-white rounded-3xl p-4 shadow-sm border border-brand-dark/5 space-y-1">
+            <div className="bg-white rounded-2xl p-4 border border-zinc-200 space-y-1 shadow-sm">
               <button
                 onClick={() => setSelectedCategoryFilter('All')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-left text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-xs font-bold uppercase tracking-wider transition-all ${
                   selectedCategoryFilter === 'All'
-                    ? 'bg-brand-accent/10 text-brand-accent font-black'
-                    : 'text-brand-dark hover:bg-brand-dark/5'
+                    ? 'bg-zinc-800 text-white font-bold'
+                    : 'text-zinc-600 hover:bg-zinc-50'
                 }`}
               >
                 <span>All Categories</span>
-                <ChevronRight size={14} />
+                <ChevronRight size={12} />
               </button>
 
               {categories.map((cat) => (
                 <div key={cat.id} className="group relative">
                   <button
                     onClick={() => setSelectedCategoryFilter(cat.name)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-left text-xs font-bold uppercase tracking-wider transition-all pr-12 ${
+                    className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-xs font-bold uppercase tracking-wider transition-all pr-12 ${
                       selectedCategoryFilter === cat.name
-                        ? 'bg-brand-accent/10 text-brand-accent font-black'
-                        : 'text-brand-dark hover:bg-brand-dark/5'
+                        ? 'bg-zinc-800 text-white font-bold'
+                        : 'text-zinc-600 hover:bg-zinc-50'
                     }`}
                   >
                     <span className="truncate">{cat.name}</span>
-                    <span className="text-[10px] text-brand-dark/40 font-mono">({cat.dishes?.length || 0})</span>
+                    <span className={`text-[9px] font-mono ${selectedCategoryFilter === cat.name ? 'text-zinc-300' : 'text-zinc-400'}`}>({cat.dishes?.length || 0})</span>
                   </button>
 
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -512,14 +527,14 @@ export default function MenuCMS() {
                         setCategoryDescription(cat.description || '');
                         setIsCategoryModalOpen(true);
                       }}
-                      className="p-1 hover:text-brand-accent transition-colors"
+                      className={`p-1 transition-colors ${selectedCategoryFilter === cat.name ? 'text-zinc-300 hover:text-white' : 'text-zinc-400 hover:text-zinc-700'}`}
                       title="Edit Category"
                     >
                       <Edit size={12} />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(cat.id)}
-                      className="p-1 hover:text-red-500 transition-colors"
+                      className="p-1 text-rose-500 hover:text-rose-700 transition-colors"
                       title="Delete Category"
                     >
                       <Trash2 size={12} />
@@ -534,38 +549,38 @@ export default function MenuCMS() {
           <div className="lg:col-span-9 space-y-6">
             
             {/* Search Bar & Badge Filters */}
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-brand-dark/5 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-zinc-200 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
               <div className="relative w-full md:w-80">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-dark/40" size={16} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
                 <input
                   type="text"
                   placeholder="Search food by name, code, telugu..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#ECE3D4]/20 border border-brand-dark/10 rounded-2xl pl-10 pr-4 py-3 text-xs font-sans focus:outline-none focus:border-brand-accent transition-colors"
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-sans focus:outline-none focus:border-zinc-400 transition-colors placeholder:text-zinc-400 text-zinc-800"
                 />
               </div>
 
               <div className="flex items-center gap-2 self-stretch md:self-auto overflow-x-auto no-scrollbar">
                 <button
                   onClick={() => setVegFilter('All')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${
+                  className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all ${
                     vegFilter === 'All'
-                      ? 'bg-brand-dark text-white border-brand-dark'
-                      : 'bg-white text-brand-dark border-brand-dark/10 hover:border-brand-dark/20'
+                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-sm'
+                      : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300'
                   }`}
                 >
                   All Food
                 </button>
                 <button
                   onClick={() => setVegFilter('Veg')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all flex items-center gap-1.5 ${
                     vegFilter === 'Veg'
-                      ? 'bg-green-600 text-white border-green-600'
-                      : 'bg-white text-green-600 border-brand-dark/10 hover:border-brand-dark/20'
+                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-sm'
+                      : 'bg-white text-emerald-700 border-zinc-200 hover:border-zinc-300'
                   }`}
                 >
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block border border-white" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block border border-white animate-pulse" />
                   Veg Only
                 </button>
               </div>
@@ -573,151 +588,23 @@ export default function MenuCMS() {
 
             {/* Dishes list grid */}
             {allDishes.length === 0 ? (
-              <div className="bg-white rounded-3xl p-16 border border-brand-dark/5 text-center flex flex-col items-center">
-                <AlertCircle className="text-brand-dark/30 mb-4" size={48} />
-                <h3 className="font-display text-lg font-bold text-brand-dark">No Food Items Found</h3>
-                <p className="text-sm text-brand-dark/50 mt-1">Try resetting your filters or add a new menu item.</p>
+              <div className="bg-white rounded-2xl p-16 border border-zinc-200 text-center flex flex-col items-center">
+                <AlertCircle className="text-zinc-400 mb-4" size={48} />
+                <h3 className="font-display text-base font-bold text-zinc-700">No Food Items Found</h3>
+                <p className="text-xs text-zinc-500 mt-1">Try resetting your filters or add a new menu item.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {allDishes.map((dish) => (
-                  <div 
+                  <FoodCard 
                     key={dish.id} 
-                    className={`bg-white rounded-3xl border border-brand-dark/5 overflow-hidden shadow-sm flex flex-col justify-between transition-all hover:shadow-md ${
-                      dish.isHidden ? 'opacity-65 border-dashed' : ''
-                    }`}
-                  >
-                    <div>
-                      {/* Dish Image header */}
-                      <div className="relative h-40 bg-brand-dark">
-                        <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        
-                        {/* Badges on Image */}
-                        <div className="absolute top-4 left-4 flex flex-wrap gap-1">
-                          <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border tracking-wider flex items-center gap-1 bg-white ${
-                            dish.isVegetarian ? 'text-green-600 border-green-600/30' : 'text-red-600 border-red-600/30'
-                          }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${dish.isVegetarian ? 'bg-green-500' : 'bg-red-500'}`} />
-                            {dish.isVegetarian ? 'Veg' : 'Egg/NonVeg'}
-                          </span>
-
-                          {dish.isBestseller && (
-                            <span className="bg-brand-gold text-brand-dark border border-brand-gold/30 px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                              🔥 Bestseller
-                            </span>
-                          )}
-                          {dish.isChefSpecial && (
-                            <span className="bg-brand-accent text-white border border-brand-accent/30 px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                              👨‍🍳 Chef Special
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Top-Right Quick Toggle Indicators */}
-                        <div className="absolute top-4 right-4 flex gap-1">
-                          <button
-                            onClick={() => handleToggleHide(dish)}
-                            className="p-2 rounded-lg bg-black/50 text-[#F6EFE3] hover:bg-black/75 transition-colors"
-                            title={dish.isHidden ? 'Show on Public Site' : 'Hide from Public Site'}
-                          >
-                            {dish.isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
-                          </button>
-                        </div>
-
-                        {/* Bottom Category/Price tag */}
-                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-gold bg-black/40 px-2 py-0.5 rounded backdrop-blur-sm">
-                            {dish.categoryName}
-                          </span>
-                          <span className="font-display font-black text-brand-gold text-lg">
-                            ₹{dish.price}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content block */}
-                      <div className="p-6 space-y-3">
-                        <div className="flex justify-between items-start gap-2">
-                          <div>
-                            <h3 className="font-display font-bold text-brand-dark text-base">{dish.name}</h3>
-                            {dish.teluguName && (
-                              <p className="text-xs font-semibold text-brand-dark/40 font-sans mt-0.5">{dish.teluguName}</p>
-                            )}
-                          </div>
-                          
-                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                            dish.isOutOfStock ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                          }`}>
-                            {dish.isOutOfStock ? 'Out of Stock' : 'In Stock'}
-                          </span>
-                        </div>
-
-                        <p className="text-xs text-brand-dark/60 font-sans line-clamp-2">
-                          {dish.description || 'No description provided.'}
-                        </p>
-
-                        {/* Scheduling Information */}
-                        {(dish.scheduleDays?.length > 0 || dish.scheduleTimings) && (
-                          <div className="pt-2 border-t border-brand-dark/5 flex items-center gap-3 text-[10px] text-brand-dark/50">
-                            {dish.scheduleDays?.length > 0 && (
-                              <div className="flex items-center gap-1">
-                                <Calendar size={12} />
-                                <span>{dish.scheduleDays.length} Days</span>
-                              </div>
-                            )}
-                            {dish.scheduleTimings && (
-                              <div className="flex items-center gap-1">
-                                <Clock size={12} />
-                                <span>{dish.scheduleTimings}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions bar */}
-                    <div className="px-6 py-4 bg-[#ECE3D4]/25 border-t border-brand-dark/5 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs text-brand-dark/40 font-sans">
-                        <span>Last edit: {new Date(dish.updatedAt).toLocaleDateString()}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleToggleStock(dish)}
-                          className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider border transition-colors ${
-                            dish.isOutOfStock
-                              ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                              : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
-                          }`}
-                        >
-                          {dish.isOutOfStock ? 'Set In Stock' : 'Out of Stock'}
-                        </button>
-                        <button
-                          onClick={() => handleDuplicateDish(dish)}
-                          className="p-2 text-brand-dark/60 hover:text-brand-dark hover:bg-brand-dark/5 rounded-lg transition-all"
-                          title="Duplicate Dish"
-                        >
-                          <Copy size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleEditDishClick(dish)}
-                          className="p-2 text-brand-accent hover:text-brand-accent/90 hover:bg-brand-accent/5 rounded-lg transition-all"
-                          title="Edit Food Item"
-                        >
-                          <Edit size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteDish(dish.id)}
-                          className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                          title="Delete Food Item"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    dish={dish}
+                    onToggleStock={handleToggleStock}
+                    onToggleHide={handleToggleHide}
+                    onDuplicate={handleDuplicateDish}
+                    onEdit={handleEditDishClick}
+                    onDelete={handleDeleteDish}
+                  />
                 ))}
               </div>
             )}
@@ -1099,3 +986,166 @@ export default function MenuCMS() {
     </div>
   );
 }
+
+interface FoodCardProps {
+  dish: any;
+  onToggleStock: (dish: any) => void;
+  onToggleHide: (dish: any) => void;
+  onDuplicate: (dish: any) => void;
+  onEdit: (dish: any) => void;
+  onDelete: (id: string) => void;
+}
+
+const FoodCard = React.memo(function FoodCard({
+  dish,
+  onToggleStock,
+  onToggleHide,
+  onDuplicate,
+  onEdit,
+  onDelete
+}: FoodCardProps) {
+  return (
+    <div 
+      className={`bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between transition-all hover:shadow-md ${
+        dish.isOutOfStock || dish.isHidden ? 'opacity-65 border-dashed bg-zinc-50' : ''
+      }`}
+    >
+      <div>
+        {/* Dish Image header */}
+        <div className={`relative h-40 bg-zinc-950 overflow-hidden ${dish.isOutOfStock ? 'opacity-50 grayscale' : ''}`}>
+          <img src={dish.image} alt={dish.name} className="w-full h-full object-cover transition-all duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+          
+          {/* Badges on Image */}
+          <div className="absolute top-4 left-4 flex flex-wrap gap-1">
+            <span className={`px-2 py-0.5 rounded text-[8px] font-extrabold uppercase border tracking-wider flex items-center gap-1.5 ${
+              dish.isVegetarian 
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-100' 
+                : 'bg-zinc-100 text-zinc-800 border-zinc-200'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${dish.isVegetarian ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
+              {dish.isVegetarian ? 'Veg' : 'Egg/NonVeg'}
+            </span>
+
+            {dish.isBestseller && (
+              <span className="bg-zinc-100 text-zinc-800 border border-zinc-200 px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider">
+                🔥 Bestseller
+              </span>
+            )}
+            
+            {dish.isChefSpecial && (
+              <span className="bg-zinc-800 text-white border border-zinc-700 px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider">
+                👨‍🍳 Chef Special
+              </span>
+            )}
+
+            {dish.isOutOfStock && (
+              <span className="bg-rose-50 text-rose-800 border border-rose-100 px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider">
+                🚫 Out of Stock
+              </span>
+            )}
+          </div>
+
+          {/* Top-Right Quick Toggle Indicators */}
+          <div className="absolute top-4 right-4 flex gap-1">
+            <button
+              onClick={() => onToggleHide(dish)}
+              className="p-1.5 rounded-lg bg-black/40 text-zinc-100 hover:bg-black/60 transition-colors"
+              title={dish.isHidden ? 'Show on Public Site' : 'Hide from Public Site'}
+            >
+              {dish.isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
+            </button>
+          </div>
+
+          {/* Bottom Category/Price tag */}
+          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-300 bg-black/45 px-2 py-0.5 rounded backdrop-blur-sm">
+              {dish.categoryName}
+            </span>
+            <span className="font-display font-black text-white text-lg font-mono">
+              ₹{dish.price}
+            </span>
+          </div>
+        </div>
+
+        {/* Content block */}
+        <div className={`p-5 space-y-2 ${dish.isOutOfStock ? 'text-zinc-400' : ''}`}>
+          <div className="flex justify-between items-start gap-2">
+            <div>
+              <h3 className={`font-display font-bold text-sm ${dish.isOutOfStock ? 'text-zinc-500 line-through' : 'text-zinc-800'}`}>{dish.name}</h3>
+              {dish.teluguName && (
+                <p className="text-[10px] font-semibold text-zinc-400 font-sans mt-0.5">{dish.teluguName}</p>
+              )}
+            </div>
+          </div>
+
+          <p className="text-[11px] text-zinc-500 font-sans line-clamp-2">
+            {dish.description || 'No description provided.'}
+          </p>
+
+          {/* Scheduling Information */}
+          {(dish.scheduleDays?.length > 0 || dish.scheduleTimings) && (
+            <div className="pt-2 border-t border-zinc-100 flex items-center gap-3 text-[9px] text-zinc-400">
+              {dish.scheduleDays?.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <Calendar size={10} />
+                  <span>{dish.scheduleDays.length} Days</span>
+                </div>
+              )}
+              {dish.scheduleTimings && (
+                <div className="flex items-center gap-1">
+                  <Clock size={10} />
+                  <span>{dish.scheduleTimings}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Actions bar */}
+      <div className="px-5 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[9px] text-zinc-400 font-sans">
+          <span>Last edit: {new Date(dish.updatedAt).toLocaleDateString()}</span>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => onToggleStock(dish)}
+            className={`px-2.5 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-wider border transition-all ${
+              dish.isOutOfStock
+                ? 'bg-zinc-800 text-white border-zinc-700 hover:bg-zinc-900'
+                : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:bg-zinc-200'
+            }`}
+          >
+            {dish.isOutOfStock ? 'Restock Item' : 'Mark Out of Stock'}
+          </button>
+          
+          <button
+            onClick={() => onDuplicate(dish)}
+            className="p-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 rounded-lg transition-all"
+            title="Duplicate Dish"
+          >
+            <Copy size={12} />
+          </button>
+          
+          <button
+            onClick={() => onEdit(dish)}
+            className="p-1.5 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 rounded-lg transition-all"
+            title="Edit Food Item"
+          >
+            <Edit size={12} />
+          </button>
+          
+          <button
+            onClick={() => onDelete(dish.id)}
+            className="p-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all"
+            title="Delete Food Item"
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+});
