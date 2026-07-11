@@ -256,60 +256,102 @@ export default function MenuCMS() {
 
   // Toggle quick badges
   const handleToggleStock = React.useCallback(async (dish: any) => {
+    // 1. Optimistic UI update
+    setCategories(prev => prev.map(cat => {
+      if (cat.id !== dish.categoryId) return cat;
+      return {
+        ...cat,
+        dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isOutOfStock: !dish.isOutOfStock } : d)
+      };
+    }));
+
     try {
       const res = await fetch('/api/cms/menu', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'dish',
+          type: 'dish',
           id: dish.id,
-          name: dish.name,
-          price: dish.price,
-          categoryId: dish.categoryId,
-          isOutOfStock: !dish.isOutOfStock
+          data: {
+            name: dish.name,
+            price: dish.price,
+            categoryId: dish.categoryId,
+            isOutOfStock: !dish.isOutOfStock
+          }
         })
       });
       const data = await res.json();
-      if (data.success) {
+      if (!data.success) {
+        // Rollback on server failure
         setCategories(prev => prev.map(cat => {
           if (cat.id !== dish.categoryId) return cat;
           return {
             ...cat,
-            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isOutOfStock: !dish.isOutOfStock } : d)
+            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isOutOfStock: dish.isOutOfStock } : d)
           };
         }));
+        alert(data.error || 'Failed to update stock status on server');
       }
     } catch (e) {
       console.error(e);
+      // Rollback on network failure
+      setCategories(prev => prev.map(cat => {
+        if (cat.id !== dish.categoryId) return cat;
+        return {
+          ...cat,
+          dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isOutOfStock: dish.isOutOfStock } : d)
+        };
+      }));
     }
   }, []);
 
   const handleToggleHide = React.useCallback(async (dish: any) => {
+    // 1. Optimistic UI update
+    setCategories(prev => prev.map(cat => {
+      if (cat.id !== dish.categoryId) return cat;
+      return {
+        ...cat,
+        dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isHidden: !dish.isHidden } : d)
+      };
+    }));
+
     try {
       const res = await fetch('/api/cms/menu', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'dish',
+          type: 'dish',
           id: dish.id,
-          name: dish.name,
-          price: dish.price,
-          categoryId: dish.categoryId,
-          isHidden: !dish.isHidden
+          data: {
+            name: dish.name,
+            price: dish.price,
+            categoryId: dish.categoryId,
+            isHidden: !dish.isHidden
+          }
         })
       });
       const data = await res.json();
-      if (data.success) {
+      if (!data.success) {
+        // Rollback on server failure
         setCategories(prev => prev.map(cat => {
           if (cat.id !== dish.categoryId) return cat;
           return {
             ...cat,
-            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isHidden: !dish.isHidden } : d)
+            dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isHidden: dish.isHidden } : d)
           };
         }));
+        alert(data.error || 'Failed to update visibility status on server');
       }
     } catch (e) {
       console.error(e);
+      // Rollback on network failure
+      setCategories(prev => prev.map(cat => {
+        if (cat.id !== dish.categoryId) return cat;
+        return {
+          ...cat,
+          dishes: cat.dishes.map((d: any) => d.id === dish.id ? { ...d, isHidden: dish.isHidden } : d)
+        };
+      }));
     }
   }, []);
 
@@ -1004,6 +1046,20 @@ const FoodCard = React.memo(function FoodCard({
   onEdit,
   onDelete
 }: FoodCardProps) {
+  const formatLastEditDate = (dateString: any) => {
+    if (!dateString) return "Never Modified";
+    const parsedDate = Date.parse(dateString);
+    return isNaN(parsedDate) 
+      ? "Never Modified" 
+      : new Date(parsedDate).toLocaleDateString('en-IN', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric',
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+  };
+
   return (
     <div 
       className={`bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between transition-all hover:shadow-md ${
@@ -1106,7 +1162,7 @@ const FoodCard = React.memo(function FoodCard({
       {/* Actions bar */}
       <div className="px-5 py-3.5 bg-zinc-50/50 border-t border-zinc-100 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[9px] text-zinc-400 font-sans">
-          <span>Last edit: {new Date(dish.updatedAt).toLocaleDateString()}</span>
+          <span>Last edit: {formatLastEditDate(dish.lastModifiedAt)}</span>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -1114,8 +1170,8 @@ const FoodCard = React.memo(function FoodCard({
             onClick={() => onToggleStock(dish)}
             className={`px-2.5 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-wider border transition-all ${
               dish.isOutOfStock
-                ? 'bg-zinc-800 text-white border-zinc-700 hover:bg-zinc-900'
-                : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:bg-zinc-200'
+                ? 'bg-zinc-850 text-white border-zinc-700 hover:bg-zinc-900'
+                : 'bg-zinc-100 text-zinc-750 border-zinc-200 hover:bg-zinc-200'
             }`}
           >
             {dish.isOutOfStock ? 'Restock Item' : 'Mark Out of Stock'}
