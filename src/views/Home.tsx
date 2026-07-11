@@ -194,7 +194,12 @@ export const Home: React.FC = () => {
         
         const [settingsRes, menuRes, offersRes, testimonialsRes, galleryRes, branchesRes] = await Promise.all([
           fetch(`/api/cms/homepage?draft=${previewMode}`),
-          fetch('/api/cms/menu'),
+          fetch('/api/cms/menu', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-store, max-age=0'
+            }
+          }),
           fetch('/api/cms/offers?activeOnly=true&homepageOnly=true'),
           fetch('/api/cms/testimonials?approvedOnly=true'),
           fetch('/api/cms/gallery?featured=true'),

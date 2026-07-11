@@ -291,6 +291,16 @@ export default function MenuCMS() {
           };
         }));
         alert(data.error || 'Failed to update stock status on server');
+      } else {
+        // Force an immediate background refetch mutation to keep UI coupled with live database
+        const freshRes = await fetch('/api/cms/menu', {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-store, max-age=0' }
+        });
+        const freshData = await freshRes.json();
+        if (freshData.success) {
+          setCategories(freshData.categories);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -341,6 +351,16 @@ export default function MenuCMS() {
           };
         }));
         alert(data.error || 'Failed to update visibility status on server');
+      } else {
+        // Force an immediate background refetch mutation to keep UI coupled with live database
+        const freshRes = await fetch('/api/cms/menu', {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-store, max-age=0' }
+        });
+        const freshData = await freshRes.json();
+        if (freshData.success) {
+          setCategories(freshData.categories);
+        }
       }
     } catch (e) {
       console.error(e);

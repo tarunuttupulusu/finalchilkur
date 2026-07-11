@@ -431,7 +431,12 @@ export const Menu: React.FC = () => {
   useEffect(() => {
     async function loadMenu() {
       try {
-        const res = await fetch('/api/cms/menu');
+        const res = await fetch('/api/cms/menu', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-store, max-age=0'
+          }
+        });
         const data = await res.json();
         if (data.success) {
           setMenuCategories(data.categories);
