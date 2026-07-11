@@ -433,9 +433,11 @@ export const Menu: React.FC = () => {
     try {
       const res = await fetch('/api/cms/menu', {
         cache: 'no-store',
+        next: { revalidate: 0 },
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
       const data = await res.json();

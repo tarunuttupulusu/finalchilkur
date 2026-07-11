@@ -196,8 +196,11 @@ export const Home: React.FC = () => {
           fetch(`/api/cms/homepage?draft=${previewMode}`),
           fetch('/api/cms/menu', {
             cache: 'no-store',
+            next: { revalidate: 0 },
             headers: {
-              'Cache-Control': 'no-store, max-age=0'
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
             }
           }),
           fetch('/api/cms/offers?activeOnly=true&homepageOnly=true'),
