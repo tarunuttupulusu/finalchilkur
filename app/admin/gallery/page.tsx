@@ -258,9 +258,17 @@ export default function GalleryCMS() {
     setShowAddAlbum(false);
   };
 
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [selectedAlbum]);
+
   const filteredPhotos = selectedAlbum === 'All'
     ? photos
     : photos.filter(p => p.albumName === selectedAlbum);
+
+  const displayedPhotos = filteredPhotos.slice(0, visibleCount);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -500,13 +508,13 @@ export default function GalleryCMS() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPhotos.map((photo, index) => (
+                {displayedPhotos.map((photo, index) => (
                   <div 
                     key={photo.id} 
                     className="bg-white border border-brand-dark/5 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between group"
                   >
                     <div className="relative aspect-square bg-brand-dark">
-                      <img src={photo.src} alt={photo.altText || photo.title} className="w-full h-full object-cover" />
+                      <img src={photo.src} alt={photo.altText || photo.title} loading="lazy" className="w-full h-full object-cover" />
                       
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
                         <div className="w-full flex justify-between items-end">
@@ -587,6 +595,18 @@ export default function GalleryCMS() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {visibleCount < filteredPhotos.length && (
+              <div className="flex justify-center pt-6">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount(prev => prev + 12)}
+                  className="px-6 py-3.5 rounded-2xl bg-brand-dark hover:bg-brand-dark/90 text-white font-display font-extrabold uppercase tracking-wider text-[10px] shadow-lg shadow-brand-dark/15 transition-all"
+                >
+                  Load More Images
+                </button>
               </div>
             )}
           </div>
