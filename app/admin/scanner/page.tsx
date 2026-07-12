@@ -188,14 +188,30 @@ export default function ScannerPage() {
 
     let payload: any = {};
 
-    // Validate if the string is a cryptographically signed Base64 token
-    if (sanitized.includes('.') && sanitized.split('.').length === 2) {
+    if (sanitized.includes('claimBonusToken=')) {
+      try {
+        const url = new URL(sanitized);
+        payload = {
+          isVoucher: true,
+          voucherToken: url.searchParams.get('claimBonusToken') || '',
+          billNo: url.searchParams.get('billNo') || '',
+          rewardAmt: url.searchParams.get('rewardAmt') || '',
+          discountPercent: url.searchParams.get('discountPercent') || '',
+          expiry: url.searchParams.get('expiry') || ''
+        };
+      } catch (err) {
+        payload = { isVoucher: true, voucherToken: sanitized };
+      }
+    } else if (sanitized.toUpperCase().startsWith('BSD-REWARD-')) {
+      payload = {
+        isVoucher: true,
+        voucherToken: sanitized.toUpperCase()
+      };
+    } else if (sanitized.includes('.') && sanitized.split('.').length === 2) {
       payload = { qrToken: sanitized };
     } else {
-      // Regex extraction pattern to strip external protocol strings and isolate Booking ID
       const match = sanitized.toUpperCase().match(/(RES-[A-Z0-9]{6,10})/);
       const extractedId = match ? match[1] : sanitized.toUpperCase();
-      
       payload = { bookingRef: extractedId };
     }
 
@@ -227,13 +243,37 @@ export default function ScannerPage() {
     setError(null);
     setScanResult(null);
 
-    const sanitizedCode = manualCode.replace(/[\r\n]+/g, "").trim().toUpperCase();
+    const sanitizedCode = manualCode.replace(/[\r\n]+/g, "").trim();
+    let payload: any = {};
+
+    if (sanitizedCode.includes('claimBonusToken=')) {
+      try {
+        const url = new URL(sanitizedCode);
+        payload = {
+          isVoucher: true,
+          voucherToken: url.searchParams.get('claimBonusToken') || '',
+          billNo: url.searchParams.get('billNo') || '',
+          rewardAmt: url.searchParams.get('rewardAmt') || '',
+          discountPercent: url.searchParams.get('discountPercent') || '',
+          expiry: url.searchParams.get('expiry') || ''
+        };
+      } catch (err) {
+        payload = { isVoucher: true, voucherToken: sanitizedCode };
+      }
+    } else if (sanitizedCode.toUpperCase().startsWith('BSD-REWARD-')) {
+      payload = {
+        isVoucher: true,
+        voucherToken: sanitizedCode.toUpperCase()
+      };
+    } else {
+      payload = { bookingRef: sanitizedCode.toUpperCase() };
+    }
 
     try {
       const res = await fetch('/api/admin/reservations/scan-qr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingRef: sanitizedCode })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
@@ -398,35 +438,86 @@ export default function ScannerPage() {
               <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-md">
                 <CheckCircle className="text-green-500" size={56} />
               </div>
-              <div>
-                <h2 className="text-2xl font-display font-black text-zinc-800">Ticket Verified!</h2>
-                <p className="text-emerald-700 font-bold text-xs uppercase tracking-widest mt-1">10% discount applied successfully</p>
-              </div>
               
-              <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
-                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
-                  <span className="font-bold text-zinc-400 uppercase">Booking ID</span>
-                  <span className="font-mono font-bold text-zinc-800">{scanResult.reservation.bookingRef}</span>
-                </div>
-                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
-                  <span className="font-bold text-zinc-400 uppercase">Customer</span>
-                  <span className="font-bold text-zinc-800">{scanResult.reservation.customerName}</span>
-                </div>
-                <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
-                  <span className="font-bold text-zinc-400 uppercase">Guests</span>
-                  <span className="font-bold text-zinc-800">{scanResult.reservation.guests} persons</span>
-                </div>
-                <div className="flex justify-between text-xs pt-1">
-                  <span className="font-bold text-zinc-400 uppercase">Claim Status</span>
-                  <span className="font-black text-green-700 bg-green-100 px-2 py-0.5 rounded uppercase text-[10px]">Verified</span>
-                </div>
-              </div>
+              {scanResult.isVoucher ? (
+                <>
+                  <div>
+                    <h2 className="text-2xl font-display font-black text-[#D35400]">Voucher Claimed!</h2>
+                    <p className="text-emerald-700 font-bold text-xs uppercase tracking-widest mt-1">
+                      ₹{scanResult.voucher.discountValue} discount applied successfully
+                    </p>
+                  </div>
+                  
+                  <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Voucher Code</span>
+                      <span className="font-mono font-bold text-[#D35400]">{scanResult.voucher.token}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Invoice Ref</span>
+                      <span className="font-mono font-bold text-zinc-800">{scanResult.voucher.billNo}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Category</span>
+                      <span className="font-bold text-zinc-800">{scanResult.voucher.discountCategory}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Discount Rate</span>
+                      <span className="font-bold text-zinc-800">{scanResult.voucher.discountPercent}%</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Discount Amount</span>
+                      <span className="font-bold text-[#D35400]">₹{scanResult.voucher.discountValue}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Expiry Date</span>
+                      <span className="font-mono font-bold text-zinc-800">
+                        {new Date(scanResult.voucher.expiryEpoch).toISOString().split('T')[0]}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Customer Phone</span>
+                      <span className="font-mono font-bold text-zinc-800">{scanResult.voucher.phone}</span>
+                    </div>
+                    <div className="flex justify-between text-xs pt-1">
+                      <span className="font-bold text-zinc-400 uppercase">Claim Status</span>
+                      <span className="font-black text-green-700 bg-green-100 px-2 py-0.5 rounded uppercase text-[10px]">Verified</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <h2 className="text-2xl font-display font-black text-zinc-800">Ticket Verified!</h2>
+                    <p className="text-emerald-700 font-bold text-xs uppercase tracking-widest mt-1">10% discount applied successfully</p>
+                  </div>
+                  
+                  <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Booking ID</span>
+                      <span className="font-mono font-bold text-zinc-800">{scanResult.reservation.bookingRef}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Customer</span>
+                      <span className="font-bold text-zinc-800">{scanResult.reservation.customerName}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
+                      <span className="font-bold text-zinc-400 uppercase">Guests</span>
+                      <span className="font-bold text-zinc-800">{scanResult.reservation.guests} persons</span>
+                    </div>
+                    <div className="flex justify-between text-xs pt-1">
+                      <span className="font-bold text-zinc-400 uppercase">Claim Status</span>
+                      <span className="font-black text-green-700 bg-green-100 px-2 py-0.5 rounded uppercase text-[10px]">Verified</span>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <button 
                 onClick={resetScanner}
                 className="w-full max-w-xs py-3.5 bg-zinc-800 text-white font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-900 border border-zinc-700 transition-colors shadow-sm"
               >
-                Verify Another Ticket
+                Verify Another Code
               </button>
             </div>
           )}
@@ -438,8 +529,8 @@ export default function ScannerPage() {
                 <XCircle className="text-red-500" size={56} />
               </div>
               <div>
-                <h2 className="text-2xl font-display font-black text-zinc-800">Invalid Ticket</h2>
-                <p className="text-red-500 font-bold text-xs uppercase tracking-widest mt-1">Verification Failed</p>
+                <h2 className="text-2xl font-display font-black text-zinc-800">Verification Failure</h2>
+                <p className="text-red-500 font-bold text-xs uppercase tracking-widest mt-1">Validation Rejected</p>
               </div>
               <p className="text-zinc-500 text-xs max-w-sm leading-relaxed">{error}</p>
               

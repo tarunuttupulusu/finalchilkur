@@ -11,6 +11,10 @@ export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [announcement, setAnnouncement] = useState<string | null>(null);
+  const [badgeText, setBadgeText] = useState('Special Offer');
+  const [badgeActive, setBadgeActive] = useState(true);
+  const [badgeColor, setBadgeColor] = useState('#D35400');
+  const [activeHash, setActiveHash] = useState('');
 
   useEffect(() => {
     async function fetchAnnouncement() {
@@ -25,6 +29,12 @@ export const Navbar: React.FC = () => {
           } else {
             setAnnouncement(null);
           }
+
+          // Fetch dynamic website configuration for booking badge
+          const webSettings = data.settings.website_settings || {};
+          setBadgeText(webSettings.bookingBadgeText || 'Special Offer');
+          setBadgeActive(webSettings.bookingBadgeActive !== false);
+          setBadgeColor(webSettings.bookingBadgeColor || '#D35400');
         }
       } catch (err) {
         console.error("Failed to load navbar announcement:", err);
@@ -40,10 +50,63 @@ export const Navbar: React.FC = () => {
       } else {
         setIsScrolled(false);
       }
+
+      // If we scroll back to the top of the homepage, clear the reviews hash highlight
+      if (window.scrollY < 200 && pathname === '/') {
+        setActiveHash('');
+      }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveHash(window.location.hash);
+    };
+    handleHashChange(); // initial check
+    window.addEventListener('hashchange', handleHashChange);
+
+    let observer: IntersectionObserver | null = null;
+    const reviewsEl = document.getElementById('reviews');
+
+    if (pathname === '/') {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveHash('#reviews');
+            } else {
+              setActiveHash((prev) => (prev === '#reviews' ? '' : prev));
+            }
+          });
+        },
+        { threshold: 0.2, rootMargin: '-10% 0px -10% 0px' }
+      );
+
+      if (reviewsEl) observer.observe(reviewsEl);
+    } else {
+      setActiveHash('');
+    }
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      if (observer && reviewsEl) observer.unobserve(reviewsEl);
+    };
+  }, [pathname]);
+
+  const isLinkActive = (path: string) => {
+    if (path.includes('#')) {
+      const parts = path.split('#');
+      const route = parts[0] || '/';
+      const hash = '#' + parts[1];
+      return pathname === route && activeHash === hash;
+    }
+    if (path === '/') {
+      return pathname === '/' && !activeHash;
+    }
+    return pathname === path;
+  };
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -57,6 +120,8 @@ export const Navbar: React.FC = () => {
   const handleLinkClick = (path: string) => {
     setIsOpen(false);
     if (path.includes('#')) {
+      const hash = '#' + path.split('#')[1];
+      setActiveHash(hash);
       const elementId = path.split('#')[1];
       setTimeout(() => {
         const element = document.getElementById(elementId);
@@ -64,6 +129,8 @@ export const Navbar: React.FC = () => {
           element.scrollIntoView({ behavior: 'smooth' });
         }
       }, 100);
+    } else {
+      setActiveHash('');
     }
   };
 
@@ -121,7 +188,7 @@ export const Navbar: React.FC = () => {
                 href={link.path}
                 onClick={() => handleLinkClick(link.path)}
                 className={`relative font-sans text-sm font-medium tracking-wide uppercase transition-colors duration-300 py-1 ${
-                  pathname === link.path 
+                  isLinkActive(link.path) 
                     ? 'text-brand-gold' 
                     : isScrolled 
                       ? 'text-brand-dark hover:text-brand-accent'
@@ -129,7 +196,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 {link.name}
-                {pathname === link.path && (
+                {isLinkActive(link.path) && (
                   <motion.div 
                     layoutId="activeNavIndicator"
                     className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-gold"
@@ -155,9 +222,14 @@ export const Navbar: React.FC = () => {
             
             {/* Premium CTA Button with Floating Badge */}
             <div className="relative group">
-              <span className="absolute -top-3 right-4 bg-brand-accent text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none scale-90 group-hover:scale-95 transition-transform duration-300">
-                10% OFF
-              </span>
+              {badgeActive && (
+                <span 
+                  className="absolute -top-3 right-4 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none scale-90 group-hover:scale-95 transition-transform duration-300"
+                  style={{ backgroundColor: badgeColor }}
+                >
+                  {badgeText}
+                </span>
+              )}
               <Link 
                 href="/reserve" 
                 className="flex items-center space-x-2 bg-brand-gold hover:bg-brand-gold/90 text-brand-dark transition-all duration-300 text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-full shadow-lg shadow-brand-gold/30 hover:scale-[1.02]"
@@ -171,9 +243,14 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center space-x-3">
             <div className="relative">
-              <span className="absolute -top-2.5 right-1 bg-brand-accent text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full shadow z-10 scale-90 select-none">
-                10% OFF
-              </span>
+              {badgeActive && (
+                <span 
+                  className="absolute -top-2.5 right-1 text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full shadow z-10 scale-90 select-none"
+                  style={{ backgroundColor: badgeColor }}
+                >
+                  {badgeText}
+                </span>
+              )}
               <Link 
                 href="/reserve" 
                 className="flex items-center space-x-1 bg-brand-gold text-brand-dark transition-colors duration-300 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-lg"
@@ -214,7 +291,7 @@ export const Navbar: React.FC = () => {
                   href={link.path}
                   onClick={() => handleLinkClick(link.path)}
                   className={`font-display text-2xl font-bold tracking-wide transition-colors ${
-                    pathname === link.path ? 'text-brand-accent' : 'text-brand-dark'
+                    isLinkActive(link.path) ? 'text-brand-accent' : 'text-brand-dark'
                   }`}
                 >
                   {link.name}
@@ -232,9 +309,14 @@ export const Navbar: React.FC = () => {
               </a>
               
               <div className="relative w-full">
-                <span className="absolute -top-2.5 right-6 bg-brand-accent text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none">
-                  10% OFF
-                </span>
+                {badgeActive && (
+                  <span 
+                    className="absolute -top-2.5 right-6 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none"
+                    style={{ backgroundColor: badgeColor }}
+                  >
+                    {badgeText}
+                  </span>
+                )}
                 <Link 
                   href="/reserve" 
                   onClick={() => setIsOpen(false)}

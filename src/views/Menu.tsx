@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Star, Flame, X, ChevronLeft, ChevronRight, Leaf, ShoppingBag, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal, Star, Flame, X, ChevronLeft, ChevronRight, Leaf, ShoppingBag, Loader2, Check } from 'lucide-react';
 import type { Dish } from '../components/DishCard';
 
 // Balaji Santosh Dhaba restaurant page URLs on delivery platforms
@@ -19,6 +19,26 @@ const OrderModal: React.FC<OrderModalProps> = ({ dishName, onClose }) => {
   const swiggyItemUrl = `https://www.swiggy.com/search?query=${encodeURIComponent('Balaji Chilkur Family Dhaba ' + dishName)}`;
   const whatsappUrl = `https://wa.me/919849498681?text=${encodeURIComponent(`Hello, I would like to order "${dishName}" from Balaji Chilkur Family Dhaba.`)}`;
   const [showZomatoAlert, setShowZomatoAlert] = useState(false);
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  // Freeze background scrolling when modal is active
+  useEffect(() => {
+    const origOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = origOverflow;
+    };
+  }, []);
 
   return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-8">
@@ -203,6 +223,26 @@ interface LightboxProps {
   onClose: () => void;
 }
 const Lightbox: React.FC<LightboxProps> = ({ dish, onClose }) => {
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  // Freeze background scrolling when modal is active
+  useEffect(() => {
+    const origOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = origOverflow;
+    };
+  }, []);
+
   return createPortal(
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 md:p-10">
       {/* backdrop */}
@@ -439,9 +479,184 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
   );
 };
 
+// ─── Claim Reward Modal ─────────────────────────────────────────────────────────
+interface ClaimRewardModalProps {
+  token: string;
+  onClose: () => void;
+}
+const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) => {
+  const [checking, setChecking] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [coupon, setCoupon] = useState<any>(null);
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemed, setRedeemed] = useState(false);
+
+  useEffect(() => {
+    async function verifyCoupon() {
+      try {
+        const res = await fetch(`/api/cms/rewards?token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (data.success && data.valid) {
+          setCoupon(data.coupon);
+        } else {
+          setError(data.error || 'This reward coupon is invalid or has already been used.');
+        }
+      } catch (err) {
+        setError('Network error verifying coupon');
+      } finally {
+        setChecking(false);
+      }
+    }
+    verifyCoupon();
+  }, [token]);
+
+  const handleRedeem = async () => {
+    setRedeeming(true);
+    try {
+      const res = await fetch('/api/cms/rewards', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json();
+      if (data.success && data.redeemed) {
+        setRedeemed(true);
+      } else {
+        setError(data.error || 'Failed to redeem reward');
+      }
+    } catch (err) {
+      setError('Network failure claiming reward');
+    } finally {
+      setRedeeming(false);
+    }
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[1150] flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/75 backdrop-blur-md"
+        onClick={onClose}
+      />
+      <motion.div
+        className="relative z-10 bg-[#FDF8F5] border border-brand-dark/10 rounded-3xl shadow-2xl w-full max-w-md p-6 font-sans text-brand-dark"
+        initial={{ scale: 0.9, opacity: 0, y: 30 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 30 }}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 bg-brand-dark/5 hover:bg-brand-dark/10 text-brand-dark rounded-full p-2"
+        >
+          <X size={16} />
+        </button>
+
+        {checking ? (
+          <div className="text-center py-8 space-y-3">
+            <Loader2 className="animate-spin text-brand-accent mx-auto" size={32} />
+            <p className="font-bold text-sm">Verifying Loyalty Reward...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-6 space-y-4">
+            <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto border border-rose-100">
+              <X size={32} />
+            </div>
+            <h3 className="font-display font-black text-lg text-brand-dark">Invalid Reward Token</h3>
+            <p className="text-xs text-brand-dark/65 max-w-xs mx-auto leading-relaxed">{error}</p>
+            <button
+              onClick={onClose}
+              className="px-6 py-2.5 bg-brand-dark text-white rounded-xl text-xs font-bold uppercase transition-all shadow-sm"
+            >
+              Dismiss
+            </button>
+          </div>
+        ) : redeemed ? (
+          <div className="text-center py-6 space-y-4">
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-100">
+              <Check size={32} />
+            </div>
+            <h3 className="font-display font-black text-lg text-brand-dark">Reward Claimed!</h3>
+            <p className="text-xs text-brand-dark/70 leading-relaxed max-w-xs mx-auto">
+              You have secured a discount of <strong className="text-brand-accent text-sm">₹{coupon.discountValue}</strong>. This reward is now marked claimed in the counter ledger. Please show this screen to the cashier on checkout.
+            </p>
+            <div className="bg-[#FAF6EE] p-3.5 rounded-xl border border-brand-dark/5 text-[10px] font-mono text-brand-dark/65 text-left space-y-1">
+              <div><strong>Voucher Code:</strong> {coupon.token}</div>
+              {coupon.billNo && <div><strong>Invoice Ref:</strong> {coupon.billNo}</div>}
+              {coupon.discountCategory && <div><strong>Campaign:</strong> {coupon.discountCategory}</div>}
+            </div>
+            <button
+              onClick={onClose}
+              className="w-full px-6 py-3 bg-[#D35400] text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md"
+            >
+              Start Ordering
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-6 py-2">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-amber-50 text-[#D35400] rounded-full flex items-center justify-center mx-auto border border-amber-100">
+                <Leaf size={24} className="fill-current" />
+              </div>
+              <h3 className="font-display font-black text-lg text-brand-dark">Loyalty Reward Detected</h3>
+              <p className="text-xs text-brand-dark/65">Automated Swiggy/Zomato next-visit retention bonus.</p>
+            </div>
+
+            <div className="bg-[#FAF6EE] p-4 rounded-xl border border-brand-dark/10 space-y-2 text-left">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-brand-dark/50 uppercase">Discount Reward:</span>
+                <span className="font-display font-black text-[#D35400] text-base">₹{coupon.discountValue}</span>
+              </div>
+              {coupon.billNo && (
+                <div className="flex justify-between items-center text-xs border-t border-brand-dark/5 pt-2">
+                  <span className="font-bold text-brand-dark/50 uppercase">Invoice Reference:</span>
+                  <span className="font-mono text-brand-dark font-semibold">{coupon.billNo}</span>
+                </div>
+              )}
+              {coupon.discountCategory && (
+                <div className="flex justify-between items-center text-xs border-t border-brand-dark/5 pt-2">
+                  <span className="font-bold text-brand-dark/50 uppercase">Offer Category:</span>
+                  <span className="font-semibold text-brand-dark/85">{coupon.discountCategory}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center text-xs border-t border-brand-dark/5 pt-2">
+                <span className="font-bold text-brand-dark/50 uppercase">Expiry Date:</span>
+                <span className="font-mono text-brand-dark">
+                  {new Date(coupon.expiryEpoch).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleRedeem}
+              disabled={redeeming}
+              className="w-full px-6 py-3.5 bg-[#D35400] hover:bg-[#D35400]/95 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
+            >
+              {redeeming ? (
+                <>
+                  <Loader2 className="animate-spin" size={14} />
+                  <span>Claiming Discount...</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={14} />
+                  <span>Claim ₹{coupon.discountValue} Discount</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </div>,
+    document.body
+  );
+};
+
 // ─── Menu Page ──────────────────────────────────────────────────────────────────
 export const Menu: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [menuCategories, setMenuCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -450,8 +665,19 @@ export const Menu: React.FC = () => {
   const searchParams = useSearchParams();
   const targetCategory = searchParams.get('category') || '';
   const targetDish = searchParams.get('dish') || '';
+  const claimBonusToken = searchParams.get('claimBonusToken') || '';
 
   const [showAllHeadings, setShowAllHeadings] = useState(false);
+  const [activeClaimToken, setActiveClaimToken] = useState<string | null>(null);
+  
+  // Ref tracking whether we already auto-opened targetDish once
+  const hasAutoOpenedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (claimBonusToken) {
+      setActiveClaimToken(claimBonusToken);
+    }
+  }, [claimBonusToken]);
 
   // Fetch live menu categories and dishes from the DB (no cache)
   const loadMenu = React.useCallback(async () => {
@@ -553,11 +779,14 @@ export const Menu: React.FC = () => {
   // Auto-open lightbox for deep-linked dish
   useEffect(() => {
     if (!targetDish || allDishes.length === 0) return;
+    if (hasAutoOpenedRef.current === targetDish) return; // Prevent infinite re-opening loops
+
     const attempt = (tries = 0) => {
       const dish = allDishes.find(
         (d) => d.name.toLowerCase() === targetDish.toLowerCase()
       );
       if (dish) {
+        hasAutoOpenedRef.current = targetDish;
         setTimeout(() => setSelectedDish(dish), 600);
       } else if (tries < 8) {
         setTimeout(() => attempt(tries + 1), 200);
@@ -565,6 +794,15 @@ export const Menu: React.FC = () => {
     };
     attempt();
   }, [targetDish, allDishes]);
+
+  // Clean the targetDish query param from the URL on modal close
+  const handleCloseLightbox = () => {
+    setSelectedDish(null);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('dish');
+    const newSearch = params.toString();
+    router.replace(pathname + (newSearch ? `?${newSearch}` : ''), { scroll: false });
+  };
 
   const filteredDishes = useMemo(() => {
     const currentDay = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
@@ -627,7 +865,14 @@ export const Menu: React.FC = () => {
       {/* Lightbox */}
       <AnimatePresence>
         {selectedDish && (
-          <Lightbox dish={selectedDish} onClose={() => setSelectedDish(null)} />
+          <Lightbox dish={selectedDish} onClose={handleCloseLightbox} />
+        )}
+      </AnimatePresence>
+
+      {/* Claim Reward Modal */}
+      <AnimatePresence>
+        {activeClaimToken && (
+          <ClaimRewardModal token={activeClaimToken} onClose={() => setActiveClaimToken(null)} />
         )}
       </AnimatePresence>
 

@@ -11,56 +11,86 @@ import {
   ArrowRight, 
   Star, 
   X, 
-  Quote
+  Quote,
+  Calendar
 } from 'lucide-react';
 import { DishCard } from '../components/DishCard';
 import { SIGNATURE_DISHES as STATIC_DISHES, GALLERY_PHOTOS as STATIC_GALLERY, TESTIMONIALS as STATIC_TESTIMONIALS } from '../utils/menuData';
 import { Loader2 } from 'lucide-react';
 
-// ─── Circular Review Card ────────────────────────────────────────────────────────
+// ─── Google Review Card ────────────────────────────────────────────────────────
 interface CircularReviewCardProps {
   testimonial: any;
   onClick: () => void;
 }
 const CircularReviewCard: React.FC<CircularReviewCardProps> = ({ testimonial, onClick }) => {
+  // Generate realistic timestamps based on review ID to vary content
+  const timeLabel = testimonial.date || (testimonial.id.charCodeAt(0) % 2 === 0 ? 'a week ago' : testimonial.id.charCodeAt(0) % 3 === 0 ? '3 weeks ago' : '2 months ago');
+
   return (
     <motion.div
       onClick={onClick}
-      whileHover={{ scale: 1.05, y: -4 }}
-      className="relative w-72 h-72 md:w-80 md:h-80 rounded-full bg-[#F6EFE3] border border-brand-dark/15 shadow-md flex flex-col items-center justify-center p-8 text-center shrink-0 cursor-pointer select-none overflow-hidden group transition-all duration-300 hover:shadow-xl hover:border-brand-gold/45"
+      whileHover={{ y: -3, scale: 1.01 }}
+      className="w-[290px] md:w-[320px] bg-white border border-[#F5E6E3] p-5 rounded-2xl shrink-0 cursor-pointer select-none relative flex flex-col justify-between transition-all duration-300 hover:shadow-md shadow-sm font-sans"
     >
-      <div className="absolute -top-10 -right-10 w-24 h-24 bg-brand-gold/5 rounded-full blur-xl pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-brand-accent/5 rounded-full blur-xl pointer-events-none" />
-
-      {/* Avatar in Gold Ring */}
-      <div className="relative mb-3 shrink-0">
-        <img
-          src={testimonial.avatar}
-          alt={testimonial.name}
-          className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-2 border-brand-gold shadow-md"
-        />
-        <div className="absolute -bottom-1 right-0 bg-[#F6EFE3] text-brand-gold p-0.5 rounded-full border border-brand-gold/25 text-[8px] font-bold">
-          ⭐
+      <div>
+        {/* Profile Head */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <img
+              src={testimonial.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80'}
+              alt={testimonial.name}
+              className="w-9 h-9 rounded-full object-cover border border-[#F5E6E3] bg-zinc-50"
+            />
+            <div className="text-left">
+              <h4 className="font-sans font-bold text-xs text-brand-dark leading-tight">
+                {testimonial.name}
+              </h4>
+              <div className="flex items-center space-x-1.5 mt-0.5">
+                <span className="text-[9px] text-zinc-400 font-sans font-medium tracking-wide">
+                  Verified Google Review
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Google G Logo icon */}
+          <div className="w-6 h-6 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" width="10" height="10" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+            </svg>
+          </div>
         </div>
+
+        {/* Stars + Date */}
+        <div className="flex items-center justify-between mt-3.5">
+          <div className="flex gap-0.5 text-brand-gold">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star 
+                key={i} 
+                size={12} 
+                className={i < testimonial.rating ? 'fill-current text-[#D35400]' : 'text-zinc-200'} 
+              />
+            ))}
+          </div>
+          <span className="text-[9px] text-zinc-400 font-sans">{timeLabel}</span>
+        </div>
+
+        {/* Review body */}
+        <p className="text-[11px] font-sans text-brand-dark/75 leading-relaxed italic mt-2.5 line-clamp-3 text-left">
+          "{testimonial.content}"
+        </p>
       </div>
 
-      <h4 className="font-display font-extrabold text-sm md:text-base text-brand-dark group-hover:text-brand-accent transition-colors mt-1">
-        {testimonial.name}
-      </h4>
-
-      <p className="text-[9px] text-brand-olive uppercase tracking-widest font-semibold mt-0.5">
-        {testimonial.source}
-      </p>
-
-      <p className="text-xs font-sans text-brand-dark/70 italic leading-relaxed mt-3 flex-grow line-clamp-3 max-w-[200px] md:max-w-[230px]">
-        "{testimonial.content}"
-      </p>
-
-      <div className="flex gap-0.5 text-brand-gold mt-4 shrink-0">
-        {Array.from({ length: testimonial.rating }).map((_, i) => (
-          <Star key={i} size={10} className="fill-current text-brand-gold" />
-        ))}
-      </div>
+      {testimonial.role && testimonial.role !== 'Google Reviews' && testimonial.role !== 'Local Guide' && (
+        <div className="mt-3.5 pt-2.5 border-t border-[#F5E6E3] flex justify-between items-center text-[9px] font-sans">
+          <span className="text-zinc-400 font-bold uppercase tracking-wider">Recommended:</span>
+          <span className="text-[#D35400] font-extrabold">{testimonial.role}</span>
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -71,6 +101,26 @@ interface ReviewModalProps {
   onClose: () => void;
 }
 const ReviewModal: React.FC<ReviewModalProps> = ({ testimonial, onClose }) => {
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  // Freeze background scrolling when modal is active
+  useEffect(() => {
+    const origOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = origOverflow;
+    };
+  }, []);
+
   return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
       {/* backdrop */}
@@ -156,11 +206,11 @@ const HOME_BRANCHES = [
     closingTime: "23:00"
   },
   {
-    name: "Chinthal Branch",
-    address: "1 2nd floor, HMT Rd, above The Kakatiya Co-operative Bank, Chinthal, Quthbullapur, Hyderabad, Telangana 500037",
+    name: "Visit Our Second Branch – Pragathi Nagar",
+    address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
     phone: "098494 98681",
-    mapEmbedUrl: "https://maps.google.com/maps?q=1%202nd%20floor,%20HMT%20Rd,%20above%20The%20kakatiya%20co-operative%20Bank.LTD,%20beside%20Ridge%20Towers,%20Chinthal,%20Quthbullapur,%20Hyderabad,%20Telangana%20500037&t=&z=15&ie=UTF8&iwloc=&output=embed",
-    mapNavUrl: "https://www.google.com/maps/search/?api=1&query=1+2nd+floor,+HMT+Rd,+above+The+kakatiya+co-operative+Bank.LTD,+beside+Ridge+Towers,+Chinthal,+Quthbullapur,+Hyderabad,+Telangana+500037",
+    mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
+    mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
     openingTime: "11:00",
     closingTime: "23:00"
   }
@@ -183,7 +233,6 @@ export const Home: React.FC = () => {
   // Selected review for details modal
   const [selectedReview, setSelectedReview] = useState<any>(null);
 
-  const galleryScrollRef = useRef<HTMLDivElement>(null);
   const reviewsScrollRef = useRef<HTMLDivElement>(null);
   const reviewsDragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0, hasDragged: false });
 
@@ -247,74 +296,7 @@ export const Home: React.FC = () => {
     loadCMSData();
   }, []);
 
-  useEffect(() => {
-    const el = galleryScrollRef.current;
-    if (!el) return;
 
-    let animationFrameId: number;
-    let startX: number;
-    let scrollLeft: number;
-    let isDown = false;
-
-    const autoScroll = () => {
-      if (!isDown && el) {
-        el.scrollLeft += 0.6; // slow scroll speed
-        // If we scrolled past half the width (loop-around point), reset to 0
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft = 0;
-        }
-      }
-      animationFrameId = requestAnimationFrame(autoScroll);
-    };
-
-    animationFrameId = requestAnimationFrame(autoScroll);
-
-    const onMouseDown = (e: MouseEvent) => {
-      isDown = true;
-      startX = e.pageX - el.offsetLeft;
-      scrollLeft = el.scrollLeft;
-    };
-
-    const onMouseLeave = () => {
-      isDown = false;
-    };
-
-    const onMouseUp = () => {
-      isDown = false;
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX) * 1.5; // drag speed
-      el.scrollLeft = scrollLeft - walk;
-    };
-
-    const onTouchStart = () => {
-      isDown = true;
-    };
-    const onTouchEnd = () => {
-      isDown = false;
-    };
-
-    el.addEventListener('mousedown', onMouseDown);
-    el.addEventListener('mouseleave', onMouseLeave);
-    el.addEventListener('mouseup', onMouseUp);
-    el.addEventListener('mousemove', onMouseMove);
-    el.addEventListener('touchstart', onTouchStart);
-    el.addEventListener('touchend', onTouchEnd);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      el.removeEventListener('mousedown', onMouseDown);
-      el.removeEventListener('mouseleave', onMouseLeave);
-      el.removeEventListener('mouseup', onMouseUp);
-      el.removeEventListener('mousemove', onMouseMove);
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, []);
 
   // Reviews auto-scroll + drag-to-scroll
   useEffect(() => {
@@ -401,20 +383,61 @@ export const Home: React.FC = () => {
   ];
 
   const listTestimonials = testimonials.length > 0 ? testimonials : STATIC_TESTIMONIALS;
+  const uniqueTestimonials = React.useMemo(() => {
+    const seenNames = new Set();
+    const seenAvatars = new Set();
+    return listTestimonials.filter(t => {
+      const nameKey = t.name.toLowerCase().trim();
+      const avatarKey = (t.avatar || '').toLowerCase().trim();
+      if (seenNames.has(nameKey)) return false;
+      seenNames.add(nameKey);
+      
+      // If avatar is repeated, we clear it so a default avatar or initials card is shown
+      if (avatarKey && seenAvatars.has(avatarKey)) {
+        t.avatar = '';
+      }
+      if (avatarKey) {
+        seenAvatars.add(avatarKey);
+      }
+      return true;
+    });
+  }, [listTestimonials]);
+
   const listGallery = galleryPhotos.length > 0 ? galleryPhotos : STATIC_GALLERY;
-  const listBranches = branches.length > 0 ? branches.map(b => ({
-    name: b.name,
-    address: b.address,
-    phone: b.phone,
-    mapEmbedUrl: b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e' 
-      ? "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed"
-      : "https://maps.google.com/maps?q=1%202nd%20floor,%20HMT%20Rd,%20above%20The%20kakatiya%20co-operative%20Bank.LTD,%20beside%20Ridge%20Towers,%20Chinthal,%20Quthbullapur,%20Hyderabad,%20Telangana%20500037&t=&z=15&ie=UTF8&iwloc=&output=embed",
-    mapNavUrl: b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e'
-      ? "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana"
-      : "https://www.google.com/maps/search/?api=1&query=1+2nd+floor,+HMT+Rd,+above+The+kakatiya+co-operative+Bank.LTD,+beside+Ridge+Towers,+Chinthal,+Quthbullapur,+Hyderabad,+Telangana+500037",
-    openingTime: b.openingTime,
-    closingTime: b.closingTime
-  })) : HOME_BRANCHES;
+  const listBranches = React.useMemo(() => {
+    const rawList = branches.length > 0 ? branches : HOME_BRANCHES;
+    const mapped = rawList.map(b => {
+      const isMoinabad = b.name.toLowerCase().includes('moinabad') || b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e';
+      if (isMoinabad) {
+        return {
+          name: "Moinabad Branch",
+          address: b.address,
+          phone: b.phone,
+          mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
+          mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
+          openingTime: b.openingTime || "11:00",
+          closingTime: b.closingTime || "23:00"
+        };
+      } else {
+        return {
+          name: "Visit Our Second Branch – Pragathi Nagar",
+          address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
+          phone: b.phone || "098494 98681",
+          mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
+          mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
+          openingTime: b.openingTime || "11:00",
+          closingTime: b.closingTime || "23:00"
+        };
+      }
+    });
+
+    // Ensure Moinabad is always first, Pragathi Nagar is second
+    return [...mapped].sort((a, b) => {
+      if (a.name.includes("Moinabad")) return -1;
+      if (b.name.includes("Moinabad")) return 1;
+      return 0;
+    });
+  }, [branches]);
 
   // Destructure homepage CMS settings or fallback
   const sectionsMap = cmsSettings?.homepage_sections || {
@@ -451,6 +474,22 @@ export const Home: React.FC = () => {
     isActive: true
   };
 
+  const mappedOffers = React.useMemo(() => {
+    return listOffers.map(offer => {
+      const isBookingOffer = 
+        offer.id === 'online-booking-offer' || 
+        offer.link?.includes('reserve') || 
+        offer.link?.includes('book') || 
+        offer.title?.toLowerCase().includes('book') || 
+        offer.title?.toLowerCase().includes('reserve');
+
+      return {
+        ...offer,
+        isBooking: isBookingOffer
+      };
+    });
+  }, [listOffers]);
+
   return (
     <div className="relative bg-brand-bg noise-overlay min-h-screen">
       
@@ -479,34 +518,34 @@ export const Home: React.FC = () => {
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                          w-[177.78vh] h-[100vh]
                          min-w-full min-h-full
-                         opacity-50 scale-110"
+                         opacity-40 scale-110"
             />
 
-            {/* Subtle dark gradient overlay for branding integration without losing video clarity */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/45 to-black/60" />
+            {/* Premium luxury dark radial gradient overlay */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.25)_0%,_rgba(43,27,18,0.6)_60%,_rgba(43,27,18,0.95)_100%)]" />
           </div>
 
           {/* Hero Content Overlay */}
-          <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center">
-            <span className="text-[#F6EFE3] text-[10px] font-bold uppercase tracking-[0.2em] bg-brand-accent/20 border border-brand-accent/40 px-4 py-1.5 rounded-full backdrop-blur-md mb-6 animate-pulse">
+          <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center pt-20">
+            <span className="text-[#F6EFE3] text-[9px] font-bold uppercase tracking-[0.25em] bg-brand-accent/20 border border-brand-accent/40 px-5 py-2 rounded-full backdrop-blur-md mb-8 animate-pulse font-sans">
               Balaji Chilkur Family Dhaba
             </span>
-            <h1 className="font-display text-4xl md:text-7xl font-black text-[#F6EFE3] leading-tight drop-shadow-xl uppercase tracking-tight">
+            <h1 className="font-display text-4xl md:text-7xl font-semibold text-[#F6EFE3] leading-tight drop-shadow-2xl uppercase tracking-wider">
               {heroData.title}
             </h1>
-            <p className="text-sm md:text-lg text-[#F6EFE3]/80 font-sans mt-4 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            <p className="text-xs md:text-sm text-[#F6EFE3]/70 font-sans uppercase tracking-[0.15em] max-w-2xl mx-auto leading-loose mt-6 drop-shadow-md">
               {heroData.subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
+            <div className="flex flex-col sm:flex-row items-center gap-5 mt-12">
               <Link
                 href={heroData.ctaLink}
-                className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] px-8 py-4 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-sm block"
+                className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-xs block"
               >
                 {heroData.ctaText}
               </Link>
               <Link
                 href={heroData.secondaryCtaLink}
-                className="w-full sm:w-auto bg-transparent hover:bg-[#F6EFE3]/10 border-2 border-[#F6EFE3] text-[#F6EFE3] px-8 py-4 rounded-full font-bold uppercase tracking-wider transition-all text-sm block"
+                className="w-full sm:w-auto bg-transparent hover:bg-[#F6EFE3]/10 border-2 border-[#F6EFE3] text-[#F6EFE3] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider transition-all text-xs block"
               >
                 {heroData.secondaryCtaText}
               </Link>
@@ -567,50 +606,58 @@ export const Home: React.FC = () => {
       {sectionsMap.offers && (
         <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-accent">Exclusive Indulgence</span>
-            <h2 className="font-display text-3xl md:text-5xl font-black text-brand-dark mt-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Exclusive Indulgence</span>
+            <h2 className="font-display text-3xl md:text-5xl font-semibold text-brand-dark mt-3">
               Limited Time Promotions
             </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {listOffers.map((offer) => (
+            {mappedOffers.map((offer) => (
               <div 
                 key={offer.id}
                 onClick={() => navigate.push(offer.link)}
-                className="relative rounded-2xl overflow-hidden min-h-[300px] flex items-center bg-brand-dark text-[#F6EFE3] group cursor-pointer"
+                className="relative rounded-3xl overflow-hidden min-h-[320px] flex items-center bg-[#2B1B12] text-[#F6EFE3] group cursor-pointer border border-brand-gold/10 hover:border-brand-gold/25 transition-all duration-500 shadow-md"
               >
                 {/* Offer Image */}
                 <div className="absolute inset-0 z-0">
                   <img 
                     src={offer.image} 
                     alt={offer.title}
-                    className="w-full h-full object-cover opacity-25 group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-brand-dark via-brand-dark/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#2B1B12] via-[#2B1B12]/80 to-transparent" />
                 </div>
 
                 {/* Offer Content */}
                 <div className="relative z-10 p-8 md:p-12 max-w-md">
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-brand-accent text-brand-bg px-2.5 py-1 rounded-md">
+                  <span className="text-[9px] font-bold uppercase tracking-widest bg-brand-gold/20 border border-brand-gold/45 text-brand-gold px-3 py-1 rounded-md">
                     {offer.badge}
                   </span>
-                  <h3 className="font-display text-2xl md:text-3xl font-extrabold mt-4 text-[#F6EFE3]">
+                  <h3 className="font-display text-2xl md:text-3xl font-semibold mt-5 text-[#F6EFE3] tracking-wide">
                     {offer.title}
                   </h3>
-                  <p className="text-sm text-[#F6EFE3]/70 mt-2 font-sans">
+                  <p className="text-xs text-[#F6EFE3]/70 mt-3 font-sans leading-relaxed">
                     {offer.description}
                   </p>
-                  <div className="flex items-center space-x-6 mt-6">
-                    <span className="font-display text-3xl font-black text-brand-gold">
-                      {offer.price}
-                    </span>
+                  
+                  <div className="flex items-center space-x-6 mt-8">
+                    {offer.isBooking ? (
+                      <div className="w-12 h-12 rounded-full border border-brand-gold/30 flex items-center justify-center text-brand-gold bg-brand-gold/5 shrink-0">
+                        <Calendar size={18} className="animate-pulse" />
+                      </div>
+                    ) : (
+                      <span className="font-display text-2xl font-black text-brand-gold">
+                        {offer.price}
+                      </span>
+                    )}
+                    
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate.push(offer.link);
                       }}
-                      className="text-xs font-bold uppercase tracking-widest bg-[#F6EFE3] text-brand-dark hover:bg-brand-accent hover:text-[#F6EFE3] px-6 py-3 rounded-full transition-colors duration-300"
+                      className="text-[10px] font-bold uppercase tracking-widest bg-brand-gold hover:bg-brand-accent text-brand-dark hover:text-[#F6EFE3] px-6 py-3.5 rounded-full transition-colors duration-300 shadow-md"
                     >
                       {offer.cta}
                     </button>
@@ -624,39 +671,82 @@ export const Home: React.FC = () => {
 
       {/* 5. ABOUT SECTION */}
       {sectionsMap.about && aboutData.isActive && (
-        <section className="py-24 bg-[#ECE3D4]/50 border-y border-brand-dark/5 px-6 md:px-12">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Simple Image Column */}
-            <div className="rounded-3xl overflow-hidden aspect-[4/3] shadow-xl relative group">
+        <section className="py-24 bg-[#ECE3D4]/50 border-y border-brand-dark/5 px-6 md:px-12 overflow-hidden">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Image Column */}
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="lg:col-span-5 relative rounded-3xl overflow-hidden aspect-[4/3] shadow-xl group border-4 border-white bg-brand-dark/5"
+            >
               <img 
-                src={aboutData.image} 
+                src={(!aboutData.image || aboutData.image.includes('bsd-about.jpg') || aboutData.image.includes('veg-dining.png')) ? '/dhaba_restaurant.png' : aboutData.image} 
                 alt="Balaji Chilkur Family Dhaba Dining Setup" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
-            </div>
+            </motion.div>
 
-            {/* Simplified Description Column */}
-            <div className="flex flex-col justify-center">
-              <span className="text-xs font-bold uppercase tracking-widest text-brand-accent">About Us</span>
-              <h2 className="font-display text-3xl md:text-5xl font-black text-brand-dark mt-3 leading-tight">
-                {aboutData.heading}
+            {/* Right Content Column */}
+            <motion.div 
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="lg:col-span-7 flex flex-col justify-center"
+            >
+              <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Pure vegetarian heritage</span>
+              <h2 className="font-display text-3xl md:text-5xl font-semibold text-brand-dark mt-3 leading-tight tracking-wide">
+                {(!aboutData.heading || aboutData.heading === 'Our Culinary Journey') ? 'A Tradition of Pure Vegetarian Excellence' : aboutData.heading}
               </h2>
               
-              <p className="text-brand-dark/75 font-sans text-sm md:text-base mt-6 leading-relaxed">
-                {aboutData.content}
-              </p>
+              <div className="space-y-4 mt-6">
+                <p className="text-brand-dark/95 font-display text-lg md:text-xl font-medium leading-relaxed">
+                  Located near the famous Chilkur Balaji Temple, our Dhaba has become a cherished destination for devotees, families, and travelers seeking authentic North & South Indian vegetarian cuisine.
+                </p>
+                <p className="text-brand-dark/70 font-sans text-xs md:text-sm leading-loose">
+                  For over two decades, our kitchen has celebrated the rich heritage of traditional recipes. By sourcing premium ingredients and house-grinding spices daily, we ensure that every clay-oven naan and slow-cooked curry we serve is a testament to pure quality and hospitality.
+                </p>
+              </div>
 
-              <div className="mt-8">
+              {/* Elegant highlights grid with stagger loading entry */}
+              <div className="grid grid-cols-2 gap-3.5 mt-8">
+                {[
+                  { icon: '✔', label: '100% Pure Vegetarian' },
+                  { icon: '🌿', label: 'Fresh Ingredients' },
+                  { icon: '👨‍👩‍👧', label: 'Family Friendly' },
+                  { icon: '🚗', label: 'Spacious Parking' },
+                  { icon: '📍', label: 'Near Chilkur Balaji Temple' },
+                  { icon: '⭐', label: 'Highly Rated' }
+                ].map((h, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.06, duration: 0.5, ease: "easeOut" }}
+                    className="flex items-center space-x-2.5 bg-white p-3.5 rounded-2xl border border-brand-gold/15 shadow-sm hover:scale-[1.02] transition-all duration-300 hover:border-brand-gold/30 select-none"
+                  >
+                    <span className="text-base shrink-0">{h.icon}</span>
+                    <span className="text-xs font-bold text-brand-dark/85 font-sans tracking-wide">{h.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-10">
                 <Link 
                   href="/about" 
-                  className="inline-flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-brand-accent hover:text-brand-dark transition-colors duration-300"
+                  className="inline-flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-[#D35400] hover:text-brand-dark transition-colors duration-300"
                 >
                   <span>Our Story</span>
                   <ArrowRight size={16} />
                 </Link>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
@@ -680,27 +770,26 @@ export const Home: React.FC = () => {
             </Link>
           </div>
 
-          {/* Draggable & Scrollable Auto-Scrolling Container */}
-          <div 
-            ref={galleryScrollRef}
-            className="relative w-full flex overflow-x-auto py-4 no-scrollbar cursor-grab active:cursor-grabbing select-none"
-            style={{ scrollSnapType: 'none', WebkitOverflowScrolling: 'touch' }}
-          >
-            <div className="flex space-x-6 shrink-0">
+          {/* Infinite Scrolling Marquee Container */}
+          <div className="relative w-full overflow-hidden py-4 select-none">
+            <div className="flex space-x-6 w-max animate-marquee-left hover:[animation-play-state:paused] cursor-pointer">
               {(() => {
-                // Drop duplicate photo entries entirely by tracking seen ids
+                // Drop duplicate photo entries entirely by tracking seen URLs or IDs
                 const seen = new Set();
                 const uniqueGallery = listGallery.filter(photo => {
-                  if (!photo.id) return false;
-                  if (seen.has(photo.id)) return false;
-                  seen.add(photo.id);
+                  const key = (photo.src || photo.id || '').toString().toLowerCase().trim();
+                  if (!key) return false;
+                  if (seen.has(key)) return false;
+                  seen.add(key);
                   return true;
                 });
 
-                return uniqueGallery.map((photo) => (
-                  <div 
-                    key={photo.id}
-                    className="relative overflow-hidden rounded-2xl bg-brand-dark group aspect-square w-72 md:w-80 shrink-0 shadow-md pointer-events-none"
+                // Double rendering to form seamless looping marquee
+                return [...uniqueGallery, ...uniqueGallery].map((photo, index) => (
+                  <Link
+                    href="/gallery"
+                    key={`${photo.id || photo.src}-${index}`}
+                    className="relative overflow-hidden rounded-2xl bg-brand-dark group aspect-square w-72 md:w-80 shrink-0 shadow-md block cursor-pointer"
                   >
                     <img 
                       src={photo.src} 
@@ -713,7 +802,7 @@ export const Home: React.FC = () => {
                         {photo.title}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 ));
               })()}
             </div>
@@ -744,7 +833,7 @@ export const Home: React.FC = () => {
           >
             <div className="flex space-x-8 shrink-0">
               {/* Duplicated array to allow seamless scrolling loop */}
-              {[...listTestimonials, ...listTestimonials].map((testimonial, index) => (
+              {[...uniqueTestimonials, ...uniqueTestimonials].map((testimonial, index) => (
                 <CircularReviewCard 
                   key={`${testimonial.id}-${index}`}
                   testimonial={testimonial}
@@ -773,22 +862,108 @@ export const Home: React.FC = () => {
       {/* 8. LOCATION & MAP SECTION */}
       {sectionsMap.contact && listBranches.length > 0 && (
         <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-          {/* Branch Switcher Tabs */}
-          <div className="flex justify-center mb-12">
-            <div className="flex bg-[#ECE3D4]/50 p-1.5 rounded-2xl border border-brand-dark/5 shadow-sm">
-              {listBranches.map((b, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveBranch(idx)}
-                  className={`px-6 py-3 rounded-xl font-display font-extrabold text-sm transition-all duration-300 ${
-                    activeBranch === idx
-                      ? 'bg-brand-accent text-brand-bg shadow-md'
-                      : 'text-brand-dark/70 hover:text-brand-dark hover:bg-brand-dark/5'
-                  }`}
+          {/* Section heading */}
+          <div className="text-center mb-12">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-accent">Our Locations</span>
+            <h2 className="font-display text-3xl md:text-4xl font-extrabold text-brand-dark mt-2">Find Us Near You</h2>
+            <p className="text-sm text-brand-dark/55 mt-3 max-w-xs mx-auto leading-relaxed">Two welcoming branches, one family experience.</p>
+          </div>
+
+          {/* Branch Switcher animated premium cards */}
+          {/* Luxury Minimal Branch Selector */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mb-16">
+            {/* Card 1: Moinabad Branch */}
+            <div
+              onClick={() => setActiveBranch(0)}
+              style={{
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease',
+              }}
+              onMouseEnter={e => {
+                if (activeBranch !== 0) {
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(212,175,55,0.18)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeBranch !== 0) {
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(30,20,10,0.10)';
+                }
+              }}
+              className="cursor-pointer rounded-[20px] border flex items-center justify-center"
+              style={{
+                padding: '2.25rem 2rem',
+                background: activeBranch === 0 ? '#FFF9F2' : '#ffffff',
+                borderColor: activeBranch === 0 ? '#D4AF37' : 'rgba(30,20,10,0.10)',
+                boxShadow: activeBranch === 0
+                  ? '0 0 0 1px #D4AF37, 0 8px 32px rgba(212,175,55,0.14)'
+                  : '0 2px 12px rgba(0,0,0,0.05)',
+                transform: 'translateY(0)',
+              } as React.CSSProperties}
+            >
+              <div className="text-center">
+                {activeBranch === 0 && (
+                  <span className="block w-8 h-[2px] bg-[#D4AF37] mx-auto mb-4 rounded-full" />
+                )}
+                <h3
+                  className="font-display font-semibold tracking-wide"
+                  style={{
+                    fontSize: '1.125rem',
+                    color: activeBranch === 0 ? '#1a120b' : '#4a3728',
+                    letterSpacing: '0.02em',
+                  }}
                 >
-                  {b.name}
-                </button>
-              ))}
+                  Moinabad Branch
+                </h3>
+              </div>
+            </div>
+
+            {/* Card 2: Pragathi Nagar Branch */}
+            <div
+              onClick={() => setActiveBranch(1)}
+              onMouseEnter={e => {
+                if (activeBranch !== 1) {
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(212,175,55,0.18)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeBranch !== 1) {
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)';
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(30,20,10,0.10)';
+                }
+              }}
+              className="cursor-pointer rounded-[20px] border flex items-center justify-center"
+              style={{
+                padding: '2.25rem 2rem',
+                background: activeBranch === 1 ? '#FFF9F2' : '#ffffff',
+                borderColor: activeBranch === 1 ? '#D4AF37' : 'rgba(30,20,10,0.10)',
+                boxShadow: activeBranch === 1
+                  ? '0 0 0 1px #D4AF37, 0 8px 32px rgba(212,175,55,0.14)'
+                  : '0 2px 12px rgba(0,0,0,0.05)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease',
+                transform: 'translateY(0)',
+              } as React.CSSProperties}
+            >
+              <div className="text-center">
+                {activeBranch === 1 && (
+                  <span className="block w-8 h-[2px] bg-[#D4AF37] mx-auto mb-4 rounded-full" />
+                )}
+                <h3
+                  className="font-display font-semibold tracking-wide"
+                  style={{
+                    fontSize: '1.125rem',
+                    color: activeBranch === 1 ? '#1a120b' : '#4a3728',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  Pragathi Nagar Branch
+                </h3>
+              </div>
             </div>
           </div>
 

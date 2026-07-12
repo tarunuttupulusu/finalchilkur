@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag as originalRevalidateTag } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
+
+const revalidateTag = (tag: string) => {
+  try {
+    (originalRevalidateTag as any)(tag);
+  } catch (e) {
+    console.error('revalidateTag error:', e);
+  }
+};
 
 // GET /api/cms/menu
 // Fetches all categories and dishes, with optional search, filtering, and pagination.

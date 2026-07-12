@@ -11,6 +11,7 @@ export const GalleryPage: React.FC = () => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const [activeAlbum, setActiveAlbum] = useState<string>('All');
   const [albums, setAlbums] = useState<string[]>([]);
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   
   const navigate = useRouter();
 
@@ -47,9 +48,31 @@ export const GalleryPage: React.FC = () => {
     albumName: 'General'
   }));
 
+  const uniqueDisplayList = React.useMemo(() => {
+    const seen = new Set();
+    return displayList.filter(photo => {
+      const key = (photo.src || photo.id || '').toString().toLowerCase().trim();
+      if (!key) return false;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [displayList]);
+
   const filteredPhotos = activeAlbum === 'All' 
-    ? displayList 
-    : displayList.filter(p => p.albumName === activeAlbum);
+    ? uniqueDisplayList 
+    : uniqueDisplayList.filter(p => p.albumName === activeAlbum);
+
+  // Freeze background scrolling when lightbox is active
+  useEffect(() => {
+    if (selectedPhotoIndex !== null) {
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [selectedPhotoIndex]);
 
   const nextPhoto = () => {
     if (selectedPhotoIndex !== null) {
@@ -135,12 +158,22 @@ export const GalleryPage: React.FC = () => {
               transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.8) }}
               className="break-inside-avoid relative overflow-hidden rounded-2xl bg-brand-dark cursor-pointer group shadow-sm hover:shadow-xl transition-shadow"
             >
-              <img
-                src={photo.src}
-                alt={photo.altText || photo.title}
-                className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                loading="lazy"
-              />
+              <div className="relative w-full h-full min-h-[200px] bg-brand-dark/5">
+                {!loadedImages[photo.id || index] && (
+                  <div className="absolute inset-0 bg-[#ECE3D4]/40 animate-pulse flex items-center justify-center">
+                    <Loader2 className="animate-spin text-brand-accent/30" size={24} />
+                  </div>
+                )}
+                <img
+                  src={photo.src}
+                  alt={photo.altText || photo.title}
+                  onLoad={() => setLoadedImages(prev => ({ ...prev, [photo.id || index]: true }))}
+                  className={`w-full h-auto object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+                    loadedImages[photo.id || index] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  loading="lazy"
+                />
+              </div>
               <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-start justify-end p-5">
                 {photo.menuCategory && (
                   <p className="text-[9px] font-bold uppercase tracking-widest text-brand-gold mb-1">{photo.menuCategory}</p>

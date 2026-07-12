@@ -9,7 +9,7 @@ export const AboutPage: React.FC = () => {
         
         {/* Editorial Page Header */}
         <div className="max-w-3xl mb-20">
-          <span className="text-xs font-bold uppercase tracking-widest text-brand-accent">Our Journey</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Our Journey</span>
           <h1 className="font-display text-4xl md:text-7xl font-black text-brand-dark mt-4 leading-tight">
             Pure Vegetarian <br/>
             Indian Hospitality
@@ -25,19 +25,19 @@ export const AboutPage: React.FC = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="lg:col-span-6 order-2 lg:order-1"
           >
-            <h2 className="font-display text-2xl md:text-4xl font-extrabold text-brand-dark mb-6">
+            <h2 className="font-display text-2xl md:text-4xl font-semibold text-brand-dark mb-6 tracking-wide">
               Flavor, Quality, & Pure Vegetarian Ethics
             </h2>
             <div className="space-y-6 text-sm md:text-base text-brand-dark/75 font-sans leading-relaxed">
               <p>
-                Founded on the values of traditional Indian hospitality, Balaji Chilkur Family Dhaba was established to serve high-quality, pure vegetarian cuisine to families and visitors in Aziz Nagar, Himayat Sagar Road, and the Chilkur locality.
+                Located near the famous Chilkur Balaji Temple, Balaji Chilkur Family Dhaba has become a favourite stop for families, travellers, and devotees looking for authentic North and South Indian vegetarian cuisine. Founded with a commitment to pure vegetarian ethics, our kitchen serves as a culinary sanctuary on the Aziz Nagar - Himayat Nagar route.
               </p>
               <p>
-                We believe that great vegetarian food starts with freshness. From our signature Paneer Butter Masala to our hot, tandoor-baked Butter Naan, we prepare our dishes daily using premium ingredients and direct farm-sourced vegetables.
+                We believe that true flavor begins with standard ingredients and respect for traditional recipes. Every morning, our chefs hand-grind whole spices, clay-bake tandoori roti and naans, and simmer fresh curries to order. Our focus is on serving clean, delicious, and homely meals that bring families together after their visits to the temple.
               </p>
               <div className="border-l-4 border-brand-accent pl-6 py-2 my-8">
                 <p className="font-display italic text-brand-dark/90 font-medium">
-                  "Awesome food taste, friendly staff, and owner is very good and down to earth. Visited with my family, and loved the experience. There is plenty of parking space."
+                  "Our commitment is to serve authentic pure vegetarian cuisine prepared with fresh ingredients, traditional recipes, and heartfelt hospitality."
                 </p>
               </div>
             </div>
@@ -51,9 +51,10 @@ export const AboutPage: React.FC = () => {
             className="lg:col-span-6 order-1 lg:order-2 rounded-2xl overflow-hidden aspect-[4/3] shadow-lg"
           >
             <img 
-              src="https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=800&q=80" 
-              alt="Balaji Santosh Family Dhaba cooking process" 
+              src="/paneer-butter-masala.jpg" 
+              alt="Fresh vegetarian curries and naan at Balaji Chilkur Family Dhaba" 
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              loading="lazy"
             />
           </motion.div>
         </div>
@@ -68,9 +69,10 @@ export const AboutPage: React.FC = () => {
             className="lg:col-span-6 rounded-2xl overflow-hidden aspect-[4/3] shadow-lg"
           >
             <img 
-              src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80" 
-              alt="Premium spices and ingredients at Balaji Santosh Family Dhaba" 
+              src="/dhaba_restaurant.png" 
+              alt="Balaji Chilkur Family Dhaba restaurant ambience and dining stops" 
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              loading="lazy"
             />
           </motion.div>
 
@@ -81,7 +83,7 @@ export const AboutPage: React.FC = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="lg:col-span-6"
           >
-            <h2 className="font-display text-2xl md:text-4xl font-extrabold text-brand-dark mb-6">
+            <h2 className="font-display text-2xl md:text-4xl font-semibold text-brand-dark mb-6 tracking-wide">
               Our Culinary Philosophy
             </h2>
             <div className="space-y-6 text-sm md:text-base text-brand-dark/75 font-sans leading-relaxed">
@@ -93,7 +95,7 @@ export const AboutPage: React.FC = () => {
               </p>
               <div className="border-l-4 border-brand-accent pl-6 py-2 my-8">
                 <p className="font-display italic text-brand-dark/90 font-medium">
-                  "Good family restaurant near Chilkur. All vegetarian dishes available here, serving high-quality food with generous portions."
+                  "Every meal reflects our passion for purity, quality, and memorable family dining."
                 </p>
               </div>
             </div>
