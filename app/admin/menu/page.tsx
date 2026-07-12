@@ -92,13 +92,21 @@ export default function MenuCMS() {
     if (!categoryName) return;
 
     try {
-      const url = editingCategory ? '/api/cms/menu' : '/api/cms/menu';
       const method = editingCategory ? 'PUT' : 'POST';
-      const body = editingCategory 
-        ? { action: 'category', id: editingCategory.id, name: categoryName, description: categoryDescription }
-        : { action: 'category', name: categoryName, description: categoryDescription };
 
-      const res = await fetch(url, {
+      // API schema: { type, id (PUT only), data: {...} }
+      const body = editingCategory
+        ? {
+            type: 'category',
+            id: editingCategory.id,
+            data: { name: categoryName, description: categoryDescription }
+          }
+        : {
+            type: 'category',
+            data: { name: categoryName, description: categoryDescription }
+          };
+
+      const res = await fetch('/api/cms/menu', {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -122,7 +130,8 @@ export default function MenuCMS() {
   const handleDeleteCategory = async (id: string) => {
     if (!confirm('Are you sure you want to delete this category? All its dishes will be deleted!')) return;
     try {
-      const res = await fetch(`/api/cms/menu?action=category&id=${id}`, { method: 'DELETE' });
+      // API DELETE uses ?type=category&id=...
+      const res = await fetch(`/api/cms/menu?type=category&id=${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         broadcastMenuUpdate();
@@ -142,9 +151,7 @@ export default function MenuCMS() {
 
     try {
       const method = editingDish ? 'PUT' : 'POST';
-      const body = {
-        action: 'dish',
-        id: editingDish?.id,
+      const dishData = {
         name: dishName,
         teluguName: dishTeluguName || null,
         description: dishDescription || '',
@@ -161,6 +168,13 @@ export default function MenuCMS() {
         scheduleDays: dishScheduleDays,
         scheduleTimings: dishScheduleTimings || null
       };
+
+      // API schema:
+      //   POST: { type: 'dish', data: {...} }
+      //   PUT:  { type: 'dish', id: '...', data: {...} }
+      const body = editingDish
+        ? { type: 'dish', id: editingDish.id, data: dishData }
+        : { type: 'dish', data: dishData };
 
       const res = await fetch('/api/cms/menu', {
         method,
@@ -223,7 +237,8 @@ export default function MenuCMS() {
   const handleDeleteDish = React.useCallback(async (id: string) => {
     if (!confirm('Are you sure you want to delete this dish?')) return;
     try {
-      const res = await fetch(`/api/cms/menu?action=dish&id=${id}`, { method: 'DELETE' });
+      // API DELETE uses ?type=dish&id=...
+      const res = await fetch(`/api/cms/menu?type=dish&id=${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         broadcastMenuUpdate();
@@ -246,21 +261,24 @@ export default function MenuCMS() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'dish',
-          name: `${dish.name} (Copy)`,
-          teluguName: dish.teluguName,
-          description: dish.description,
-          price: dish.price,
-          categoryId: dish.categoryId,
-          image: dish.image,
-          isVegetarian: dish.isVegetarian,
-          isBestseller: dish.isBestseller,
-          isChefSpecial: dish.isChefSpecial,
-          isSeasonal: dish.isSeasonal,
-          isOutOfStock: dish.isOutOfStock,
-          isHidden: true, // Hide by default
-          scheduleDays: dish.scheduleDays,
-          scheduleTimings: dish.scheduleTimings
+          // API POST schema: { type: 'dish', data: {...} }
+          type: 'dish',
+          data: {
+            name: `${dish.name} (Copy)`,
+            teluguName: dish.teluguName,
+            description: dish.description,
+            price: dish.price,
+            categoryId: dish.categoryId,
+            image: dish.image,
+            isVegetarian: dish.isVegetarian,
+            isBestseller: dish.isBestseller,
+            isChefSpecial: dish.isChefSpecial,
+            isSeasonal: dish.isSeasonal,
+            isOutOfStock: dish.isOutOfStock,
+            isHidden: true, // Hide by default
+            scheduleDays: dish.scheduleDays,
+            scheduleTimings: dish.scheduleTimings
+          }
         })
       });
       const data = await res.json();
