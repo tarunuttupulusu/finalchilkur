@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     });
 
     await logAdminAction(user.id, user.email, 'ADD_GALLERY_PHOTO', `Photo: ${photo.title}`, null, photo);
-    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), revalidateTag('gallery')]);
+    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), (revalidateTag as any)('gallery')]);
 
     return NextResponse.json({ success: true, photo }, { headers: noCacheHeaders });
   } catch (error: any) {
@@ -114,7 +114,7 @@ export async function PUT(request: Request) {
       
       await Promise.all(updates);
       await logAdminAction(user.id, user.email, 'REORDER_GALLERY', `Reordered ${updates.length} items`, null, null);
-      await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), revalidateTag('gallery')]);
+      await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), (revalidateTag as any)('gallery')]);
       
       return NextResponse.json({ success: true, message: 'Reordered successfully' }, { headers: noCacheHeaders });
     }
@@ -145,7 +145,7 @@ export async function PUT(request: Request) {
     });
 
     await logAdminAction(user.id, user.email, 'UPDATE_GALLERY_PHOTO', `Photo: ${photo.title}`, oldVal, photo);
-    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), revalidateTag('gallery')]);
+    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), (revalidateTag as any)('gallery')]);
 
     return NextResponse.json({ success: true, photo }, { headers: noCacheHeaders });
   } catch (error: any) {
@@ -177,7 +177,7 @@ export async function DELETE(request: Request) {
     await prisma.galleryPhoto.delete({ where: { id } });
 
     await logAdminAction(user.id, user.email, 'DELETE_GALLERY_PHOTO', `Photo: ${photo.title}`, photo, null);
-    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), revalidateTag('gallery')]);
+    await Promise.all([revalidatePath('/gallery'), revalidatePath('/'), (revalidateTag as any)('gallery')]);
 
     return NextResponse.json({ success: true, message: 'Photo deleted successfully' }, { headers: noCacheHeaders });
   } catch (error: any) {
