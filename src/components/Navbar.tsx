@@ -16,6 +16,9 @@ export const Navbar: React.FC = () => {
   const [badgeColor, setBadgeColor] = useState('#D35400');
   const [activeHash, setActiveHash] = useState('');
 
+  const isHomepage = pathname === '/';
+  const showScrolledStyle = isScrolled || !isHomepage;
+
   useEffect(() => {
     async function fetchAnnouncement() {
       try {
@@ -141,9 +144,9 @@ export const Navbar: React.FC = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-          isScrolled 
+          showScrolledStyle 
             ? 'glass-panel shadow-md bg-brand-bg/90 backdrop-blur-md' 
-            : 'bg-black/20 backdrop-blur-sm'
+            : 'bg-transparent'
         }`}
       >
         {/* Top Announcement Bar - Visible only when not scrolled */}
@@ -174,7 +177,7 @@ export const Navbar: React.FC = () => {
               className="w-16 h-16 md:w-[72px] md:h-[72px] object-contain"
             />
             <span className={`font-display text-xs sm:text-sm md:text-base font-bold tracking-wider uppercase transition-colors duration-300 group-hover:text-brand-gold drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] ${
-              isScrolled ? 'text-brand-dark' : 'text-white'
+              showScrolledStyle ? 'text-brand-dark' : 'text-white'
             }`}>
               BALAJI CHILUKUR FAMILY DHABA
             </span>
@@ -190,7 +193,7 @@ export const Navbar: React.FC = () => {
                 className={`relative font-sans text-sm font-medium tracking-wide uppercase transition-colors duration-300 py-1 ${
                   isLinkActive(link.path) 
                     ? 'text-brand-gold' 
-                    : isScrolled 
+                    : showScrolledStyle 
                       ? 'text-brand-dark hover:text-brand-accent'
                       : 'text-white/90 hover:text-brand-gold drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]'
                 }`}
@@ -210,9 +213,9 @@ export const Navbar: React.FC = () => {
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-5">
             <a 
-              href="tel:+919849498681" 
+              href="tel:+919347104569" 
               className={`p-2.5 rounded-full border transition-colors flex items-center justify-center ${
-                isScrolled
+                showScrolledStyle
                   ? 'border-brand-dark/15 text-brand-dark hover:text-brand-accent hover:border-brand-accent'
                   : 'border-white/30 text-white hover:text-brand-gold hover:border-brand-gold'
               }`}
@@ -263,7 +266,7 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className={`p-2 rounded-full transition-colors ${
-                isScrolled
+                showScrolledStyle
                   ? 'text-brand-dark hover:text-brand-accent'
                   : 'text-white hover:text-brand-gold'
               }`}
@@ -301,11 +304,11 @@ export const Navbar: React.FC = () => {
 
             <div className="flex flex-col space-y-4 mb-8">
               <a 
-                href="tel:+919849498681" 
+                href="tel:+919347104569" 
                 className="w-full flex justify-center items-center space-x-2 text-brand-dark border border-brand-dark/30 py-3.5 rounded-full font-bold uppercase tracking-wider"
               >
                 <Phone size={16} className="text-brand-accent" />
-                <span>Call 098494 98681</span>
+                <span>Call +91 93471 04569</span>
               </a>
               
               <div className="relative w-full">

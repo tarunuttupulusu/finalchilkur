@@ -12,13 +12,52 @@ const ZOMATO_URL = 'https://www.zomato.com/hyderabad/restaurants?q=Balaji+Santos
 
 // ─── Order Platform Modal ──────────────────────────────────────────────────────
 interface OrderModalProps {
-  dishName: string;
+  dish: Dish;
   onClose: () => void;
 }
-const OrderModal: React.FC<OrderModalProps> = ({ dishName, onClose }) => {
-  const swiggyItemUrl = `https://www.swiggy.com/search?query=${encodeURIComponent('Balaji Chilkur Family Dhaba ' + dishName)}`;
-  const whatsappUrl = `https://wa.me/919849498681?text=${encodeURIComponent(`Hello, I would like to order "${dishName}" from Balaji Chilkur Family Dhaba.`)}`;
-  const [showZomatoAlert, setShowZomatoAlert] = useState(false);
+const OrderModal: React.FC<OrderModalProps> = ({ dish, onClose }) => {
+  const [step, setStep] = useState<'options' | 'whatsappForm'>('options');
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [houseNo, setHouseNo] = useState('');
+  const [areaDetails, setAreaDetails] = useState('');
+  const [landmark, setLandmark] = useState('');
+  const [gpsLink, setGpsLink] = useState('');
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const swiggyItemUrl = `https://www.swiggy.com/search?query=${encodeURIComponent('Balaji Chilkur Family Dhaba ' + dish.name)}`;
+  const zomatoItemUrl = `https://www.zomato.com/search?q=${encodeURIComponent('Balaji Chilkur Family Dhaba ' + dish.name)}`;
+
+  const numericPrice = useMemo(() => {
+    if (typeof dish.price === 'number') return dish.price;
+    const match = dish.price.replace(/,/g, '').match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+  }, [dish.price]);
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        // Generate google maps link
+        const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+        setGpsLink(mapsLink);
+        setGpsLoading(false);
+      },
+      (error) => {
+        console.error(error);
+        alert("Unable to retrieve GPS coordinates. Please type your address details manually below.");
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   // Close on Escape key press
   useEffect(() => {
@@ -39,6 +78,54 @@ const OrderModal: React.FC<OrderModalProps> = ({ dishName, onClose }) => {
       document.body.style.overflow = origOverflow;
     };
   }, []);
+
+  const handleWhatsAppOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerName || !phone || !houseNo || !areaDetails) return;
+    
+    setIsSubmitting(true);
+    try {
+      // Construct full location string
+      const fullLocation = `House: ${houseNo}, Area: ${areaDetails}${landmark ? `, Landmark: ${landmark}` : ''}${gpsLink ? ` | GPS Pin: ${gpsLink}` : ''}`;
+
+      // 1. Prepare items checklist
+      const orderItems = [
+        { name: dish.name, quantity: 1, price: numericPrice }
+      ];
+      orderItems.push({ name: `📍 Drop-off: ${fullLocation}`, quantity: 1, price: 0 });
+
+      // 2. Log order to database via API
+      await fetch('/api/whatsapp/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName,
+          phone,
+          items: orderItems,
+          total: numericPrice,
+        }),
+      });
+      
+      // 3. Open WhatsApp with pre-filled details
+      const messageText = `Hello, I would like to order:
+- Item: ${dish.name}
+- Category: ${dish.category}
+- Price: ₹${dish.price}
+- Drop-off Location: ${fullLocation}
+
+My Details:
+- Name: ${customerName}
+- Phone: ${phone}`;
+      
+      const whatsappUrl = `https://wa.me/919347104569?text=${encodeURIComponent(messageText)}`;
+      window.open(whatsappUrl, '_blank');
+      onClose();
+    } catch (err) {
+      console.error('Failed to log WhatsApp order:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 md:p-8">
@@ -75,101 +162,217 @@ const OrderModal: React.FC<OrderModalProps> = ({ dishName, onClose }) => {
           <h3 className="font-display text-2xl font-extrabold text-[#F6EFE3]">Order Online</h3>
           <p className="text-sm text-[#F6EFE3]/60 font-sans mt-1">
             Choose your platform to order&nbsp;
-            <span className="text-brand-gold font-semibold">{dishName}</span>
+            <span className="text-brand-gold font-semibold">{dish.name}</span>
           </p>
         </div>
 
-        {/* Platform buttons */}
-        <div className="p-6 space-y-4">
-          {/* Swiggy + Zomato — side by side on desktop */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Swiggy */}
-            <a
-              href={swiggyItemUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col items-center gap-3 bg-[#FC8019] hover:bg-[#e8710f] text-white px-4 py-6 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-orange-300/30"
-            >
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md shrink-0">
-                <span className="text-[#FC8019] font-extrabold text-2xl leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>S</span>
-              </div>
-              <div className="text-center">
-                <div className="font-extrabold text-lg tracking-wide">Swiggy</div>
-                <div className="text-xs opacity-80 font-normal mt-0.5">Fast delivery · Live tracking</div>
-              </div>
-              <span className="text-white/70 text-sm group-hover:translate-x-1 transition-transform">Order Now →</span>
-            </a>
+        {step === 'whatsappForm' ? (
+          <form onSubmit={handleWhatsAppOrderSubmit} className="p-6 space-y-5">
+            <h4 className="font-display font-extrabold text-lg text-brand-dark mb-1">WhatsApp Order Details</h4>
+            <p className="text-xs text-brand-dark/60 leading-relaxed">
+              Provide your details to log this order on our kitchen dashboard and redirect to WhatsApp chat.
+            </p>
 
-            {/* Zomato */}
-            <button
-              onClick={() => setShowZomatoAlert(true)}
-              className="group flex flex-col items-center gap-3 bg-[#E23744]/45 hover:bg-[#E23744]/55 text-[#2B1B12] border border-brand-dark/10 px-4 py-6 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.03] active:scale-[0.97] shadow-sm cursor-pointer"
-            >
-              <div className="w-14 h-14 bg-white/90 rounded-2xl flex items-center justify-center shadow-md shrink-0">
-                <span className="text-[#E23744] font-extrabold text-2xl leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>Z</span>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-brand-dark/50 mb-1.5">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="w-full px-4 py-3 bg-[#FAF6EE] border border-brand-dark/15 rounded-xl font-semibold text-brand-dark text-sm focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+                />
               </div>
-              <div className="text-center">
-                <div className="font-extrabold text-lg tracking-wide text-brand-dark/80">Zomato</div>
-                <div className="text-[10px] text-brand-dark/60 font-semibold mt-0.5">Not Active Online</div>
-              </div>
-              <span className="text-brand-dark/50 text-xs mt-1">Tap for Info →</span>
-            </button>
-          </div>
 
-          {/* Zomato warning alert box */}
-          <AnimatePresence>
-            {showZomatoAlert && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="p-4 bg-brand-gold/10 border border-brand-gold/30 rounded-2xl text-left"
-              >
-                <div className="flex items-center gap-2 text-brand-accent font-bold text-xs uppercase tracking-wider">
-                  <span>⚠️</span> Zomato Delivery Offline
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-brand-dark/50 mb-1.5">
+                  WhatsApp Mobile Number
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="e.g. +91 98765 43210"
+                  className="w-full px-4 py-3 bg-[#FAF6EE] border border-brand-dark/15 rounded-xl font-semibold text-brand-dark text-sm focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+                />
+              </div>
+
+              {/* GPS Pin option */}
+              <div>
+                {gpsLink ? (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-200 px-3 py-2 rounded-xl text-[10px] text-green-800 font-bold uppercase tracking-wider">
+                    <div className="flex items-center gap-1.5 font-sans">
+                      <span className="text-xs">✅</span>
+                      <span>GPS Pin Attached</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setGpsLink('')}
+                      className="text-[9px] text-red-600 hover:underline font-black font-sans uppercase tracking-wider"
+                    >
+                      Clear Pin
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleGetCurrentLocation}
+                    disabled={gpsLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-brand-dark/5 hover:bg-brand-dark/10 text-brand-dark border border-dashed border-brand-dark/25 rounded-xl text-xs font-bold uppercase transition-all"
+                  >
+                    {gpsLoading ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" /> Fetching GPS coords...
+                      </>
+                    ) : (
+                      <>📍 Pin Current GPS Coordinates</>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* House details */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-dark/50 mb-1">
+                    Flat / House / Floor
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={houseNo}
+                    onChange={(e) => setHouseNo(e.target.value)}
+                    placeholder="e.g. Flat 201"
+                    className="w-full px-3 py-2.5 bg-[#FAF6EE] border border-brand-dark/15 rounded-xl font-semibold text-brand-dark text-xs focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+                  />
                 </div>
-                <p className="text-xs text-brand-dark/85 font-sans mt-2 leading-relaxed">
-                  Balaji Santosh Family Dhaba is currently not active on Zomato for delivery at this location. Please use the <strong>Swiggy</strong> option above or place a direct order via <strong>WhatsApp</strong> below!
-                </p>
-                <button
-                  onClick={() => setShowZomatoAlert(false)}
-                  className="mt-3 text-[10px] font-bold uppercase tracking-widest text-brand-accent hover:underline"
-                >
-                  Dismiss
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          {/* WhatsApp — full width */}
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-4 bg-[#25D366] hover:bg-[#1eb85a] text-white px-6 py-4 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-green-300/30 w-full"
-          >
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
-              <span className="text-[#25D366] font-extrabold text-xl">💬</span>
-            </div>
-            <div className="flex-1 text-left">
-              <div className="font-extrabold text-base">WhatsApp</div>
-              <div className="text-xs opacity-80 font-normal">Call or chat to place order directly</div>
-            </div>
-            <span className="opacity-70 text-sm group-hover:translate-x-1 transition-transform shrink-0">→</span>
-          </a>
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-dark/50 mb-1">
+                    Landmark (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={landmark}
+                    onChange={(e) => setLandmark(e.target.value)}
+                    placeholder="e.g. Near temple"
+                    className="w-full px-3 py-2.5 bg-[#FAF6EE] border border-brand-dark/15 rounded-xl font-semibold text-brand-dark text-xs focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+                  />
+                </div>
+              </div>
 
-          <p className="text-center text-[10px] text-brand-dark/40 font-sans pt-1">
-            Balaji Chilkur Family Dhaba · Moinabad · +91 98494 98681
-          </p>
-        </div>
+              {/* Area details */}
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-brand-dark/50 mb-1">
+                  Area / Locality / Street
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={areaDetails}
+                  onChange={(e) => setAreaDetails(e.target.value)}
+                  placeholder="e.g. Chilkur Balaji Temple Road, Moinabad"
+                  className="w-full px-3 py-2.5 bg-[#FAF6EE] border border-brand-dark/15 rounded-xl font-semibold text-brand-dark text-xs focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStep('options')}
+                className="w-1/3 px-4 py-3 bg-brand-dark/5 hover:bg-brand-dark/10 text-brand-dark rounded-xl text-xs font-bold uppercase transition-all"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-2/3 px-4 py-3 bg-[#25D366] hover:bg-[#1eb85a] text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md shadow-green-300/30 flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" /> Logging Order...
+                  </>
+                ) : (
+                  <>Confirm & Order</>
+                )}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="p-6 space-y-4">
+            {/* Swiggy + Zomato — side by side */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Swiggy */}
+              <a
+                href={swiggyItemUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-3 bg-[#FC8019] hover:bg-[#e8710f] text-white px-4 py-6 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-orange-300/30"
+              >
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md shrink-0">
+                  <span className="text-[#FC8019] font-extrabold text-2xl leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>S</span>
+                </div>
+                <div className="text-center">
+                  <div className="font-extrabold text-lg tracking-wide">Swiggy</div>
+                  <div className="text-xs opacity-80 font-normal mt-0.5">Fast delivery · Live tracking</div>
+                </div>
+                <span className="text-white/70 text-sm group-hover:translate-x-1 transition-transform">Order Now →</span>
+              </a>
+
+              {/* Zomato */}
+              <a
+                href={zomatoItemUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center gap-3 bg-[#E23744] hover:bg-[#cb2c3a] text-white px-4 py-6 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-red-300/30"
+              >
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md shrink-0">
+                  <span className="text-[#E23744] font-extrabold text-2xl leading-none" style={{ fontFamily: 'Arial, sans-serif' }}>Z</span>
+                </div>
+                <div className="text-center">
+                  <div className="font-extrabold text-lg tracking-wide">Zomato</div>
+                  <div className="text-xs opacity-80 font-normal mt-0.5">Fast delivery · Live tracking</div>
+                </div>
+                <span className="text-white/70 text-sm group-hover:translate-x-1 transition-transform">Order Now →</span>
+              </a>
+            </div>
+
+            {/* WhatsApp — full width */}
+            <button
+              onClick={() => setStep('whatsappForm')}
+              className="group flex items-center gap-4 bg-[#25D366] hover:bg-[#1eb85a] text-white px-6 py-4 rounded-2xl font-bold transition-all duration-250 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-green-300/30 w-full text-left cursor-pointer"
+            >
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                <span className="text-[#25D366] font-extrabold text-xl">💬</span>
+              </div>
+              <div className="flex-1">
+                <div className="font-extrabold text-base">WhatsApp</div>
+                <div className="text-xs opacity-80 font-normal">Call or chat to place order directly</div>
+              </div>
+              <span className="opacity-70 text-sm group-hover:translate-x-1 transition-transform shrink-0">→</span>
+            </button>
+
+            <p className="text-center text-[10px] text-brand-dark/40 font-sans pt-1">
+              Balaji Chilkur Family Dhaba · Moinabad · +91 93471 04569
+            </p>
+          </div>
+        )}
       </motion.div>
     </div>,
     document.body
   );
 };
 
+
 // ─── OrderTrigger ────────────────────────────────────────────────────────────────
-const OrderTrigger: React.FC<{ dishName: string; isOutOfStock?: boolean }> = ({ dishName, isOutOfStock }) => {
+const OrderTrigger: React.FC<{ dish: Dish; isOutOfStock?: boolean }> = ({ dish, isOutOfStock }) => {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -211,7 +414,7 @@ const OrderTrigger: React.FC<{ dishName: string; isOutOfStock?: boolean }> = ({ 
         )}
       </button>
       <AnimatePresence>
-        {open && <OrderModal dishName={dishName} onClose={() => setOpen(false)} />}
+        {open && <OrderModal dish={dish} onClose={() => setOpen(false)} />}
       </AnimatePresence>
     </>
   );
@@ -315,7 +518,7 @@ const Lightbox: React.FC<LightboxProps> = ({ dish, onClose }) => {
 
           <div className="flex items-center justify-between border-t border-brand-dark/10 pt-4">
             <span className="font-display text-3xl font-black text-brand-dark">{dish.price}</span>
-            <OrderTrigger dishName={dish.name} />
+            <OrderTrigger dish={dish} />
           </div>
         </div>
       </motion.div>
@@ -354,20 +557,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
           : 'p-0'
       }`}
     >
-      {/* Highlighted banner when arriving from Home page */}
-      {isHighlighted && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 bg-brand-gold/15 border border-brand-gold/40 rounded-2xl px-5 py-3 mb-5"
-        >
-          <span className="text-lg">🍽️</span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Order from this section</p>
-            <p className="text-xs text-brand-dark/60 font-sans mt-0.5">Click any dish to view details, then order via Swiggy or Zomato</p>
-          </div>
-        </motion.div>
-      )}
+
       {/* Category Header */}
       <div className="flex items-center justify-between mb-4 px-1">
         <div>
@@ -394,7 +584,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
       <div
         ref={scrollRef}
         className="flex gap-5 overflow-x-auto pb-3 no-scrollbar scroll-smooth"
-        style={{ scrollSnapType: 'x mandatory' }}
+        style={{ scrollSnapType: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         {dishes.map((dish) => (
           <motion.div
@@ -404,7 +594,6 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
             className={`shrink-0 w-44 md:w-52 bg-[#F6EFE3] rounded-xl overflow-hidden border border-brand-dark/10 shadow-sm transition-all ${
               dish.isOutOfStock ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:shadow-xl group'
             }`}
-            style={{ scrollSnapAlign: 'start' }}
             onClick={dish.isOutOfStock ? undefined : () => onDishClick(dish)}
           >
             {/* Image */}
@@ -469,7 +658,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
               <p className="text-[10px] font-sans text-brand-dark/60 leading-relaxed mt-1 line-clamp-2">{dish.description}</p>
               {/* Order button – stops propagation so lightbox doesn't open */}
               <div className="mt-2 pt-2 border-t border-brand-dark/5" onClick={(e) => e.stopPropagation()}>
-                <OrderTrigger dishName={dish.name} isOutOfStock={dish.isOutOfStock} />
+                <OrderTrigger dish={dish} isOutOfStock={dish.isOutOfStock} />
               </div>
             </div>
           </motion.div>

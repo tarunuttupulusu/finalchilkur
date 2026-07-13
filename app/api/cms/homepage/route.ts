@@ -3,6 +3,8 @@ import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 function getYouTubeEmbedUrl(url: string) {
   if (!url) return '';
   

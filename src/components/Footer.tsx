@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, Phone, Clock, Compass } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const [branches, setBranches] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadBranches() {
+      try {
+        const res = await fetch('/api/cms/branches');
+        const data = await res.json();
+        if (data.success && data.branches) {
+          // Sort Moinabad first, others second
+          const sorted = [...data.branches].sort((a: any, b: any) => {
+            if (a.name.toLowerCase().includes('moinabad')) return -1;
+            if (b.name.toLowerCase().includes('moinabad')) return 1;
+            return 0;
+          });
+          setBranches(sorted);
+        }
+      } catch (e) {
+        console.error('Failed to load footer branches:', e);
+      }
+    }
+    loadBranches();
+  }, []);
 
   return (
     <footer className="bg-brand-dark text-[#F6EFE3]/80 border-t border-brand-gold/15 py-20 px-6 md:px-12 relative overflow-hidden font-sans">
@@ -33,7 +55,7 @@ export const Footer: React.FC = () => {
           <div className="flex space-x-4 pt-2">
             {/* Green Call Icon */}
             <a 
-              href="tel:+919849498681" 
+              href="tel:+919347104569" 
               className="w-10 h-10 flex items-center justify-center rounded-full bg-[#2ECC71] hover:scale-110 shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 active:scale-95" 
               aria-label="Call Balaji Dhaba"
             >
@@ -44,7 +66,7 @@ export const Footer: React.FC = () => {
             
             {/* Official WhatsApp Green */}
             <a 
-              href="https://wa.me/919849498681?text=Hi%20Balaji%20Chilkur%20Family%20Dhaba!%20I'd%20like%20to%20make%20an%20inquiry." 
+              href="https://wa.me/919347104569?text=Hi%20Balaji%20Chilkur%20Family%20Dhaba!%20I'd%20like%20to%20make%20an%20inquiry." 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-10 h-10 flex items-center justify-center rounded-full bg-[#25D366] hover:scale-110 shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-green-600/20 active:scale-95" 
@@ -60,72 +82,55 @@ export const Footer: React.FC = () => {
               href="https://instagram.com" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:scale-110 shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 active:scale-95"
-              style={{ background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-[#FFB900] via-[#D10176] to-[#3B199C] hover:scale-110 shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 active:scale-95" 
               aria-label="Instagram Balaji Dhaba"
             >
               <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-              </svg>
-            </a>
-            
-            {/* Official YouTube Red */}
-            <a 
-              href="https://youtube.com" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FF0000] hover:scale-110 shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-red-600/20 active:scale-95" 
-              aria-label="YouTube Balaji Dhaba"
-            >
-              <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
-                <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.508a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.87.508 9.388.508 9.388.508s7.518 0 9.388-.508a3.003 3.003 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
               </svg>
             </a>
           </div>
         </div>
 
-        {/* Quick Links with Translate and gold highlights */}
+        {/* Quick Links */}
         <div className="flex flex-col space-y-4">
           <h4 className="font-display text-lg font-bold tracking-wider text-brand-bg border-b border-brand-gold/15 pb-2">
-            Quick Links
+            Navigation
           </h4>
           <ul className="space-y-3 text-sm">
             <li>
-              <Link href="/" className="hover:text-brand-gold hover:translate-x-1 inline-block transform transition-all duration-300">Home</Link>
+              <Link href="/" className="hover:text-brand-gold hover:translate-x-1 transform inline-block transition-all duration-300">Home</Link>
             </li>
             <li>
-              <Link href="/menu" className="hover:text-brand-gold hover:translate-x-1 inline-block transform transition-all duration-300">Interactive Menu</Link>
+              <Link href="/menu" className="hover:text-brand-gold hover:translate-x-1 transform inline-block transition-all duration-300">Our Menu</Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-brand-gold hover:translate-x-1 inline-block transform transition-all duration-300">Our Heritage</Link>
+              <Link href="/about" className="hover:text-brand-gold hover:translate-x-1 transform inline-block transition-all duration-300">About Us</Link>
             </li>
             <li>
-              <Link href="/gallery" className="hover:text-brand-gold hover:translate-x-1 inline-block transform transition-all duration-300">Photo Gallery</Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-brand-gold hover:translate-x-1 inline-block transform transition-all duration-300">Find Us & Contact</Link>
+              <Link href="/contact" className="hover:text-brand-gold hover:translate-x-1 transform inline-block transition-all duration-300">Contact</Link>
             </li>
           </ul>
         </div>
 
-        {/* Operating Hours & Services */}
+        {/* Dynamic Operating Hours from settings or standard fallbacks */}
         <div className="flex flex-col space-y-4">
           <h4 className="font-display text-lg font-bold tracking-wider text-brand-bg border-b border-brand-gold/15 pb-2">
-            Opening Hours
+            Operational Hours
           </h4>
-          <ul className="space-y-4 text-sm text-[#F6EFE3]/70">
-            <li className="flex items-start space-x-3 group">
-              <Clock size={16} className="text-brand-gold shrink-0 mt-0.5 group-hover:rotate-12 transition-transform duration-300" />
+          <ul className="space-y-4 text-xs">
+            <li className="flex items-start space-x-3">
+              <Clock size={16} className="text-brand-gold shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-brand-bg leading-none">Daily Operation</p>
-                <p className="text-xs text-[#F6EFE3]/50 mt-1">11:00 AM – 11:00 PM</p>
+                <p className="font-bold text-[#F6EFE3]">Lunch Service</p>
+                <p className="mt-1 text-[#F6EFE3]/60">11:00 AM – 4:00 PM</p>
               </div>
             </li>
-            <li className="flex items-start space-x-3 group">
-              <Compass size={16} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
+            <li className="flex items-start space-x-3">
+              <Clock size={16} className="text-brand-gold shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-brand-bg leading-none">Services Available</p>
-                <p className="text-xs text-[#F6EFE3]/50 mt-1">Dine In • Takeaway • Delivery</p>
+                <p className="font-bold text-[#F6EFE3]">Dinner Service</p>
+                <p className="mt-1 text-[#F6EFE3]/60">6:30 PM – 11:00 PM</p>
               </div>
             </li>
           </ul>
@@ -137,36 +142,69 @@ export const Footer: React.FC = () => {
             Our Branches
           </h4>
           <ul className="space-y-4 text-[#F6EFE3]/70">
-            <li className="flex items-start space-x-3 group">
-              <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
-              <a 
-                href="https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
-              >
-                <p className="font-bold text-[#F6EFE3] text-sm leading-none">Moinabad Branch (Primary)</p>
-                <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Aziz Nagar, Himayat Sagar Rd, Moinabad</p>
-              </a>
-            </li>
-            
-            <li className="flex items-start space-x-3 group">
-              <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
-              <a 
-                href="https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
-              >
-                <p className="font-bold text-[#F6EFE3] text-sm leading-none">Pragathi Nagar Branch</p>
-                <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally</p>
-              </a>
-            </li>
-            
-            <li className="flex items-center space-x-3 pt-2 border-t border-[#F6EFE3]/10 group">
-              <Phone size={16} className="text-brand-gold shrink-0 group-hover:scale-110 transition-transform duration-300" />
-              <a href="tel:+919849498681" className="hover:text-brand-gold text-sm font-semibold transition-all duration-300 group-hover:translate-x-0.5 transform inline-block">+91 98494 98681</a>
-            </li>
+            {branches.length === 0 ? (
+              <>
+                <li className="flex items-start space-x-3 group">
+                  <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
+                  <a 
+                    href="https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
+                  >
+                    <p className="font-bold text-[#F6EFE3] text-sm leading-none">Moinabad Branch (Primary)</p>
+                    <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Aziz Nagar, Himayat Sagar Rd, Moinabad</p>
+                  </a>
+                </li>
+                
+                <li className="flex items-start space-x-3 group">
+                  <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
+                  <a 
+                    href="https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
+                  >
+                    <p className="font-bold text-[#F6EFE3] text-sm leading-none">Pragathi Nagar Branch</p>
+                    <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally</p>
+                  </a>
+                </li>
+                
+                <li className="flex items-center space-x-3 pt-2 border-t border-[#F6EFE3]/10 group">
+                  <Phone size={16} className="text-brand-gold shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                  <a href="tel:+919347104569" className="hover:text-brand-gold text-sm font-semibold transition-all duration-300 group-hover:translate-x-0.5 transform inline-block">+91 93471 04569</a>
+                </li>
+              </>
+            ) : (
+              <>
+                {branches.map((b) => {
+                  const q = encodeURIComponent(`${b.name} ${b.address}`);
+                  return (
+                    <li key={b.id} className="flex items-start space-x-3 group">
+                      <MapPin size={18} className="text-brand-gold shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300" />
+                      <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${q}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
+                      >
+                        <p className="font-bold text-[#F6EFE3] text-sm leading-none">{b.name}</p>
+                        <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">{b.address}</p>
+                      </a>
+                    </li>
+                  );
+                })}
+                
+                {branches.map((b, idx) => (
+                  <li key={`phone-${b.id}`} className={`flex items-center space-x-3 pt-2 group ${idx > 0 ? '' : 'border-t border-[#F6EFE3]/10'}`}>
+                    <Phone size={16} className="text-brand-gold shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                    <a href={`tel:${b.phone}`} className="hover:text-brand-gold text-sm font-semibold transition-all duration-300 group-hover:translate-x-0.5 transform inline-block">
+                      {b.phone} ({b.name.replace(' Branch', '')})
+                    </a>
+                  </li>
+                ))}
+              </>
+            )}
           </ul>
         </div>
 

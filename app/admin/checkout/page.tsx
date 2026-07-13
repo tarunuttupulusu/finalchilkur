@@ -482,7 +482,7 @@ We look forward to serving you again.`;
                 </Text>
                 <Input 
                   size="large"
-                  placeholder="e.g. 9849498681" 
+                  placeholder="e.g. 9347104569" 
                   prefix={<Phone size={14} className="text-gray-400" />}
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ''))}

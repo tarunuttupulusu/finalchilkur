@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 
-// This would interact with the WhatsApp Cloud API in Phase 2
-// For Phase 1, it just saves the order to the database
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -14,10 +11,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Generate unique order reference (e.g., ORD-A9B4C)
     const orderRef = 'ORD-' + crypto.randomBytes(3).toString('hex').toUpperCase();
 
-    // Create order in database
     const order = await prisma.whatsAppOrder.create({
       data: {
         orderRef,
@@ -29,9 +24,6 @@ export async function POST(request: Request) {
       }
     });
 
-    // Here we would trigger the WhatsApp Cloud API message using a pre-approved template
-    // e.g., await sendWhatsAppMessage(phone, templateName, variables)
-
     return NextResponse.json({
       success: true,
       order,
@@ -41,5 +33,45 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('WhatsApp Order Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json({ error: 'Missing order ID or status' }, { status: 400 });
+    }
+
+    const updatedOrder = await prisma.whatsAppOrder.update({
+      where: { id },
+      data: { status }
+    });
+
+    let whatsappLog = '';
+    if (status === 'confirmed') {
+      whatsappLog = `[WhatsApp Send] Mocked message sent to ${updatedOrder.phone}: "Hello ${updatedOrder.customerName || 'Customer'}, your order (${updatedOrder.orderRef}) has been confirmed and is now preparing!"`;
+      console.log(whatsappLog);
+    } else if (status === 'delivering') {
+      whatsappLog = `[WhatsApp Send] Mocked message sent to ${updatedOrder.phone}: "Hello ${updatedOrder.customerName || 'Customer'}, your order (${updatedOrder.orderRef}) is out for delivery!"`;
+      console.log(whatsappLog);
+    } else if (status === 'completed') {
+      whatsappLog = `[WhatsApp Send] Mocked message sent to ${updatedOrder.phone}: "Hello ${updatedOrder.customerName || 'Customer'}, your order (${updatedOrder.orderRef}) has been successfully delivered! Thank you for dining with Balaji Chilkur!"`;
+      console.log(whatsappLog);
+    } else if (status === 'cancelled') {
+      whatsappLog = `[WhatsApp Send] Mocked message sent to ${updatedOrder.phone}: "Hello ${updatedOrder.customerName || 'Customer'}, your order (${updatedOrder.orderRef}) has been cancelled. Please contact us for details."`;
+      console.log(whatsappLog);
+    }
+
+    return NextResponse.json({
+      success: true,
+      order: updatedOrder,
+      whatsappLog
+    });
+  } catch (error: any) {
+    console.error('Error updating order:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

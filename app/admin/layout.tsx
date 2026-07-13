@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
@@ -21,22 +21,83 @@ import {
   Users,
   ShieldAlert,
   Database,
-  Award
+  Award,
+  Bell
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import AntdProvider from '@/components/AntdProvider';
+import AdminLoginSnapshotModal from '@/components/AdminLoginSnapshotModal';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [counts, setCounts] = useState<{
+    whatsapp_orders: number;
+    reservations: number;
+    testimonials: number;
+    queries: number;
+  }>({
+    whatsapp_orders: 0,
+    reservations: 0,
+    testimonials: 0,
+    queries: 0
+  });
 
-  // Do not render sidebar on login page
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
+
+  const fetchNotificationCounts = async () => {
+    try {
+      const params = new URLSearchParams();
+      const lastSeenOrders = localStorage.getItem('lastSeen_orders');
+      const lastSeenReservations = localStorage.getItem('lastSeen_reservations');
+      const lastSeenQueries = localStorage.getItem('lastSeen_queries');
+
+      if (lastSeenOrders) params.set('lastSeen_orders', lastSeenOrders);
+      if (lastSeenReservations) params.set('lastSeen_reservations', lastSeenReservations);
+      if (lastSeenQueries) params.set('lastSeen_queries', lastSeenQueries);
+
+      const res = await fetch(`/api/admin/notifications?${params.toString()}`);
+      const data = await res.json();
+      if (data.success && data.counts) {
+        setCounts(data.counts);
+      }
+    } catch (e) {
+      console.error('Failed to load notification counts:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotificationCounts();
+    const interval = setInterval(fetchNotificationCounts, 15_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch the current admin's email for the snapshot modal
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setAdminEmail(user.email);
+    })();
+  }, []);
+
+  // Update seen marker timestamps when pathname changes
+  useEffect(() => {
+    if (pathname === '/admin/orders') {
+      localStorage.setItem('lastSeen_orders', new Date().toISOString());
+      setCounts(prev => ({ ...prev, whatsapp_orders: 0 }));
+    } else if (pathname === '/admin/reservations') {
+      localStorage.setItem('lastSeen_reservations', new Date().toISOString());
+      setCounts(prev => ({ ...prev, reservations: 0 }));
+    } else if (pathname === '/admin/messages') {
+      localStorage.setItem('lastSeen_queries', new Date().toISOString());
+      setCounts(prev => ({ ...prev, queries: 0 }));
+    } else if (pathname === '/admin/testimonials') {
+      localStorage.setItem('last_seen_testimonials_count', counts.testimonials.toString());
+    }
+  }, [pathname, counts.testimonials]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -46,23 +107,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Reservations', path: '/admin/reservations', icon: Calendar, badgeKey: 'reservations' },
+    { name: 'WhatsApp Orders', path: '/admin/orders', icon: MessageCircle, badgeKey: 'whatsapp_orders' },
     { name: 'Checkout Rewards', path: '/admin/checkout', icon: Award },
-    { name: 'Reservations', path: '/admin/reservations', icon: Calendar },
-    { name: 'WhatsApp Orders', path: '/admin/orders', icon: MessageCircle },
     { name: 'QR Scanner', path: '/admin/scanner', icon: QrCode },
-    { name: 'Menu Editor', path: '/admin/menu', icon: UtensilsCrossed },
-    { name: 'Gallery CMS', path: '/admin/gallery', icon: Image },
     { name: 'Homepage CMS', path: '/admin/homepage', icon: Home },
-    { name: 'Offers / Promos', path: '/admin/offers', icon: Tag },
-    { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquare },
-    { name: 'Customer Inbox', path: '/admin/messages', icon: Inbox },
-    { name: 'Customer DB', path: '/admin/customers', icon: Users },
+    { name: 'Menu Editor CMS', path: '/admin/menu', icon: UtensilsCrossed },
+    { name: 'Gallery CMS', path: '/admin/gallery', icon: Image },
+    { name: 'Offers CMS', path: '/admin/offers', icon: Tag },
+    { name: 'Reviews CMS', path: '/admin/testimonials', icon: MessageSquare, badgeKey: 'testimonials' },
+    { name: 'Customer Inbox', path: '/admin/messages', icon: Inbox, badgeKey: 'queries' },
     { name: 'Audit Trail', path: '/admin/audit', icon: ShieldAlert },
     { name: 'Backups & Seed', path: '/admin/backup', icon: Database },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
+  const totalNotifications = Object.values(counts).reduce((a, b) => a + b, 0);
+
+  // Do not render sidebar on login page
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
+    <>
     <AntdProvider>
       <div className="flex h-screen bg-[#FDF8F5] overflow-hidden font-sans selection:bg-[#D35400] selection:text-[#FDF8F5]">
         {/* Desktop Sidebar (Deep Chocolate-Charcoal #4A2E2B) */}
@@ -81,24 +149,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </p>
             </div>
           </div>
+
+
           
           {/* Navigation */}
-          <nav className="flex-1 py-6 px-4 flex flex-col gap-1.5 overflow-y-auto">
+          <nav className="flex-1 py-5 px-4 flex flex-col gap-1.5 overflow-y-auto">
             {navItems.map((item) => {
               const isActive = pathname === item.path;
               const Icon = item.icon;
+              
+              // Get current count from API
+              const baseCount = item.badgeKey ? (counts[item.badgeKey as keyof typeof counts] || 0) : 0;
+              
+              // Testimonials seen offset
+              let badgeCount = baseCount;
+              if (item.badgeKey === 'testimonials') {
+                const seenCount = typeof window !== 'undefined' ? Number(localStorage.getItem('last_seen_testimonials_count') || 0) : 0;
+                badgeCount = Math.max(0, baseCount - seenCount);
+              }
+
+              // If currently viewing this page, hide the badge (seen)
+              if (isActive) {
+                badgeCount = 0;
+              }
+
               return (
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-[11px] font-bold uppercase tracking-wider border ${
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-[11px] font-bold uppercase tracking-wider border relative group ${
                     isActive 
                       ? 'bg-[#D35400] text-white shadow-sm border-[#D35400]/30' 
                       : 'text-[#FAF6EE]/75 border-transparent hover:bg-[#FAF6EE]/10 hover:text-white'
                   }`}
                 >
-                  <Icon size={14} className={isActive ? 'text-white' : 'text-[#FAF6EE]/50 group-hover:text-[#D35400]'} />
+                  <Icon size={14} className={isActive ? 'text-white' : 'text-[#FAF6EE]/50 group-hover:text-[#D35400] transition-colors'} />
                   <span>{item.name}</span>
+                  {badgeCount > 0 && (
+                    <span className="ml-auto bg-[#D35400] text-white text-[9px] font-black px-2 py-0.5 rounded-full min-w-[18px] text-center shadow-md animate-pulse border border-white/10">
+                      {badgeCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -147,23 +238,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AnimatePresence>
           {mobileMenuOpen && (
             <div className="lg:hidden fixed inset-0 bg-[#4A2E2B]/95 z-40 backdrop-blur-md flex flex-col pt-24 px-6 pb-6">
+
               <nav className="flex-grow flex flex-col gap-2 overflow-y-auto">
                 {navItems.map((item) => {
                   const isActive = pathname === item.path;
                   const Icon = item.icon;
+                  
+                  const baseCount = item.badgeKey ? (counts[item.badgeKey as keyof typeof counts] || 0) : 0;
+                  
+                  let badgeCount = baseCount;
+                  if (item.badgeKey === 'testimonials') {
+                    const seenCount = typeof window !== 'undefined' ? Number(localStorage.getItem('last_seen_testimonials_count') || 0) : 0;
+                    badgeCount = Math.max(0, baseCount - seenCount);
+                  }
+
+                  if (isActive) {
+                    badgeCount = 0;
+                  }
+
                   return (
                     <Link
                       key={item.path}
                       href={item.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all font-bold uppercase tracking-wider text-xs border ${
+                      className={`flex items-center justify-between px-5 py-3.5 rounded-xl transition-all font-bold uppercase tracking-wider text-xs border ${
                         isActive 
                           ? 'bg-[#D35400] text-white border-[#D35400]/30' 
                           : 'text-[#FAF6EE]/75 border-transparent hover:bg-[#FAF6EE]/10 hover:text-white'
                       }`}
                     >
-                      <Icon size={16} />
-                      <span>{item.name}</span>
+                      <div className="flex items-center gap-4">
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </div>
+                      {badgeCount > 0 && (
+                        <span className="bg-[#D35400] text-white text-[10px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-md animate-pulse">
+                          {badgeCount}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -185,5 +297,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </AnimatePresence>
       </div>
     </AntdProvider>
+    {/* Admin daily login verification modal */}
+    {adminEmail && <AdminLoginSnapshotModal adminEmail={adminEmail} />}
+    </>
   );
 }

@@ -3,6 +3,8 @@ import { revalidatePath, revalidateTag as originalRevalidateTag } from 'next/cac
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 const revalidateTag = (tag: string) => {
   try {
     (originalRevalidateTag as any)(tag);

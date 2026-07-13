@@ -27,7 +27,7 @@ export async function POST(request: Request) {
           id: branchId,
           name: 'Chintal Branch',
           address: 'Main Road, Chintal',
-          phone: '+91 98494 98681',
+          phone: '+91 93471 04569',
           totalTables: 20,
           openingTime: '11:00 AM',
           closingTime: '11:00 PM'

@@ -6,7 +6,7 @@ const STATIC_BRANCHES = [
   {
     name: "Moinabad Branch",
     address: "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
-    phone: "098494 98681",
+    phone: "+91 93471 04569",
     mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
     mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
     rating: "4.1 ★ (63 reviews)",
@@ -16,7 +16,7 @@ const STATIC_BRANCHES = [
   {
     name: "Visit Our Second Branch – Pragathi Nagar",
     address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
-    phone: "098494 98681",
+    phone: "+91 93471 04569",
     mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
     mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
     rating: "4.3 ★ (19 reviews)",
@@ -40,30 +40,18 @@ export const ContactPage: React.FC = () => {
         const data = await res.json();
         if (data.success && data.branches.length > 0) {
           const mapped = data.branches.map((b: any) => {
-            const isMoinabad = b.name.toLowerCase().includes('moinabad') || b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e';
-            if (isMoinabad) {
-              return {
-                name: "Moinabad Branch",
-                address: b.address,
-                phone: b.phone,
-                mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
-                mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
-                rating: "4.1 ★ (63 reviews)",
-                openingTime: b.openingTime || "11:00",
-                closingTime: b.closingTime || "23:00"
-              };
-            } else {
-              return {
-                name: "Visit Our Second Branch – Pragathi Nagar",
-                address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
-                phone: b.phone || "098494 98681",
-                mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
-                mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
-                rating: "4.3 ★ (19 reviews)",
-                openingTime: b.openingTime || "11:00",
-                closingTime: b.closingTime || "23:00"
-              };
-            }
+            const q = encodeURIComponent(`${b.name} ${b.address}`);
+            return {
+              id: b.id,
+              name: b.name,
+              address: b.address,
+              phone: b.phone,
+              mapEmbedUrl: b.mapEmbedUrl || `https://maps.google.com/maps?q=${q}&t=&z=15&ie=UTF8&iwloc=&output=embed`,
+              mapNavUrl: b.mapNavUrl || `https://www.google.com/maps/search/?api=1&query=${q}`,
+              rating: b.name.toLowerCase().includes('moinabad') ? "4.1 ★ (63 reviews)" : "4.3 ★ (19 reviews)",
+              openingTime: b.openingTime || "11:00",
+              closingTime: b.closingTime || "23:00"
+            };
           });
 
           // Sort Moinabad first, Pragathi Nagar second
@@ -145,63 +133,47 @@ export const ContactPage: React.FC = () => {
 
         {/* Branch Selector animated cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16 font-sans">
-          {/* Card 1: Moinabad */}
-          <div 
-            onClick={() => setActiveBranch(0)}
-            className={`p-6 rounded-3xl cursor-pointer border transition-all duration-500 flex flex-col justify-between ${
-              activeBranch === 0
-                ? 'bg-white border-[#C1440E] shadow-lg shadow-[#C1440E]/5 scale-[1.02]'
-                : 'bg-[#ECE3D4]/25 border-brand-dark/5 hover:border-brand-dark/15 shadow-sm'
-            }`}
-          >
-            <div>
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#D35400] bg-[#D35400]/10 px-2.5 py-1 rounded-full">
-                  Primary Location
-                </span>
-                <span className="text-xs text-[#D4AF37] font-semibold">★★★★★</span>
+          {branches.map((b: any, idx: number) => {
+            const isActive = activeBranch === idx;
+            const isMoinabad = b.name.toLowerCase().includes('moinabad');
+            return (
+              <div 
+                key={b.id || idx}
+                onClick={() => setActiveBranch(idx)}
+                className={`p-6 rounded-3xl cursor-pointer border transition-all duration-500 flex flex-col justify-between ${
+                  isActive
+                    ? 'bg-white border-[#C1440E] shadow-lg shadow-[#C1440E]/5 scale-[1.02]'
+                    : 'bg-[#ECE3D4]/25 border-brand-dark/5 hover:border-brand-dark/15 shadow-sm'
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-start">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                      isMoinabad ? 'text-[#D35400] bg-[#D35400]/10' : 'text-brand-dark/60 bg-brand-dark/5'
+                    }`}>
+                      {isMoinabad ? 'Primary Location' : `Branch #${idx + 1}`}
+                    </span>
+                    <span className="text-xs text-[#D4AF37] font-semibold">{isMoinabad ? '★★★★★' : '★★★★☆'}</span>
+                  </div>
+                  <h3 className="font-display font-bold text-lg text-brand-dark mt-4">{b.name}</h3>
+                  <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">
+                    {isMoinabad 
+                      ? 'Flagship outlet near the holy Chilkur Balaji Temple.'
+                      : 'Authentic pure vegetarian store location.'
+                    }
+                  </p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-brand-dark/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                  <span className={isMoinabad ? 'text-[#2ECC71]' : 'text-brand-gold'}>
+                    ● {isMoinabad ? 'Open Now' : 'Visit Branch'}
+                  </span>
+                  <span className={isActive ? 'text-[#C1440E]' : 'text-brand-dark/50'}>
+                    {isActive ? 'Currently Selected' : 'Select Branch →'}
+                  </span>
+                </div>
               </div>
-              <h3 className="font-display font-bold text-lg text-brand-dark mt-4">Moinabad Branch</h3>
-              <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">
-                Flagship outlet near the holy Chilkur Balaji Temple.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-brand-dark/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-              <span className="text-[#2ECC71]">● Open Now</span>
-              <span className={activeBranch === 0 ? 'text-[#C1440E]' : 'text-brand-dark/50'}>
-                {activeBranch === 0 ? 'Currently Selected' : 'Select Branch →'}
-              </span>
-            </div>
-          </div>
-
-          {/* Card 2: Pragathi Nagar */}
-          <div 
-            onClick={() => setActiveBranch(1)}
-            className={`p-6 rounded-3xl cursor-pointer border transition-all duration-500 flex flex-col justify-between ${
-              activeBranch === 1
-                ? 'bg-white border-[#C1440E] shadow-lg shadow-[#C1440E]/5 scale-[1.02]'
-                : 'bg-[#ECE3D4]/25 border-brand-dark/5 hover:border-brand-dark/15 shadow-sm'
-            }`}
-          >
-            <div>
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-dark/60 bg-brand-dark/5 px-2.5 py-1 rounded-full">
-                  Second Location
-                </span>
-                <span className="text-xs text-zinc-400 font-semibold">★★★★☆</span>
-              </div>
-              <h3 className="font-display font-bold text-lg text-brand-dark mt-4">Pragathi Nagar Branch</h3>
-              <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">
-                Premium dining outlet serving the Kukatpally locality.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-brand-dark/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-              <span className="text-brand-gold">● Visit Branch</span>
-              <span className={activeBranch === 1 ? 'text-[#C1440E]' : 'text-brand-dark/50'}>
-                {activeBranch === 1 ? 'Currently Selected' : 'Select Branch →'}
-              </span>
-            </div>
-          </div>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 items-stretch">

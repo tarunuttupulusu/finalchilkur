@@ -37,3 +37,4 @@ tsconfig.tsbuildinfo
 # Secrets and environment files
 .env
 .env*.local
+migrate-data.cjs

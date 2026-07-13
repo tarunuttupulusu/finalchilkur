@@ -199,7 +199,7 @@ const HOME_BRANCHES = [
   {
     name: "Moinabad Branch",
     address: "4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075",
-    phone: "098494 98681",
+    phone: "+91 93471 04569",
     mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
     mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
     openingTime: "11:00",
@@ -208,7 +208,7 @@ const HOME_BRANCHES = [
   {
     name: "Visit Our Second Branch – Pragathi Nagar",
     address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
-    phone: "098494 98681",
+    phone: "+91 93471 04569",
     mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
     mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
     openingTime: "11:00",
@@ -407,31 +407,20 @@ export const Home: React.FC = () => {
   const listBranches = React.useMemo(() => {
     const rawList = branches.length > 0 ? branches : HOME_BRANCHES;
     const mapped = rawList.map(b => {
-      const isMoinabad = b.name.toLowerCase().includes('moinabad') || b.id === '52ae6a0f-daee-40f5-aa0e-ac44e17d325e';
-      if (isMoinabad) {
-        return {
-          name: "Moinabad Branch",
-          address: b.address,
-          phone: b.phone,
-          mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Aziz%20Nagar%20Himayat%20Sagar%20Rd%20Moinabad%20Telangana&t=&z=15&ie=UTF8&iwloc=&output=embed",
-          mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Aziz+Nagar+Himayat+Sagar+Rd+Moinabad+Telangana",
-          openingTime: b.openingTime || "11:00",
-          closingTime: b.closingTime || "23:00"
-        };
-      } else {
-        return {
-          name: "Visit Our Second Branch – Pragathi Nagar",
-          address: "Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally, Hyderabad, Telangana 500090",
-          phone: b.phone || "098494 98681",
-          mapEmbedUrl: "https://maps.google.com/maps?q=Balaji%20Santosh%20Family%20Dhaba%20Pragathi%20Nagar%20Kukatpally%20Hyderabad&t=&z=15&ie=UTF8&iwloc=&output=embed",
-          mapNavUrl: "https://www.google.com/maps/search/?api=1&query=Balaji+Santosh+Family+Dhaba+Pragathi+Nagar+Kukatpally+Hyderabad",
-          openingTime: b.openingTime || "11:00",
-          closingTime: b.closingTime || "23:00"
-        };
-      }
+      const q = encodeURIComponent(`${b.name} ${b.address}`);
+      return {
+        id: b.id,
+        name: b.name,
+        address: b.address,
+        phone: b.phone,
+        mapEmbedUrl: b.mapEmbedUrl || `https://maps.google.com/maps?q=${q}&t=&z=15&ie=UTF8&iwloc=&output=embed`,
+        mapNavUrl: b.mapNavUrl || `https://www.google.com/maps/search/?api=1&query=${q}`,
+        openingTime: b.openingTime || "11:00",
+        closingTime: b.closingTime || "23:00"
+      };
     });
 
-    // Ensure Moinabad is always first, Pragathi Nagar is second
+    // Ensure Moinabad is always first, Pragathi Nagar/others are second
     return [...mapped].sort((a, b) => {
       if (a.name.includes("Moinabad")) return -1;
       if (b.name.includes("Moinabad")) return 1;
@@ -514,11 +503,19 @@ export const Home: React.FC = () => {
               title="Balaji Santosh Family Dhaba Background Video"
               allow="autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-              style={{ border: 'none', pointerEvents: 'none' }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                         w-[177.78vh] h-[100vh]
-                         min-w-full min-h-full
-                         opacity-40 scale-110"
+              style={{
+                border: 'none',
+                pointerEvents: 'none',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) scale(1.05)',
+                width: '100vw',
+                height: '177.78vw',
+                minWidth: '56.25vh',
+                minHeight: '100vh',
+              }}
+              className="opacity-40"
             />
 
             {/* Premium luxury dark radial gradient overlay */}
@@ -870,99 +867,52 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Branch Switcher animated premium cards */}
-          {/* Luxury Minimal Branch Selector */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mb-16">
-            {/* Card 1: Moinabad Branch */}
-            <div
-              onClick={() => setActiveBranch(0)}
-              onMouseEnter={e => {
-                if (activeBranch !== 0) {
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(212,175,55,0.18)';
-                  (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
-                }
-              }}
-              onMouseLeave={e => {
-                if (activeBranch !== 0) {
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)';
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(30,20,10,0.10)';
-                }
-              }}
-              className="cursor-pointer rounded-[20px] border flex items-center justify-center"
-              style={{
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease',
-                padding: '2.25rem 2rem',
-                background: activeBranch === 0 ? '#FFF9F2' : '#ffffff',
-                borderColor: activeBranch === 0 ? '#D4AF37' : 'rgba(30,20,10,0.10)',
-                boxShadow: activeBranch === 0
-                  ? '0 0 0 1px #D4AF37, 0 8px 32px rgba(212,175,55,0.14)'
-                  : '0 2px 12px rgba(0,0,0,0.05)',
-                transform: 'translateY(0)',
-              } as React.CSSProperties}
-            >
-              <div className="text-center">
-                {activeBranch === 0 && (
-                  <span className="block w-8 h-[2px] bg-[#D4AF37] mx-auto mb-4 rounded-full" />
-                )}
-                <h3
-                  className="font-display font-semibold tracking-wide"
-                  style={{
-                    fontSize: '1.125rem',
-                    color: activeBranch === 0 ? '#1a120b' : '#4a3728',
-                    letterSpacing: '0.02em',
+          <div className="flex flex-wrap gap-4 justify-center max-w-2xl mx-auto mb-12">
+            {listBranches.map((branch, idx) => {
+              const isActive = activeBranch === idx;
+              return (
+                <div
+                  key={branch.id || idx}
+                  onClick={() => setActiveBranch(idx)}
+                  onMouseEnter={e => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(212,175,55,0.12)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
+                    }
                   }}
-                >
-                  Moinabad Branch
-                </h3>
-              </div>
-            </div>
-
-            {/* Card 2: Pragathi Nagar Branch */}
-            <div
-              onClick={() => setActiveBranch(1)}
-              onMouseEnter={e => {
-                if (activeBranch !== 1) {
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(212,175,55,0.18)';
-                  (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
-                }
-              }}
-              onMouseLeave={e => {
-                if (activeBranch !== 1) {
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.05)';
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(30,20,10,0.10)';
-                }
-              }}
-              className="cursor-pointer rounded-[20px] border flex items-center justify-center"
-              style={{
-                padding: '2.25rem 2rem',
-                background: activeBranch === 1 ? '#FFF9F2' : '#ffffff',
-                borderColor: activeBranch === 1 ? '#D4AF37' : 'rgba(30,20,10,0.10)',
-                boxShadow: activeBranch === 1
-                  ? '0 0 0 1px #D4AF37, 0 8px 32px rgba(212,175,55,0.14)'
-                  : '0 2px 12px rgba(0,0,0,0.05)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease',
-                transform: 'translateY(0)',
-              } as React.CSSProperties}
-            >
-              <div className="text-center">
-                {activeBranch === 1 && (
-                  <span className="block w-8 h-[2px] bg-[#D4AF37] mx-auto mb-4 rounded-full" />
-                )}
-                <h3
-                  className="font-display font-semibold tracking-wide"
-                  style={{
-                    fontSize: '1.125rem',
-                    color: activeBranch === 1 ? '#1a120b' : '#4a3728',
-                    letterSpacing: '0.02em',
+                  onMouseLeave={e => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                      (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(30,20,10,0.10)';
+                    }
                   }}
+                  className="cursor-pointer rounded-full border flex items-center justify-center transition-all duration-300 h-12 px-6"
+                  style={{
+                    background: isActive ? '#FFF9F2' : '#ffffff',
+                    borderColor: isActive ? '#D4AF37' : 'rgba(30,20,10,0.10)',
+                    boxShadow: isActive
+                      ? '0 0 0 1.5px #D4AF37, 0 6px 20px rgba(212,175,55,0.12)'
+                      : '0 2px 8px rgba(0,0,0,0.03)',
+                    transform: 'translateY(0)',
+                  } as React.CSSProperties}
                 >
-                  Pragathi Nagar Branch
-                </h3>
-              </div>
-            </div>
+                  <h3
+                    className="font-display font-bold tracking-wide flex items-center justify-center gap-1.5 transition-colors duration-300 select-none"
+                    style={{
+                      fontSize: '0.85rem',
+                      color: isActive ? '#C1440E' : '#4a3728',
+                      letterSpacing: '0.03em',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <span className="text-xs transition-opacity duration-300" style={{ opacity: isActive ? 1 : 0, width: isActive ? 'auto' : 0, overflow: 'hidden' }}>📍</span>
+                    {branch.name}
+                  </h3>
+                </div>
+              );
+            })}
           </div>
 
           {(() => {

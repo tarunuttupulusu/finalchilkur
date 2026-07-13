@@ -4,6 +4,7 @@ import {
   Plus, Trash2, ArrowUp, ArrowDown, FolderPlus, Image, FileText, Upload,
   X, Check, Loader2, Sparkles, AlertCircle, Edit, Star, RefreshCw, ChevronRight
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function GalleryCMS() {
   const [photos, setPhotos] = useState<any[]>([]);
@@ -293,11 +294,19 @@ export default function GalleryCMS() {
     }
   };
 
-  // Handle photo deletion
-  const handleDeletePhoto = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this image? This will permanently remove it.')) return;
+  // Deletion verification states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const handleDeletePhoto = (id: string) => {
+    setDeleteTargetId(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetId) return;
     try {
-      const res = await fetch(`/api/cms/gallery?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/cms/gallery?id=${deleteTargetId}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         broadcastGalleryUpdate();
@@ -789,6 +798,135 @@ export default function GalleryCMS() {
           </form>
         </div>
       )}
+
+      {/* Admin Confirm Delete credentials modal */}
+      <AdminConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Delete Gallery Photo"
+        message="Deleting this photo will remove it from the website gallery permanently. Verification is required."
+      />
+    </div>
+  );
+}
+
+interface AdminConfirmDeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  title?: string;
+  message?: string;
+}
+
+function AdminConfirmDeleteModal({ isOpen, onClose, onConfirm, title, message }: AdminConfirmDeleteModalProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const supabase = createClient();
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      // Validate credentials using Supabase signInWithPassword
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (authError) {
+        setError("Invalid administrator credentials. Deletion denied.");
+        setLoading(false);
+        return;
+      }
+
+      // Credentials are correct! Proceed to actual deletion callback
+      await onConfirm();
+      setEmail('');
+      setPassword('');
+      onClose();
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/45 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-brand-dark/5 space-y-4">
+        <div>
+          <h3 className="font-display font-black text-lg text-[#4A2E2B]">{title}</h3>
+          <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">{message}</p>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl border border-rose-100 font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors"
+              placeholder="admin@example.com"
+              autoComplete="off"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors"
+              placeholder="••••••••"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg border border-brand-dark/10 hover:bg-brand-dark/5 text-brand-dark text-[11px] font-bold uppercase tracking-wider"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 justify-center min-w-[110px]"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={12} className="animate-spin" /> Verifying...
+                </>
+              ) : (
+                "Verify & Delete"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

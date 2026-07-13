@@ -3,6 +3,8 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // Headers that prevent ALL caching layers (Vercel Edge, CDN, browser) from caching this response.
 const noCacheHeaders = {
   'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',

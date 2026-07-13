@@ -56,8 +56,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, phone, subject, message } = body;
 
-    if (!name || !email || !phone || !message) {
-      return NextResponse.json({ success: false, error: 'Missing required fields (name, email, phone, message)' }, { status: 400 });
+    if (!name || !email) {
+      return NextResponse.json({ success: false, error: 'Missing required fields (name, email)' }, { status: 400 });
     }
 
     // Basic email validation
@@ -70,9 +70,9 @@ export async function POST(request: Request) {
       data: {
         name,
         email,
-        phone,
+        phone: phone || "",
         subject: subject || null,
-        message
+        message: message || ""
       }
     });
 

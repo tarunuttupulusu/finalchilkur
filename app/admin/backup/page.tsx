@@ -4,6 +4,8 @@ import {
   Database, Download, Upload, RefreshCw, Loader2, Sparkles, Check, 
   AlertTriangle, ShieldAlert, FileText
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
+
 
 export default function BackupCMS() {
   const [loading, setLoading] = useState(false);
@@ -12,13 +14,19 @@ export default function BackupCMS() {
   
   // File restore state
   const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const handleExportBackup = async () => {
+  const handleConfirmCredentials = async (selectedTypes: string[]) => {
+    setIsConfirmModalOpen(false);
+    await handleExportBackup(selectedTypes);
+  };
+
+  const handleExportBackup = async (selectedTypes: string[]) => {
     setLoading(true);
     setSuccessMsg(null);
     setErrorMsg(null);
     try {
-      const res = await fetch('/api/cms/backup');
+      const res = await fetch(`/api/cms/backup?types=${selectedTypes.join(',')}`);
       const data = await res.json();
       if (data.success) {
         const jsonStr = JSON.stringify(data.payload, null, 2);
@@ -166,7 +174,7 @@ export default function BackupCMS() {
               </p>
               
               <button
-                onClick={handleExportBackup}
+                onClick={() => setIsConfirmModalOpen(true)}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-dark hover:bg-brand-dark/95 text-[#F6EFE3] font-bold uppercase tracking-wider text-xs rounded-xl shadow-md disabled:opacity-50 transition-all"
               >
@@ -257,6 +265,185 @@ export default function BackupCMS() {
         </div>
 
       </div>
+
+      {/* Admin confirm credentials modal before downloading */}
+      <AdminConfirmCredentialsModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmCredentials}
+        title="Confirm Credentials"
+        message="Please verify your administrator credentials to download the database backup snapshot."
+      />
     </div>
   );
 }
+
+interface AdminConfirmCredentialsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (selectedTypes: string[]) => Promise<void>;
+  title?: string;
+  message?: string;
+}
+
+function AdminConfirmCredentialsModal({ isOpen, onClose, onConfirm, title, message }: AdminConfirmCredentialsModalProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const supabase = createClient();
+
+  if (!isOpen) return null;
+
+  const dataOptions = [
+    { key: 'orders', label: 'WhatsApp Orders' },
+    { key: 'reservations', label: 'Reservations' },
+    { key: 'menu', label: 'Menu CMS' },
+    { key: 'reviews', label: 'Reviews CMS' },
+    { key: 'offers', label: 'Offers CMS' },
+    { key: 'gallery', label: 'Gallery CMS' },
+    { key: 'messages', label: 'Customer Inbox' },
+    { key: 'settings', label: 'Site Settings' },
+  ];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedTypes.length === 0) {
+      setError("Please select at least one dataset to export.");
+      return;
+    }
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (authError) {
+        setError("Invalid administrator credentials. Download denied.");
+        setLoading(false);
+        return;
+      }
+
+      await onConfirm(selectedTypes);
+      setEmail('');
+      setPassword('');
+      onClose();
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/45 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-brand-dark/5 space-y-4">
+        <div>
+          <h3 className="font-display font-black text-lg text-[#4A2E2B]">{title}</h3>
+          <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">{message}</p>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl border border-rose-100 font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+          {/* Datasets Selection Checks */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50">
+                Select Data to Export
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedTypes.length === dataOptions.length) {
+                    setSelectedTypes([]);
+                  } else {
+                    setSelectedTypes(dataOptions.map(o => o.key));
+                  }
+                }}
+                className="text-[9px] text-[#D35400] hover:underline font-bold uppercase tracking-wider"
+              >
+                {selectedTypes.length === dataOptions.length ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 border border-brand-dark/10 rounded-2xl p-4 bg-brand-bg/50">
+              {dataOptions.map(opt => {
+                const isChecked = selectedTypes.includes(opt.key);
+                return (
+                  <label key={opt.key} className="flex items-center gap-2 text-xs font-semibold text-brand-dark cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => {
+                        if (isChecked) {
+                          setSelectedTypes(prev => prev.filter(t => t !== opt.key));
+                        } else {
+                          setSelectedTypes(prev => [...prev, opt.key]);
+                        }
+                      }}
+                      className="rounded border-zinc-300 text-[#D35400] focus:ring-[#D35400] h-3.5 w-3.5"
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors text-zinc-800"
+              placeholder="admin@example.com"
+              autoComplete="off"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors text-zinc-800"
+              placeholder="••••••••"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg border border-brand-dark/10 hover:bg-brand-dark/5 text-brand-dark text-[11px] font-bold uppercase tracking-wider"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || selectedTypes.length === 0}
+              className="px-4 py-2 rounded-lg bg-[#D35400] hover:bg-[#D35400]/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 justify-center min-w-[110px] disabled:opacity-50"
+            >
+              {loading ? "Verifying..." : "Download"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+

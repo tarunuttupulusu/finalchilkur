@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  Search, MessageSquare, Send, Check, CheckCheck, Inbox, 
-  Loader2, AlertCircle, Phone, Mail, Clock, ShieldAlert, RefreshCw
+  Search, MessageSquare, Check, CheckCheck, Inbox, 
+  Loader2, Phone, Mail, RefreshCw
 } from 'lucide-react';
 
 export default function MessagesCMS() {
@@ -64,9 +64,19 @@ export default function MessagesCMS() {
 
   const handleSelectMessage = (msg: any) => {
     setSelectedMessageId(msg.id);
+    setReplyText(''); // always clear reply box when switching conversations
     if (!msg.isRead) {
       markAsRead(msg.id);
     }
+  };
+
+  // Build a WhatsApp deep link with phone + pre-filled message quoting the original query
+  const buildWhatsAppUrl = (phone: string, customerName: string, originalMessage: string, replyBody: string) => {
+    // Strip non-digits and ensure Indian country code prefix
+    const digits = phone.replace(/\D/g, '');
+    const normalized = digits.startsWith('91') ? digits : `91${digits}`;
+    const text = `Hi ${customerName}! 👋\n\nRegarding your query:\n_"${originalMessage}"_\n\n${replyBody}\n\n— Balaji Dhaba Team`;
+    return `https://wa.me/${normalized}?text=${encodeURIComponent(text)}`;
   };
 
   const handleSendReply = async (e: React.FormEvent) => {
@@ -161,27 +171,37 @@ export default function MessagesCMS() {
         </div>
       ) : (
         /* Split Pane Container */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[72vh] items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 h-[75vh] items-stretch rounded-3xl border border-zinc-200 shadow-lg overflow-hidden bg-white">
           
           {/* Left Panel: Preview List */}
-          <div className="lg:col-span-4 bg-white rounded-2xl border border-brand-dark/10 shadow-sm flex flex-col h-full overflow-hidden">
-            {/* Search Bar */}
-            <div className="p-4 border-b border-brand-dark/5 bg-brand-bg/40 flex items-center gap-2">
-              <Search size={14} className="text-brand-dark/40" />
-              <input
-                type="text"
-                placeholder="Search by name, phone or text..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-xs text-brand-dark/85 focus:outline-none placeholder-brand-dark/40"
-              />
+          <div className="lg:col-span-4 bg-white flex flex-col h-full border-r border-zinc-200">
+            {/* WhatsApp Style List Header */}
+            <div className="p-4 bg-[#f0f2f5] flex justify-between items-center border-b border-zinc-150">
+              <span className="font-display font-black text-sm text-[#111b21] uppercase tracking-wide">Chats</span>
+              <span className="text-[10px] bg-brand-accent/10 text-brand-accent px-2 py-0.5 rounded-full font-bold">
+                {filteredMessages.length} Conversations
+              </span>
             </div>
 
-            {/* Scrollable list */}
-            <div className="flex-1 overflow-y-auto divide-y divide-brand-dark/5 pr-1 no-scrollbar">
+            {/* Search Bar */}
+            <div className="p-2.5 bg-white border-b border-zinc-100 flex items-center gap-2">
+              <div className="bg-[#f0f2f5] flex items-center gap-3 px-3 py-1.5 rounded-full flex-1 border border-transparent focus-within:border-zinc-300 transition-all">
+                <Search size={14} className="text-zinc-500" />
+                <input
+                  type="text"
+                  placeholder="Search by name, phone or text..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-xs text-[#111b21] focus:outline-none placeholder-zinc-400"
+                />
+              </div>
+            </div>
+
+            {/* Scrollable list — padded card grid, scrolls up when full */}
+            <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 no-scrollbar">
               {filteredMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-12 text-center text-brand-dark/40">
-                  <Inbox size={32} className="mb-2 text-brand-dark/30" />
+                <div className="flex flex-col items-center justify-center p-12 text-center text-zinc-400">
+                  <Inbox size={32} className="mb-2 text-zinc-300" />
                   <span className="text-xs font-semibold">No messages found</span>
                 </div>
               ) : (
@@ -191,114 +211,156 @@ export default function MessagesCMS() {
                   const replies = repliesStore[msg.id] || [];
                   const isReplied = msg.isReplied || replies.length > 0;
                   
+                  // Helper to get initials
+                  const initials = msg.name
+                    ? msg.name.trim().split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase()
+                    : "?";
+                  
+                  // Deterministic color
+                  const colors = [
+                    'bg-emerald-100 text-emerald-800',
+                    'bg-sky-100 text-sky-800',
+                    'bg-amber-100 text-amber-800',
+                    'bg-indigo-100 text-indigo-800',
+                    'bg-rose-100 text-rose-800',
+                    'bg-teal-100 text-teal-800'
+                  ];
+                  const colorIdx = (msg.name?.length || 0) % colors.length;
+                  const avatarClass = colors[colorIdx];
+
                   return (
-                    <button
+                    <div
                       key={msg.id}
-                      onClick={() => handleSelectMessage(msg)}
-                      className={`w-full p-4 text-left flex flex-col gap-2 transition-all cursor-pointer border-b border-brand-dark/5 last:border-b-0 ${
-                        isSelected 
-                          ? 'bg-brand-accent text-[#F6EFE3]' 
-                          : 'hover:bg-brand-bg/30 text-brand-dark'
+                      className={`transition-all duration-200 rounded-xl ${
+                        isSelected
+                          ? 'shadow-lg scale-[1.015] z-10 relative'
+                          : 'shadow-none scale-100 z-0'
                       }`}
                     >
-                      <div className="flex justify-between items-start w-full">
-                        <div className="font-bold text-xs truncate max-w-[150px]">
-                          {msg.name}
-                        </div>
-                        <span className={`text-[8px] font-mono shrink-0 ${isSelected ? 'text-[#F6EFE3]/80' : 'text-brand-dark/45'}`}>
-                          {new Date(msg.createdAt).toLocaleDateString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                    <button
+                      onClick={() => handleSelectMessage(msg)}
+                      className={`w-full p-3.5 text-left flex items-start gap-3 transition-all duration-200 cursor-pointer rounded-xl border ${
+                        isSelected 
+                          ? 'bg-white border-[#00a884] ring-1 ring-[#00a884]/30 shadow-md' 
+                          : 'bg-white border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50'
+                      }`}
+                    >
+                      {/* Avatar Circle */}
+                      <div className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm ${avatarClass}`}>
+                        {initials}
                       </div>
 
-                      <p className={`text-[11px] line-clamp-2 ${isSelected ? 'text-[#F6EFE3]/90' : 'text-brand-dark/65'}`}>
-                        {msg.message}
-                      </p>
+                      {/* Info Panel */}
+                      <div className="flex-grow min-w-0">
+                        <div className="flex justify-between items-center w-full mb-0.5">
+                          <span className="font-bold text-xs text-[#111b21] truncate max-w-[130px]">
+                            {msg.name}
+                          </span>
+                          <span className="text-[9px] text-zinc-400 shrink-0 font-medium">
+                            {new Date(msg.createdAt).toLocaleDateString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }).split(',')[1]?.trim() || "Now"}
+                          </span>
+                        </div>
 
-                      <div className="flex items-center justify-between w-full mt-1">
-                        {/* Source Tag */}
-                        <span className={`text-[8px] px-2 py-0.5 rounded font-extrabold uppercase border ${
-                          isSelected 
-                            ? 'bg-brand-dark/20 border-brand-dark/30 text-[#F6EFE3]' 
-                            : 'bg-brand-bg border-brand-dark/10 text-brand-dark/60'
-                        }`}>
-                          {isWebForm ? 'Web Form' : 'WhatsApp'}
-                        </span>
+                        <p className="text-[11px] text-zinc-500 truncate pr-2">
+                          {msg.message}
+                        </p>
 
-                        {/* Status Label */}
-                        <div className="flex items-center gap-1">
-                          {isReplied ? (
-                            <span className={`text-[8px] font-extrabold uppercase flex items-center gap-0.5 ${
-                              isSelected ? 'text-[#F6EFE3]' : 'text-emerald-700'
-                            }`}>
-                              <CheckCheck size={10} />
-                              Replied
-                            </span>
-                          ) : !msg.isRead ? (
-                            <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#F6EFE3]' : 'bg-brand-accent'}`} title="Unread" />
-                          ) : (
-                            <span className={`text-[8px] uppercase font-bold ${isSelected ? 'text-[#F6EFE3]/80' : 'text-brand-dark/45'}`}>Read</span>
-                          )}
+                        <div className="flex items-center justify-between w-full mt-1.5">
+                          <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase border ${
+                            isSelected 
+                              ? 'bg-[#00a884]/10 border-[#00a884]/30 text-[#00a884]' 
+                              : 'bg-zinc-50 border-zinc-200 text-zinc-500'
+                          }`}>
+                            {isWebForm ? 'Web Form' : 'WhatsApp'}
+                          </span>
+
+                          <div className="flex items-center gap-1">
+                            {isReplied ? (
+                              <span className="text-[8px] font-extrabold uppercase flex items-center gap-0.5 text-emerald-600">
+                                <CheckCheck size={10} />
+                                Replied
+                              </span>
+                            ) : !msg.isRead ? (
+                              <span className="w-2 h-2 rounded-full bg-[#00a884] animate-pulse" title="Unread" />
+                            ) : (
+                              <span className="text-[8px] uppercase font-bold text-zinc-400">Read</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </button>
+                    </div>
                   );
                 })
               )}
             </div>
           </div>
 
-          {/* Right Panel: Active Chat Window (warm brand-bg) */}
-          <div className="lg:col-span-8 bg-[#FAF6EE] rounded-2xl border border-brand-dark/10 shadow-sm flex flex-col h-full overflow-hidden">
+          {/* Right Panel: Active Chat Window (WhatsApp Beige wallpaper style) */}
+          <div className="lg:col-span-8 bg-[#efeae2] flex flex-col h-full overflow-hidden relative">
+            {/* Tiled overlay pattern simulation */}
+            <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#111b21_1px,transparent_1px)] [background-size:16px_16px]" />
+
             {activeMessage ? (
               <>
-                {/* Active Chat Header */}
-                <div className="p-4 bg-white border-b border-brand-dark/10 flex justify-between items-center">
-                  <div className="space-y-1">
-                    <h3 className="font-display font-bold text-sm text-brand-dark">{activeMessage.name}</h3>
-                    <div className="flex items-center gap-4 text-[10px] text-brand-dark/60">
-                      <span className="flex items-center gap-1">
-                        <Phone size={10} className="text-brand-accent" />
-                        {activeMessage.phone}
-                      </span>
-                      {activeMessage.email && (
-                        <span className="flex items-center gap-1">
-                          <Mail size={10} className="text-brand-accent" />
-                          {activeMessage.email}
+                {/* Active Chat Header: WhatsApp Web Gray Header style */}
+                <div className="p-3 bg-[#f0f2f5] border-b border-zinc-200 flex justify-between items-center z-10 relative">
+                  <div className="flex items-center gap-3">
+                    {/* Header Avatar */}
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs bg-zinc-200 text-zinc-700 shadow-sm uppercase">
+                      {activeMessage.name ? activeMessage.name.trim().split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase() : "?"}
+                    </div>
+                    
+                    <div className="space-y-0.5">
+                      <h3 className="font-bold text-sm text-[#111b21] leading-tight">{activeMessage.name}</h3>
+                      <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-medium">
+                        <span className="flex items-center gap-0.5">
+                          <Phone size={10} className="text-zinc-400" />
+                          {activeMessage.phone}
                         </span>
-                      )}
+                        {activeMessage.email && (
+                          <span className="flex items-center gap-0.5">
+                            <Mail size={10} className="text-zinc-400" />
+                            {activeMessage.email}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <span className="text-[8px] font-extrabold bg-brand-bg text-brand-accent border border-brand-dark/10 px-2 py-0.5 rounded uppercase">
-                    {activeMessage.email ? 'Source: Web Site Form' : 'Source: WhatsApp Chat'}
+                  <span className="text-[8px] font-extrabold bg-[#00a884]/10 text-[#00a884] border border-[#00a884]/20 px-2 py-0.5 rounded-full uppercase">
+                    {activeMessage.email ? 'Web Form Sub' : 'WhatsApp'}
                   </span>
                 </div>
 
-                {/* Messages Stream */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-4">
-                  {/* Incoming Client Query Bubble */}
+                {/* Messages Stream: Scrollable conversation bubble area */}
+                <div className="flex-grow overflow-y-auto p-6 space-y-4 z-10 relative">
+                  {/* Incoming Client Query Bubble (White WhatsApp style) */}
                   <div className="flex justify-start max-w-[85%]">
-                    <div className="bg-white border border-brand-dark/10 rounded-2xl rounded-tl-none p-4 shadow-sm space-y-1.5 text-brand-dark">
+                    <div className="bg-white text-[#111b21] rounded-lg rounded-tl-none p-3 shadow-sm relative space-y-1">
                       {activeMessage.subject && (
-                        <div className="font-bold text-[10px] uppercase tracking-wider text-brand-accent/60">
+                        <div className="font-bold text-[9px] uppercase tracking-wider text-brand-accent/80 mb-0.5">
                           Subject: {activeMessage.subject}
                         </div>
                       )}
-                      <p className="text-xs font-sans leading-relaxed">{activeMessage.message}</p>
-                      <span className="block text-[8px] text-brand-dark/45 text-right mt-1 font-mono">
-                        Received: {new Date(activeMessage.createdAt).toLocaleString('en-IN')}
-                      </span>
+                      <p className="text-[12px] font-sans leading-relaxed pr-6">{activeMessage.message}</p>
+                      
+                      <div className="text-[8px] text-zinc-400 text-right font-medium block mt-1">
+                        {new Date(activeMessage.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Outgoing Reply History */}
+                  {/* Outgoing Reply History (Soft Light Green WhatsApp style) */}
                   {(repliesStore[activeMessage.id] || []).map((reply: any) => (
                     <div key={reply.id} className="flex justify-end max-w-[85%] ml-auto">
-                      <div className="bg-brand-accent text-[#F6EFE3] rounded-2xl rounded-tr-none p-4 shadow-sm space-y-1 text-right">
-                        <p className="text-xs font-sans leading-relaxed text-left">{reply.message}</p>
-                        <span className="block text-[8px] text-[#F6EFE3]/80 mt-1 font-mono">
-                          Replied: {new Date(reply.createdAt).toLocaleString('en-IN')}
-                        </span>
+                      <div className="bg-[#d9fdd3] text-[#111b21] rounded-lg rounded-tr-none p-3 shadow-sm relative space-y-1">
+                        <p className="text-[12px] font-sans leading-relaxed text-left pr-8">{reply.message}</p>
+                        
+                        <div className="text-[8px] text-zinc-400 flex items-center justify-end gap-1 mt-1 font-medium select-none">
+                          <span>{new Date(reply.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                          <CheckCheck size={12} className="text-[#53bdeb]" />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -306,33 +368,44 @@ export default function MessagesCMS() {
                   <div ref={chatEndRef} />
                 </div>
 
-                {/* Bottom Reply Bar */}
-                <form onSubmit={handleSendReply} className="p-4 bg-white border-t border-brand-dark/10 flex gap-2 items-center">
+                {/* Bottom Reply Bar: WhatsApp redirect style */}
+                <div className="p-3 bg-[#f0f2f5] border-t border-zinc-200 flex gap-2 items-center z-10 relative">
                   <input
                     type="text"
-                    required
-                    placeholder={`Write a reply direct to ${activeMessage.name}...`}
+                    placeholder={`Type a reply to ${activeMessage.name.split(" ")[0]}...`}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full bg-brand-bg/30 border border-brand-dark/10 rounded-xl px-4 py-2.5 text-xs text-brand-dark focus:outline-none focus:border-brand-accent placeholder-brand-dark/40"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && replyText.trim() && activeMessage.phone) {
+                        window.open(buildWhatsAppUrl(activeMessage.phone, activeMessage.name, activeMessage.message, replyText.trim()), '_blank');
+                        setReplyText('');
+                      }
+                    }}
+                    className="w-full bg-white border border-transparent focus:border-zinc-200 rounded-full px-4 py-2 text-xs text-[#111b21] focus:outline-none placeholder-zinc-400 shadow-sm"
                   />
+
+                  {/* WhatsApp Open Button */}
                   <button
-                    type="submit"
-                    disabled={sendingReply || !replyText.trim()}
-                    className="bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] p-2.5 rounded-xl transition-all shadow-sm border border-brand-accent/30 disabled:opacity-50 cursor-pointer flex items-center justify-center shrink-0"
-                    title="Send Reply"
+                    type="button"
+                    disabled={!replyText.trim() || !activeMessage.phone}
+                    onClick={() => {
+                      if (!replyText.trim() || !activeMessage.phone) return;
+                      window.open(buildWhatsAppUrl(activeMessage.phone, activeMessage.name, activeMessage.message, replyText.trim()), '_blank');
+                      setReplyText('');
+                    }}
+                    title={activeMessage.phone ? `Open WhatsApp chat with ${activeMessage.name}` : 'No phone number available'}
+                    className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md transition-all disabled:opacity-40 cursor-pointer bg-[#25D366] hover:bg-[#1ebe5d] active:scale-95"
                   >
-                    {sendingReply ? (
-                      <Loader2 size={14} className="animate-spin text-[#F6EFE3]/80" />
-                    ) : (
-                      <Send size={14} />
-                    )}
+                    {/* Official WhatsApp logo SVG */}
+                    <svg viewBox="0 0 32 32" width="22" height="22" fill="white" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.66 4.76 1.8 6.76L2 30l7.44-1.76A13.93 13.93 0 0016 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.4a11.37 11.37 0 01-5.8-1.58l-.42-.25-4.42 1.05 1.1-4.28-.28-.44A11.4 11.4 0 014.6 16C4.6 9.7 9.7 4.6 16 4.6S27.4 9.7 27.4 16 22.3 27.4 16 27.4zm6.26-8.54c-.34-.17-2.02-1-2.34-1.1-.32-.12-.54-.17-.77.17-.23.34-.88 1.1-1.08 1.33-.2.22-.4.25-.74.08-.34-.17-1.44-.53-2.74-1.7-1.01-.9-1.7-2.01-1.9-2.35-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.22-.34.33-.57.12-.23.06-.43-.03-.6-.08-.17-.76-1.84-1.05-2.52-.27-.65-.55-.56-.76-.57h-.65c-.23 0-.6.08-.91.4-.31.32-1.18 1.15-1.18 2.8s1.2 3.25 1.37 3.47c.17.22 2.37 3.62 5.74 5.08.8.34 1.43.55 1.92.7.8.25 1.54.22 2.12.13.65-.1 2.02-.83 2.3-1.62.28-.8.28-1.48.2-1.62-.09-.14-.3-.22-.64-.4z"/>
+                    </svg>
                   </button>
-                </form>
+                </div>
               </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-brand-dark/40">
-                <MessageSquare size={48} className="text-brand-dark/20 mb-2" />
+              <div className="flex-grow flex flex-col items-center justify-center text-zinc-400 z-10 relative">
+                <MessageSquare size={48} className="text-zinc-300 mb-2" />
                 <span className="text-sm font-semibold">Select a conversation thread to start</span>
               </div>
             )}

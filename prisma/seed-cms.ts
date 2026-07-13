@@ -13,7 +13,7 @@ async function main() {
     update: {
       name: 'Moinabad Branch',
       address: '4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075',
-      phone: '098494 98681',
+      phone: '+91 93471 04569',
       totalTables: 25,
       openingTime: '11:00',
       closingTime: '23:00'
@@ -22,7 +22,7 @@ async function main() {
       id: '52ae6a0f-daee-40f5-aa0e-ac44e17d325e',
       name: 'Moinabad Branch',
       address: '4-15/2part, Aziz Nagar, Himayat Sagar Rd, Moinabad, Telangana 500075',
-      phone: '098494 98681',
+      phone: '+91 93471 04569',
       totalTables: 25,
       openingTime: '11:00',
       closingTime: '23:00'
@@ -34,7 +34,7 @@ async function main() {
     update: {
       name: 'Chinthal Branch',
       address: '1 2nd floor, HMT Rd, above The Kakatiya Co-operative Bank, Chinthal, Quthbullapur, Hyderabad, Telangana 500037',
-      phone: '098494 98681',
+      phone: '+91 93471 04569',
       totalTables: 15,
       openingTime: '11:00',
       closingTime: '23:00'
@@ -43,7 +43,7 @@ async function main() {
       id: 'a2ae6a0f-daee-40f5-aa0e-ac44e17d325f',
       name: 'Chinthal Branch',
       address: '1 2nd floor, HMT Rd, above The Kakatiya Co-operative Bank, Chinthal, Quthbullapur, Hyderabad, Telangana 500037',
-      phone: '098494 98681',
+      phone: '+91 93471 04569',
       totalTables: 15,
       openingTime: '11:00',
       closingTime: '23:00'
@@ -112,8 +112,9 @@ async function main() {
   }
   console.log(`✅ Seeded ${dishCount} dishes.`);
 
-  // 3. Seed Gallery Photos
-  console.log('Seeding gallery photos...');
+  // 3. Clean and Seed Gallery Photos
+  console.log('Cleaning and seeding gallery photos...');
+  await prisma.galleryPhoto.deleteMany({});
   let galleryCount = 0;
   for (let i = 0; i < GALLERY_PHOTOS.length; i++) {
     const photo = GALLERY_PHOTOS[i];
@@ -133,8 +134,9 @@ async function main() {
   }
   console.log(`✅ Seeded ${galleryCount} gallery photos.`);
 
-  // 4. Seed Testimonials
-  console.log('Seeding testimonials...');
+  // 4. Clean and Seed Testimonials
+  console.log('Cleaning and seeding testimonials...');
+  await prisma.testimonial.deleteMany({});
   let testimonialCount = 0;
   for (let i = 0; i < TESTIMONIALS.length; i++) {
     const t = TESTIMONIALS[i];

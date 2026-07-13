@@ -30,6 +30,10 @@
   background: #903008;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: #F6EFE3;
   color: #2B1B12;

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, logAdminAction } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/cms/testimonials
 export async function GET(request: Request) {
   try {

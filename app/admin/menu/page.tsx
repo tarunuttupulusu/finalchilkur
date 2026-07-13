@@ -5,6 +5,7 @@ import {
   Check, X, Loader2, Sparkles, AlertCircle, Eye, EyeOff, Calendar, Clock,
   ChevronRight, RefreshCw, FileText
 } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function MenuCMS() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -31,7 +32,7 @@ export default function MenuCMS() {
   const [dishName, setDishName] = useState('');
   const [dishTeluguName, setDishTeluguName] = useState('');
   const [dishDescription, setDishDescription] = useState('');
-  const [dishPrice, setDishPrice] = useState(0);
+  const [dishPrice, setDishPrice] = useState<string>('');
   const [dishCategoryId, setDishCategoryId] = useState('');
   const [dishImage, setDishImage] = useState('');
   const [dishIsVegetarian, setDishIsVegetarian] = useState(true);
@@ -136,17 +137,40 @@ export default function MenuCMS() {
     }
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this category? All its dishes will be deleted!')) return;
+  // Deletion verification states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'dish' | 'category' } | null>(null);
+
+  const handleDeleteClick = (id: string, type: 'dish' | 'category') => {
+    setDeleteTarget({ id, type });
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const { id, type } = deleteTarget;
     try {
-      // API DELETE uses ?type=category&id=...
-      const res = await fetch(`/api/cms/menu?type=category&id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        broadcastMenuUpdate();
-        loadMenuData();
-      } else {
-        alert(data.error);
+      if (type === 'dish') {
+        const res = await fetch(`/api/cms/menu?type=dish&id=${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          broadcastMenuUpdate();
+          setCategories(prev => prev.map(cat => ({
+            ...cat,
+            dishes: cat.dishes.filter((d: any) => d.id !== id)
+          })));
+        } else {
+          alert(data.error);
+        }
+      } else if (type === 'category') {
+        const res = await fetch(`/api/cms/menu?type=category&id=${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          broadcastMenuUpdate();
+          loadMenuData();
+        } else {
+          alert(data.error);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -167,7 +191,7 @@ export default function MenuCMS() {
         name: dishName,
         teluguName: dishTeluguName || null,
         description: dishDescription || '',
-        price: Number(dishPrice),
+        price: dishPrice,
         categoryId: dishCategoryId,
         image: dishImage || 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
         isVegetarian: dishIsVegetarian,
@@ -218,7 +242,7 @@ export default function MenuCMS() {
     setDishName('');
     setDishTeluguName('');
     setDishDescription('');
-    setDishPrice(0);
+    setDishPrice('');
     setDishCategoryId('');
     setDishImage('');
     setDishIsVegetarian(true);
@@ -253,23 +277,7 @@ export default function MenuCMS() {
   }, []);
 
   const handleDeleteDish = React.useCallback(async (id: string) => {
-    if (!confirm('Are you sure you want to delete this dish?')) return;
-    try {
-      // API DELETE uses ?type=dish&id=...
-      const res = await fetch(`/api/cms/menu?type=dish&id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        broadcastMenuUpdate();
-        setCategories(prev => prev.map(cat => ({
-          ...cat,
-          dishes: cat.dishes.filter((d: any) => d.id !== id)
-        })));
-      } else {
-        alert(data.error);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    handleDeleteClick(id, 'dish');
   }, []);
 
   const handleDuplicateDish = React.useCallback(async (dish: any) => {
@@ -577,7 +585,7 @@ export default function MenuCMS() {
               setCategoryDescription('');
               setIsCategoryModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-850 hover:bg-zinc-900 text-white font-bold uppercase tracking-wider text-[10px] shadow-sm transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-900 text-white font-bold uppercase tracking-wider text-[10px] shadow-sm transition-all"
           >
             <Plus size={12} />
             <span>Add Category</span>
@@ -654,7 +662,7 @@ export default function MenuCMS() {
                       <Edit size={12} />
                     </button>
                     <button
-                      onClick={() => handleDeleteCategory(cat.id)}
+                      onClick={() => handleDeleteClick(cat.id, 'category')}
                       className="p-1 text-rose-500 hover:text-rose-700 transition-colors"
                       title="Delete Category"
                     >
@@ -792,9 +800,9 @@ export default function MenuCMS() {
 
       {/* --- Dish Modal --- */}
       {isDishModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/40 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-          <form onSubmit={handleSaveDish} className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-brand-dark/5 space-y-6 my-8">
-            <div className="flex justify-between items-center border-b border-brand-dark/5 pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/40 backdrop-blur-sm animate-fadeIn">
+          <form onSubmit={handleSaveDish} className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-brand-dark/5 overflow-hidden">
+            <div className="flex justify-between items-center border-b border-brand-dark/5 p-6 md:p-8 pb-4 flex-shrink-0">
               <h3 className="font-display font-black text-xl text-brand-dark">
                 {editingDish ? 'Edit Food Item' : 'Add Food Item'}
               </h3>
@@ -803,7 +811,8 @@ export default function MenuCMS() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 md:p-8 pt-2 overflow-y-auto space-y-6 flex-grow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column: Basic Info */}
               <div className="space-y-4">
                 <div>
@@ -833,11 +842,11 @@ export default function MenuCMS() {
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-brand-dark/65 mb-2">Price (₹) *</label>
                     <input
-                      type="number"
+                      type="text"
                       required
-                      min={0}
                       value={dishPrice}
-                      onChange={(e) => setDishPrice(Number(e.target.value))}
+                      onChange={(e) => setDishPrice(e.target.value)}
+                      placeholder="e.g. 160 or ₹160 / ₹190"
                       className="w-full bg-brand-bg border border-brand-dark/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-accent"
                     />
                   </div>
@@ -1035,8 +1044,9 @@ export default function MenuCMS() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="flex justify-end gap-3 pt-6 border-t border-brand-dark/5">
+            <div className="flex justify-end gap-3 p-6 md:p-8 pt-4 border-t border-brand-dark/5 flex-shrink-0 bg-[#FAF8F5]">
               <button
                 type="button"
                 onClick={() => setIsDishModalOpen(false)}
@@ -1104,6 +1114,135 @@ export default function MenuCMS() {
           </form>
         </div>
       )}
+
+      {/* Admin Confirm Delete credentials modal */}
+      <AdminConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title={deleteTarget?.type === 'category' ? "Confirm Delete Category" : "Confirm Delete Food Item"}
+        message={deleteTarget?.type === 'category' ? "This will delete the selected category and ALL of its associated food items! Verification is required." : "Deleting this food item will remove it from the menu permanently. Verification is required."}
+      />
+    </div>
+  );
+}
+
+interface AdminConfirmDeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  title?: string;
+  message?: string;
+}
+
+function AdminConfirmDeleteModal({ isOpen, onClose, onConfirm, title, message }: AdminConfirmDeleteModalProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const supabase = createClient();
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      // Validate credentials using Supabase signInWithPassword
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (authError) {
+        setError("Invalid administrator credentials. Deletion denied.");
+        setLoading(false);
+        return;
+      }
+
+      // Credentials are correct! Proceed to actual deletion callback
+      await onConfirm();
+      setEmail('');
+      setPassword('');
+      onClose();
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/45 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-brand-dark/5 space-y-4">
+        <div>
+          <h3 className="font-display font-black text-lg text-[#4A2E2B]">{title}</h3>
+          <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">{message}</p>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl border border-rose-100 font-semibold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors"
+              placeholder="admin@example.com"
+              autoComplete="off"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-brand-dark/50 mb-1">Admin Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-brand-bg border border-brand-dark/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-brand-accent transition-colors"
+              placeholder="••••••••"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="px-4 py-2 rounded-lg border border-brand-dark/10 hover:bg-brand-dark/5 text-brand-dark text-[11px] font-bold uppercase tracking-wider"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 justify-center min-w-[110px]"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={12} className="animate-spin" /> Verifying...
+                </>
+              ) : (
+                "Verify & Delete"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -5,42 +5,63 @@ import { getSessionUser, logAdminAction } from '@/lib/auth';
 // GET /api/cms/backup
 // Generates full database backup payload
 // Protected (admin only)
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const user = await getSessionUser();
     if (!user || user.role !== 'admin') {
       return NextResponse.json({ success: false, error: 'Admin role required' }, { status: 403 });
     }
 
-    const branches = await prisma.branch.findMany();
-    const categories = await prisma.category.findMany();
-    const dishes = await prisma.dish.findMany();
-    const testimonials = await prisma.testimonial.findMany();
-    const galleryPhotos = await prisma.galleryPhoto.findMany();
-    const offers = await prisma.offer.findMany();
-    const settings = await prisma.siteSettings.findMany();
+    const { searchParams } = new URL(request.url);
+    const typesParam = searchParams.get('types');
+    const selectedTypes = typesParam ? typesParam.split(',') : [];
 
-    const backupData = {
+    const backupData: any = {
       version: '1.0',
       timestamp: new Date().toISOString(),
-      branches,
-      categories,
-      dishes,
-      testimonials,
-      galleryPhotos,
-      offers,
-      settings
     };
 
-    await logAdminAction(user.id, user.email, 'BACKUP_DATABASE', 'Full Database Backup Exported', null, null);
+    const exportAll = selectedTypes.length === 0;
 
-    return new Response(JSON.stringify(backupData, null, 2), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename=bsd_backup_${Date.now()}.json`
-      }
-    });
+    if (exportAll || selectedTypes.includes('branches')) {
+      backupData.branches = await prisma.branch.findMany();
+    }
+    if (exportAll || selectedTypes.includes('menu')) {
+      backupData.categories = await prisma.category.findMany();
+      backupData.dishes = await prisma.dish.findMany();
+    }
+    if (exportAll || selectedTypes.includes('reviews')) {
+      backupData.testimonials = await prisma.testimonial.findMany();
+    }
+    if (exportAll || selectedTypes.includes('gallery')) {
+      backupData.galleryPhotos = await prisma.galleryPhoto.findMany();
+    }
+    if (exportAll || selectedTypes.includes('offers')) {
+      backupData.offers = await prisma.offer.findMany();
+    }
+    if (exportAll || selectedTypes.includes('settings')) {
+      backupData.settings = await prisma.siteSettings.findMany();
+    }
+    if (exportAll || selectedTypes.includes('orders')) {
+      backupData.whatsappOrders = await prisma.whatsAppOrder.findMany();
+    }
+    if (exportAll || selectedTypes.includes('reservations')) {
+      backupData.reservations = await prisma.reservation.findMany();
+    }
+    if (exportAll || selectedTypes.includes('messages')) {
+      backupData.contactMessages = await prisma.contactMessage.findMany();
+    }
+
+    await logAdminAction(
+      user.id,
+      user.email,
+      'BACKUP_DATABASE',
+      `Database Backup Exported: ${selectedTypes.join(', ') || 'All'}`,
+      null,
+      null
+    );
+
+    return NextResponse.json({ success: true, payload: backupData });
   } catch (error: any) {
     console.error('Error exporting backup:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -57,9 +78,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Admin role required' }, { status: 403 });
     }
 
-    const backup = await request.json();
+    const body = await request.json();
     
-    if (backup.action === 'seed_reset') {
+    if (body.action === 'seed_reset') {
       const { execSync } = require('child_process');
       try {
         execSync('npx tsx prisma/seed-cms.ts', { cwd: process.cwd() });
@@ -73,6 +94,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, message: 'Database successfully seeded' });
       }
     }
+    
+    const backup = body.payload || body;
     
     if (!backup.categories || !backup.dishes) {
       return NextResponse.json({ success: false, error: 'Invalid backup format. Missing core datasets.' }, { status: 400 });
