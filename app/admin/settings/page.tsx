@@ -17,7 +17,7 @@ export default async function SettingsPage() {
   const websiteSettings = websiteSettingsRow ? JSON.parse(websiteSettingsRow.value) : {
     bookingBadgeText: 'Special Offer',
     bookingBadgeActive: true,
-    bookingBadgeColor: '#D35400'
+    bookingBadgeColor: '#1E4D2B'
   };
 
   return <SettingsClient branches={branches} websiteSettings={websiteSettings} />;

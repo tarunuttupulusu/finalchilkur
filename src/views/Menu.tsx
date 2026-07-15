@@ -139,7 +139,7 @@ My Details:
       />
 
       <motion.div
-        className="relative z-10 bg-[#F6EFE3] rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden"
+        className="relative z-10 bg-[#F7E7CE] rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden"
         initial={{ scale: 0.85, opacity: 0, y: 40 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0, y: 40 }}
@@ -159,8 +159,8 @@ My Details:
           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShoppingBag size={30} className="text-brand-gold" />
           </div>
-          <h3 className="font-display text-2xl font-extrabold text-[#F6EFE3]">Order Online</h3>
-          <p className="text-sm text-[#F6EFE3]/60 font-sans mt-1">
+          <h3 className="font-display text-2xl font-extrabold text-[#F7E7CE]">Order Online</h3>
+          <p className="text-sm text-[#F7E7CE]/60 font-sans mt-1">
             Choose your platform to order&nbsp;
             <span className="text-brand-gold font-semibold">{dish.name}</span>
           </p>
@@ -378,7 +378,7 @@ const OrderTrigger: React.FC<{ dish: Dish; isOutOfStock?: boolean }> = ({ dish, 
   const [pressed, setPressed] = useState(false);
 
   const btnStyle: React.CSSProperties = {
-    backgroundColor: isOutOfStock ? '#cbd5e1' : pressed ? '#15803d' : hovered ? '#16a34a' : '#C1440E',
+    backgroundColor: isOutOfStock ? '#cbd5e1' : pressed ? '#15803d' : hovered ? '#16a34a' : '#1E4D2B',
     borderColor: isOutOfStock ? '#94a3b8' : pressed ? '#166534' : hovered ? '#15803d' : 'rgba(193,68,14,0.5)',
     boxShadow: isOutOfStock
       ? 'none'
@@ -402,7 +402,7 @@ const OrderTrigger: React.FC<{ dish: Dish; isOutOfStock?: boolean }> = ({ dish, 
         onMouseUp={() => setPressed(false)}
         style={btnStyle}
         className={`relative px-3 py-1.5 font-bold text-[9px] tracking-widest uppercase rounded-full border flex items-center gap-1 select-none ${
-          isOutOfStock ? 'text-zinc-500 cursor-not-allowed' : 'text-[#F6EFE3]'
+          isOutOfStock ? 'text-zinc-500 cursor-not-allowed' : 'text-[#F7E7CE]'
         }`}
       >
         {isOutOfStock ? (
@@ -458,7 +458,7 @@ const Lightbox: React.FC<LightboxProps> = ({ dish, onClose }) => {
       />
 
       <motion.div
-        className="relative z-10 bg-[#F6EFE3] rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl flex flex-col md:flex-row"
+        className="relative z-10 bg-[#F7E7CE] rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl flex flex-col md:flex-row"
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.85, opacity: 0 }}
@@ -468,7 +468,7 @@ const Lightbox: React.FC<LightboxProps> = ({ dish, onClose }) => {
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 bg-brand-dark/80 text-[#F6EFE3] rounded-full p-2 hover:bg-brand-accent transition-colors"
+          className="absolute top-4 right-4 z-20 bg-brand-dark/80 text-[#F7E7CE] rounded-full p-2 hover:bg-brand-accent transition-colors"
         >
           <X size={18} />
         </button>
@@ -487,7 +487,7 @@ const Lightbox: React.FC<LightboxProps> = ({ dish, onClose }) => {
           {/* Badges */}
           <div className="flex items-center gap-2 mb-4">
             {dish.isPopular && (
-              <span className="flex items-center gap-1 bg-brand-accent text-[#F6EFE3] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+              <span className="flex items-center gap-1 bg-brand-accent text-[#F7E7CE] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                 <Flame size={10} className="fill-current" /> Popular
               </span>
             )}
@@ -567,13 +567,13 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
         <div className="flex gap-2">
           <button
             onClick={() => scroll('left')}
-            className="p-2.5 rounded-full border border-brand-dark/15 hover:border-brand-accent hover:bg-brand-accent hover:text-[#F6EFE3] text-brand-dark transition-all duration-200"
+            className="p-2.5 rounded-full border border-brand-dark/15 hover:border-brand-accent hover:bg-brand-accent hover:text-[#F7E7CE] text-brand-dark transition-all duration-200"
           >
             <ChevronLeft size={18} />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="p-2.5 rounded-full border border-brand-dark/15 hover:border-brand-accent hover:bg-brand-accent hover:text-[#F6EFE3] text-brand-dark transition-all duration-200"
+            className="p-2.5 rounded-full border border-brand-dark/15 hover:border-brand-accent hover:bg-brand-accent hover:text-[#F7E7CE] text-brand-dark transition-all duration-200"
           >
             <ChevronRight size={18} />
           </button>
@@ -591,7 +591,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
             key={dish.id}
             whileHover={dish.isOutOfStock ? {} : { y: -4, scale: 1.02 }}
             transition={{ duration: 0.25 }}
-            className={`shrink-0 w-44 md:w-52 bg-[#F6EFE3] rounded-xl overflow-hidden border border-brand-dark/10 shadow-sm transition-all ${
+            className={`shrink-0 w-44 md:w-52 bg-[#F7E7CE] rounded-xl overflow-hidden border border-brand-dark/10 shadow-sm transition-all ${
               dish.isOutOfStock ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:shadow-xl group'
             }`}
             onClick={dish.isOutOfStock ? undefined : () => onDishClick(dish)}
@@ -605,7 +605,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
                 loading="lazy"
               />
               {/* Overlay: price badge bottom-left */}
-              <div className="absolute bottom-2 left-2 bg-brand-dark/80 text-[#F6EFE3] text-[10px] font-bold font-display px-2 py-0.5 rounded-full backdrop-blur-sm">
+              <div className="absolute bottom-2 left-2 bg-brand-dark/80 text-[#F7E7CE] text-[10px] font-bold font-display px-2 py-0.5 rounded-full backdrop-blur-sm">
                 {dish.price}
               </div>
               {/* Rating badge bottom-right */}
@@ -623,7 +623,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
               )}
               {/* Popular top-left */}
               {dish.isPopular && !dish.isOutOfStock && (
-                <span className="absolute top-2 left-2 flex items-center gap-0.5 bg-brand-accent text-[#F6EFE3] text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow">
+                <span className="absolute top-2 left-2 flex items-center gap-0.5 bg-brand-accent text-[#F7E7CE] text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow">
                   <Flame size={7} className="fill-current" /> Popular
                 </span>
               )}
@@ -640,7 +640,7 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ category, dishes, onDishClick
               {/* Hover overlay – click to view */}
               {!dish.isOutOfStock && (
                 <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/30 transition-colors duration-300 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#F6EFE3] text-[9px] font-bold uppercase tracking-widest bg-brand-accent/90 px-3 py-1.5 rounded-full">
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#F7E7CE] text-[9px] font-bold uppercase tracking-widest bg-brand-accent/90 px-3 py-1.5 rounded-full">
                     View Details
                   </span>
                 </div>
@@ -730,7 +730,7 @@ const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) =
         onClick={onClose}
       />
       <motion.div
-        className="relative z-10 bg-[#FDF8F5] border border-brand-dark/10 rounded-3xl shadow-2xl w-full max-w-md p-6 font-sans text-brand-dark"
+        className="relative z-10 bg-[#F7E7CE] border border-brand-dark/10 rounded-3xl shadow-2xl w-full max-w-md p-6 font-sans text-brand-dark"
         initial={{ scale: 0.9, opacity: 0, y: 30 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 30 }}
@@ -777,7 +777,7 @@ const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) =
             </div>
             <button
               onClick={onClose}
-              className="w-full px-6 py-3 bg-[#D35400] text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md"
+              className="w-full px-6 py-3 bg-[#1E4D2B] text-white rounded-xl text-xs font-bold uppercase transition-all shadow-md"
             >
               Start Ordering
             </button>
@@ -785,7 +785,7 @@ const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) =
         ) : (
           <div className="space-y-6 py-2">
             <div className="text-center space-y-2">
-              <div className="w-12 h-12 bg-amber-50 text-[#D35400] rounded-full flex items-center justify-center mx-auto border border-amber-100">
+              <div className="w-12 h-12 bg-amber-50 text-[#1E4D2B] rounded-full flex items-center justify-center mx-auto border border-amber-100">
                 <Leaf size={24} className="fill-current" />
               </div>
               <h3 className="font-display font-black text-lg text-brand-dark">Loyalty Reward Detected</h3>
@@ -795,7 +795,7 @@ const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) =
             <div className="bg-[#FAF6EE] p-4 rounded-xl border border-brand-dark/10 space-y-2 text-left">
               <div className="flex justify-between items-center text-xs">
                 <span className="font-bold text-brand-dark/50 uppercase">Discount Reward:</span>
-                <span className="font-display font-black text-[#D35400] text-base">₹{coupon.discountValue}</span>
+                <span className="font-display font-black text-[#1E4D2B] text-base">₹{coupon.discountValue}</span>
               </div>
               {coupon.billNo && (
                 <div className="flex justify-between items-center text-xs border-t border-brand-dark/5 pt-2">
@@ -820,7 +820,7 @@ const ClaimRewardModal: React.FC<ClaimRewardModalProps> = ({ token, onClose }) =
             <button
               onClick={handleRedeem}
               disabled={redeeming}
-              className="w-full px-6 py-3.5 bg-[#D35400] hover:bg-[#D35400]/95 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
+              className="w-full px-6 py-3.5 bg-[#1E4D2B] hover:bg-[#1E4D2B]/95 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5"
             >
               {redeeming ? (
                 <>
@@ -1120,7 +1120,7 @@ export const Menu: React.FC = () => {
                   onClick={() => setVegFilter(filter)}
                   className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
                     vegFilter === filter
-                      ? 'bg-brand-accent text-[#F6EFE3]'
+                      ? 'bg-brand-accent text-[#F7E7CE]'
                       : 'text-brand-dark/70 hover:text-brand-dark'
                   }`}
                 >
@@ -1155,7 +1155,7 @@ export const Menu: React.FC = () => {
                           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                       }}
-                      className="px-3.5 py-2 bg-brand-bg hover:bg-brand-accent hover:text-[#F6EFE3] text-brand-dark border border-brand-dark/10 hover:border-brand-accent rounded-xl text-xs font-bold transition-all shadow-sm"
+                      className="px-3.5 py-2 bg-brand-bg hover:bg-brand-accent hover:text-[#F7E7CE] text-brand-dark border border-brand-dark/10 hover:border-brand-accent rounded-xl text-xs font-bold transition-all shadow-sm"
                     >
                       {category}
                     </button>

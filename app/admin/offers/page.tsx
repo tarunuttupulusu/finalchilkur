@@ -306,7 +306,7 @@ export default function OffersCMS() {
             resetForm();
             setIsModalOpen(true);
           }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] font-bold uppercase tracking-wider text-[10px] shadow-sm border border-brand-accent/30 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] font-bold uppercase tracking-wider text-[10px] shadow-sm border border-brand-accent/30 transition-all"
         >
           <Plus size={12} />
           <span>Create Promotion</span>
@@ -355,7 +355,7 @@ export default function OffersCMS() {
                         
                         {/* Status badges */}
                         <div className="absolute top-4 left-4 flex gap-1.5">
-                          <span className="bg-brand-dark/80 border border-brand-dark/15 text-[#F6EFE3] px-2.5 py-1 rounded text-[8px] font-extrabold uppercase tracking-wider">
+                          <span className="bg-brand-dark/80 border border-brand-dark/15 text-[#F7E7CE] px-2.5 py-1 rounded text-[8px] font-extrabold uppercase tracking-wider">
                             {offer.badge}
                           </span>
                           
@@ -367,7 +367,7 @@ export default function OffersCMS() {
                         </div>
 
                         {/* Top-Right priority rating */}
-                        <div className="absolute top-4 right-4 bg-black/60 text-[#F6EFE3] text-[8px] font-bold px-2 py-1 rounded flex items-center gap-1">
+                        <div className="absolute top-4 right-4 bg-black/60 text-[#F7E7CE] text-[8px] font-bold px-2 py-1 rounded flex items-center gap-1">
                           <Star size={10} fill="currentColor" className="text-brand-gold" />
                           <span>Priority {offer.displayPriority}</span>
                         </div>
@@ -375,7 +375,7 @@ export default function OffersCMS() {
                         {/* Text Overlay */}
                         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                           <div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#F6EFE3]/80 flex items-center gap-1">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#F7E7CE]/80 flex items-center gap-1">
                               <MapPin size={10} className="text-brand-accent" />
                               {branchLabel}
                             </span>
@@ -685,7 +685,7 @@ export default function OffersCMS() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] text-xs font-bold uppercase tracking-wider shadow-sm border border-brand-accent/30"
+                className="px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] text-xs font-bold uppercase tracking-wider shadow-sm border border-brand-accent/30"
               >
                 {saving ? 'Saving...' : editingOffer ? 'Save Promotion' : 'Publish Promotion'}
               </button>

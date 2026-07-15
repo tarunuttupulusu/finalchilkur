@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#F6EFE3] rounded-3xl shadow-2xl overflow-hidden relative">
+      <div className="w-full max-w-md bg-[#F7E7CE] rounded-3xl shadow-2xl overflow-hidden relative">
         <div className="p-8 text-center border-b border-brand-dark/10">
           <img src="/bsd-logo.png" alt="Logo" className="w-16 h-16 mx-auto mb-4 drop-shadow-md" />
           <h2 className="font-display text-2xl font-bold text-brand-dark">Admin Portal</h2>

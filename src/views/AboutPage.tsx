@@ -9,7 +9,7 @@ export const AboutPage: React.FC = () => {
         
         {/* Editorial Page Header */}
         <div className="max-w-3xl mb-20">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Our Journey</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#1E4D2B] font-display">Our Journey</span>
           <h1 className="font-display text-4xl md:text-7xl font-black text-brand-dark mt-4 leading-tight">
             Pure Vegetarian <br/>
             Indian Hospitality
@@ -108,23 +108,23 @@ export const AboutPage: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-brand-dark text-[#F6EFE3] p-12 rounded-2xl"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-brand-dark text-[#F7E7CE] p-12 rounded-2xl"
         >
           <div className="text-center">
             <p className="font-display text-4xl md:text-5xl font-black text-brand-gold">4.8 ★</p>
-            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F6EFE3]/50 mt-2">Google Rating</p>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F7E7CE]/50 mt-2">Google Rating</p>
           </div>
           <div className="text-center">
             <p className="font-display text-4xl md:text-5xl font-black text-brand-gold">1,110+</p>
-            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F6EFE3]/50 mt-2">Happy Reviews</p>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F7E7CE]/50 mt-2">Happy Reviews</p>
           </div>
           <div className="text-center">
             <p className="font-display text-4xl md:text-5xl font-black text-brand-gold">100%</p>
-            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F6EFE3]/50 mt-2">Authentic Spices</p>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F7E7CE]/50 mt-2">Authentic Spices</p>
           </div>
           <div className="text-center">
             <p className="font-display text-4xl md:text-5xl font-black text-brand-gold">Moinabad</p>
-            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F6EFE3]/50 mt-2">Flagship Location</p>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#F7E7CE]/50 mt-2">Flagship Location</p>
           </div>
         </motion.div>
 

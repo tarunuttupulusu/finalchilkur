@@ -328,7 +328,7 @@ We look forward to serving you again.`;
       title: 'Credit Amount',
       key: 'discountValue',
       render: (_: any, record: Coupon) => (
-        <span className="font-bold text-[#D35400] text-xs">
+        <span className="font-bold text-[#1E4D2B] text-xs">
           ₹{record.discountValue} <Text type="secondary" style={{ fontSize: '10px' }}>({record.discountPercent}%)</Text>
         </span>
       )
@@ -337,7 +337,7 @@ We look forward to serving you again.`;
       title: 'Category',
       dataIndex: 'discountCategory',
       key: 'discountCategory',
-      render: (val: string) => <Badge count={val} color="#4A2E2B" style={{ fontSize: '9px', fontWeight: 'bold' }} />
+      render: (val: string) => <Badge count={val} color="#1E4D2B" style={{ fontSize: '9px', fontWeight: 'bold' }} />
     },
     {
       title: 'Status',
@@ -347,7 +347,7 @@ We look forward to serving you again.`;
         if (record.isCancelled) return <Badge status="default" text={<span className="text-zinc-400 font-bold uppercase text-[9px]">Cancelled</span>} />;
         if (record.isUsed) return <Badge status="success" text={<span className="text-emerald-600 font-bold uppercase text-[9px]">Redeemed</span>} />;
         if (isExpired) return <Badge status="error" text={<span className="text-rose-600 font-bold uppercase text-[9px]">Expired</span>} />;
-        return <Badge status="processing" text={<span className="text-[#D35400] font-bold uppercase text-[9px]">Active</span>} />;
+        return <Badge status="processing" text={<span className="text-[#1E4D2B] font-bold uppercase text-[9px]">Active</span>} />;
       }
     },
     {
@@ -403,7 +403,7 @@ We look forward to serving you again.`;
   ];
 
   return (
-    <div className="space-y-8 animate-fadeIn font-sans max-w-7xl mx-auto" style={{ background: '#FDF8F5' }}>
+    <div className="space-y-8 animate-fadeIn font-sans max-w-7xl mx-auto" style={{ background: '#F7E7CE' }}>
       
       {/* Page Header Header */}
       <Card 
@@ -412,8 +412,8 @@ We look forward to serving you again.`;
       >
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#D35400] flex items-center gap-1.5">
-              <Award size={12} className="text-[#D35400]" />
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#1E4D2B] flex items-center gap-1.5">
+              <Award size={12} className="text-[#1E4D2B]" />
               Zomato & Swiggy Loyalty retention system
             </span>
             <Title level={2} style={{ margin: '8px 0 0 0', fontWeight: 900 }}>
@@ -433,7 +433,7 @@ We look forward to serving you again.`;
           <Card 
             title={
               <Space>
-                <DollarSign size={16} className="text-[#D35400]" />
+                <DollarSign size={16} className="text-[#1E4D2B]" />
                 <span>Base Bill Processing Grid</span>
               </Space>
             }
@@ -545,8 +545,8 @@ We look forward to serving you again.`;
                     <strong className="text-zinc-800 text-sm">{discountPercent.toFixed(2)}%</strong>
                   </div>
                   <div className="border-t border-zinc-150 pt-2">
-                    <span className="text-[#D35400] block uppercase font-black text-[9px]">Discount Value:</span>
-                    <strong className="text-[#D35400] text-sm">₹{calculatedDiscount.toFixed(2)}</strong>
+                    <span className="text-[#1E4D2B] block uppercase font-black text-[9px]">Discount Value:</span>
+                    <strong className="text-[#1E4D2B] text-sm">₹{calculatedDiscount.toFixed(2)}</strong>
                   </div>
                   <div className="border-t border-zinc-150 pt-2">
                     <span className="text-emerald-700 block uppercase font-black text-[9px]">Final Bill Value:</span>
@@ -561,7 +561,7 @@ We look forward to serving you again.`;
                 size="large" 
                 block
                 disabled={generating || !baseBill || baseBill <= 0 || !billNumber}
-                style={{ height: '46px', background: '#D35400', borderColor: '#D35400', borderRadius: 8, marginTop: 8 }}
+                style={{ height: '46px', background: '#1E4D2B', borderColor: '#1E4D2B', borderRadius: 8, marginTop: 8 }}
               >
                 {generating ? (
                   <Space>
@@ -584,7 +584,7 @@ We look forward to serving you again.`;
           <Card 
             title={
               <Space>
-                <QrCode size={16} className="text-[#D35400]" />
+                <QrCode size={16} className="text-[#1E4D2B]" />
                 <span>Immediate QR Code Payload</span>
               </Space>
             }
@@ -629,7 +629,7 @@ We look forward to serving you again.`;
                   </Col>
                   <Col span={12} className="space-y-1.5 pl-2">
                     <div><Text type="secondary">Bill No:</Text> <span className="font-semibold font-mono">{activeCoupon.billNo}</span></div>
-                    <div><Text type="secondary">Discount Credit:</Text> <strong className="text-[#D35400]">₹{activeCoupon.discountValue}</strong></div>
+                    <div><Text type="secondary">Discount Credit:</Text> <strong className="text-[#1E4D2B]">₹{activeCoupon.discountValue}</strong></div>
                   </Col>
                 </Row>
 
@@ -685,7 +685,7 @@ We look forward to serving you again.`;
       <Card 
         title={
           <Space>
-            <Calendar size={16} className="text-[#D35400]" />
+            <Calendar size={16} className="text-[#1E4D2B]" />
             <span>Dining Vouchers Ledger</span>
           </Space>
         }
@@ -721,7 +721,7 @@ We look forward to serving you again.`;
       <Modal
         title={
           <Space>
-            <Ticket size={18} className="text-[#D35400] mt-1" />
+            <Ticket size={18} className="text-[#1E4D2B] mt-1" />
             <span>Voucher Details Viewer</span>
           </Space>
         }
@@ -778,7 +778,7 @@ We look forward to serving you again.`;
               </div>
               <div className="flex justify-between border-b border-zinc-150 pb-1.5">
                 <span className="text-gray-400 font-semibold">Loyalty Reward Credit:</span>
-                <strong className="text-[#D35400]">₹{viewVoucherModal.discountValue}</strong>
+                <strong className="text-[#1E4D2B]">₹{viewVoucherModal.discountValue}</strong>
               </div>
               <div className="flex justify-between border-b border-zinc-150 pb-1.5">
                 <span className="text-gray-400 font-semibold">Customer Mobile:</span>

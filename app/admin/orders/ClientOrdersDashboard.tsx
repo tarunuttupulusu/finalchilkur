@@ -414,7 +414,7 @@ export default function ClientOrdersDashboard({ initialOrders }: ClientOrdersDas
                 className="bg-white rounded-3xl border border-brand-gold/10 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col relative group"
               >
                 {/* Header Ticket Bar */}
-                <div className="bg-brand-dark p-3.5 px-4.5 text-[#F6EFE3] flex justify-between items-start border-b border-brand-gold/10">
+                <div className="bg-brand-dark p-3.5 px-4.5 text-[#F7E7CE] flex justify-between items-start border-b border-brand-gold/10">
                   <div>
                     <span className="font-mono text-[9px] uppercase tracking-widest text-brand-gold font-bold">
                       Ref: {order.orderRef}
@@ -464,7 +464,7 @@ export default function ClientOrdersDashboard({ initialOrders }: ClientOrdersDas
                     <h4 className="text-[8px] font-black uppercase tracking-widest text-brand-dark/50 mb-1.5">
                        Order Checklist
                     </h4>
-                    <ul className="space-y-1.5 bg-[#F6EFE3]/30 p-2.5 rounded-xl border border-brand-gold/5 max-h-32 overflow-y-auto">
+                    <ul className="space-y-1.5 bg-[#F7E7CE]/30 p-2.5 rounded-xl border border-brand-gold/5 max-h-32 overflow-y-auto">
                       {items.map((item, idx) => (
                         <li key={idx} className="flex justify-between items-start text-xs">
                           <div className="flex items-center gap-1">
@@ -536,14 +536,14 @@ export default function ClientOrdersDashboard({ initialOrders }: ClientOrdersDas
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Direct WhatsApp Chat"
-                    className="res-action-btn flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-100 hover:bg-[#D35400] text-emerald-700 hover:text-white transition-all shadow-md shadow-emerald-600/10 border border-emerald-200/50"
+                    className="res-action-btn flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-100 hover:bg-[#1E4D2B] text-emerald-700 hover:text-white transition-all shadow-md shadow-emerald-600/10 border border-emerald-200/50"
                   >
                     <WhatsAppIcon size={14} />
                   </a>
                 </div>
 
                 {/* Footer POS bar */}
-                <div className="px-4 py-2.5 bg-[#F6EFE3]/50 border-t border-brand-gold/10 flex justify-between items-center mt-auto">
+                <div className="px-4 py-2.5 bg-[#F7E7CE]/50 border-t border-brand-gold/10 flex justify-between items-center mt-auto">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-brand-dark/55">
                     Order Total
                   </span>

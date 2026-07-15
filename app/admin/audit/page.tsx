@@ -210,13 +210,13 @@ export default function AuditLogsCMS() {
       <div className="bg-white rounded-2xl border border-brand-dark/10 shadow-sm p-5 space-y-4">
         {/* Strip header */}
         <div className="flex items-center gap-2">
-          <Calendar size={14} className="text-[#D35400]" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#4A2E2B]/60">Filter by Date — scroll for older dates</span>
+          <Calendar size={14} className="text-[#1E4D2B]" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#1E4D2B]/60">Filter by Date — scroll for older dates</span>
           <div className="ml-auto flex items-center gap-2">
             {selectedDate && (
               <button
                 onClick={() => setSelectedDate('')}
-                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#D35400] hover:underline"
+                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#1E4D2B] hover:underline"
               >
                 <X size={9} /> Clear
               </button>
@@ -228,7 +228,7 @@ export default function AuditLogsCMS() {
                 onClick={() => calendarInputRef.current?.showPicker()}
                 className={`res-date-card-base flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-wide ${
                   selectedDate && recentDays.every(rd => rd.value !== selectedDate)
-                    ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white shadow-md'
+                    ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white shadow-md'
                     : 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:border-zinc-400'
                 }`}
               >
@@ -283,7 +283,7 @@ export default function AuditLogsCMS() {
             onClick={() => setSelectedDate('')}
             className={`res-date-card-base flex-shrink-0 flex flex-col items-center justify-center w-[50px] h-[60px] rounded-xl border-2 ${
               selectedDate === ''
-                ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white'
+                ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white'
                 : 'bg-zinc-50 border-zinc-200 text-zinc-500'
             }`}
           >
@@ -307,14 +307,14 @@ export default function AuditLogsCMS() {
                 onClick={() => setSelectedDate(isActive ? '' : day.value)}
                 className={`res-date-card-base flex-shrink-0 flex flex-col items-center justify-center w-[50px] h-[60px] rounded-xl border-2 ${
                   isActive
-                    ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white'
+                    ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white'
                     : isToday
-                    ? 'res-date-card-today bg-[#D35400]/5 border-[#D35400]/30 text-[#D35400]'
+                    ? 'res-date-card-today bg-[#1E4D2B]/5 border-[#1E4D2B]/30 text-[#1E4D2B]'
                     : 'bg-zinc-50 border-zinc-200 text-zinc-600'
                 }`}
               >
                 <span className={`text-[9px] font-black uppercase tracking-wide leading-none ${
-                  isActive ? 'text-white/60' : isToday ? 'text-[#D35400]' : 'text-zinc-400'
+                  isActive ? 'text-white/60' : isToday ? 'text-[#1E4D2B]' : 'text-zinc-400'
                 }`}>
                   {isToday ? 'Today' : isYesterday ? 'Yest.' : dayName}
                 </span>
@@ -374,7 +374,7 @@ export default function AuditLogsCMS() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs font-sans">
               <thead>
-                <tr className="bg-brand-dark text-[#F6EFE3] font-display font-bold uppercase tracking-wider border-b border-brand-dark/15">
+                <tr className="bg-brand-dark text-[#F7E7CE] font-display font-bold uppercase tracking-wider border-b border-brand-dark/15">
                   <th className="p-4 pl-6 text-[10px]">Admin User</th>
                   <th className="p-4 text-[10px]">Action</th>
                   <th className="p-4 text-[10px]">Detailed Description</th>
@@ -439,13 +439,13 @@ export default function AuditLogsCMS() {
         <div className="bg-white rounded-2xl border border-brand-dark/10 shadow-sm p-5 space-y-4">
           {/* Strip header */}
           <div className="flex items-center gap-2">
-            <Calendar size={14} className="text-[#D35400]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#4A2E2B]/60">Filter by Date — scroll for older dates</span>
+            <Calendar size={14} className="text-[#1E4D2B]" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#1E4D2B]/60">Filter by Date — scroll for older dates</span>
             <div className="ml-auto flex items-center gap-2">
               {selectedLoginDate && (
                 <button
                   onClick={() => setSelectedLoginDate('')}
-                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#D35400] hover:underline"
+                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#1E4D2B] hover:underline"
                 >
                   <X size={9} /> Clear
                 </button>
@@ -457,7 +457,7 @@ export default function AuditLogsCMS() {
                   onClick={() => loginCalendarInputRef.current?.showPicker()}
                   className={`res-date-card-base flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-wide ${
                     selectedLoginDate && recentDays.every(rd => rd.value !== selectedLoginDate)
-                      ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white shadow-md'
+                      ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white shadow-md'
                       : 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:border-zinc-400'
                   }`}
                 >
@@ -491,7 +491,7 @@ export default function AuditLogsCMS() {
               onClick={() => setSelectedLoginDate('')}
               className={`res-date-card-base flex-shrink-0 flex flex-col items-center justify-center w-[50px] h-[60px] rounded-xl border-2 ${
                 selectedLoginDate === ''
-                  ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white'
+                  ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white'
                   : 'bg-zinc-50 border-zinc-200 text-zinc-500'
               }`}
             >
@@ -515,14 +515,14 @@ export default function AuditLogsCMS() {
                   onClick={() => setSelectedLoginDate(isActive ? '' : day.value)}
                   className={`res-date-card-base flex-shrink-0 flex flex-col items-center justify-center w-[50px] h-[60px] rounded-xl border-2 ${
                     isActive
-                      ? 'res-date-card-active bg-[#4A2E2B] border-[#4A2E2B] text-white'
+                      ? 'res-date-card-active bg-[#1E4D2B] border-[#1E4D2B] text-white'
                       : isToday
-                      ? 'res-date-card-today bg-[#D35400]/5 border-[#D35400]/30 text-[#D35400]'
+                      ? 'res-date-card-today bg-[#1E4D2B]/5 border-[#1E4D2B]/30 text-[#1E4D2B]'
                       : 'bg-zinc-50 border-zinc-200 text-zinc-600'
                   }`}
                 >
                   <span className={`text-[9px] font-black uppercase tracking-wide leading-none ${
-                    isActive ? 'text-white/60' : isToday ? 'text-[#D35400]' : 'text-zinc-400'
+                    isActive ? 'text-white/60' : isToday ? 'text-[#1E4D2B]' : 'text-zinc-400'
                   }`}>
                     {isToday ? 'Today' : isYesterday ? 'Yest.' : dayName}
                   </span>

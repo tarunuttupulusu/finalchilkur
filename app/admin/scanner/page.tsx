@@ -442,7 +442,7 @@ export default function ScannerPage() {
               {scanResult.isVoucher ? (
                 <>
                   <div>
-                    <h2 className="text-2xl font-display font-black text-[#D35400]">Voucher Claimed!</h2>
+                    <h2 className="text-2xl font-display font-black text-[#1E4D2B]">Voucher Claimed!</h2>
                     <p className="text-emerald-700 font-bold text-xs uppercase tracking-widest mt-1">
                       ₹{scanResult.voucher.discountValue} discount applied successfully
                     </p>
@@ -451,7 +451,7 @@ export default function ScannerPage() {
                   <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 text-left w-full max-w-sm space-y-3 shadow-inner">
                     <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
                       <span className="font-bold text-zinc-400 uppercase">Voucher Code</span>
-                      <span className="font-mono font-bold text-[#D35400]">{scanResult.voucher.token}</span>
+                      <span className="font-mono font-bold text-[#1E4D2B]">{scanResult.voucher.token}</span>
                     </div>
                     <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
                       <span className="font-bold text-zinc-400 uppercase">Invoice Ref</span>
@@ -467,7 +467,7 @@ export default function ScannerPage() {
                     </div>
                     <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
                       <span className="font-bold text-zinc-400 uppercase">Discount Amount</span>
-                      <span className="font-bold text-[#D35400]">₹{scanResult.voucher.discountValue}</span>
+                      <span className="font-bold text-[#1E4D2B]">₹{scanResult.voucher.discountValue}</span>
                     </div>
                     <div className="flex justify-between border-b border-zinc-200 pb-2 text-xs">
                       <span className="font-bold text-zinc-400 uppercase">Expiry Date</span>

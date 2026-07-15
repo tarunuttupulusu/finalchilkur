@@ -132,19 +132,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
     <AntdProvider>
-      <div className="flex h-screen bg-[#FDF8F5] overflow-hidden font-sans selection:bg-[#D35400] selection:text-[#FDF8F5]">
-        {/* Desktop Sidebar (Deep Chocolate-Charcoal #4A2E2B) */}
-        <aside className="w-72 bg-[#4A2E2B] text-zinc-150 flex flex-col border-r border-brand-dark/10 shadow-md z-30 hidden lg:flex font-sans">
+      <div className="flex h-screen bg-[#F7E7CE] overflow-hidden font-sans selection:bg-[#1E4D2B] selection:text-[#F7E7CE]">
+        {/* Desktop Sidebar (Deep Chocolate-Charcoal #1E4D2B) */}
+        <aside className="w-72 bg-[#1E4D2B] text-zinc-150 flex flex-col border-r border-brand-dark/10 shadow-md z-30 hidden lg:flex font-sans">
           {/* Header Branding */}
           <div className="p-6 border-b border-white/10 flex items-center gap-4">
-            <div className="relative p-1 bg-[#D35400]/15 rounded-full border border-[#D35400]/25 shadow-md">
+            <div className="relative p-1 bg-[#1E4D2B]/15 rounded-full border border-[#1E4D2B]/25 shadow-md">
               <img src="/bsd-logo.png" alt="Logo" className="w-10 h-10 object-contain" />
             </div>
             <div>
               <span className="font-display font-black uppercase tracking-wider text-sm leading-tight text-[#FAF6EE] drop-shadow-sm">
                 Balaji Chilkur
               </span>
-              <p className="text-[10px] uppercase font-bold tracking-widest text-[#D35400]/80 mt-0.5">
+              <p className="text-[10px] uppercase font-bold tracking-widest text-[#1E4D2B]/80 mt-0.5">
                 Admin Portal
               </p>
             </div>
@@ -179,14 +179,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   href={item.path}
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 font-sans text-[11px] font-bold uppercase tracking-wider border relative group ${
                     isActive 
-                      ? 'bg-[#D35400] text-white shadow-sm border-[#D35400]/30' 
+                      ? 'bg-[#1E4D2B] text-white shadow-sm border-[#1E4D2B]/30' 
                       : 'text-[#FAF6EE]/75 border-transparent hover:bg-[#FAF6EE]/10 hover:text-white'
                   }`}
                 >
-                  <Icon size={14} className={isActive ? 'text-white' : 'text-[#FAF6EE]/50 group-hover:text-[#D35400] transition-colors'} />
+                  <Icon size={14} className={isActive ? 'text-white' : 'text-[#FAF6EE]/50 group-hover:text-[#1E4D2B] transition-colors'} />
                   <span>{item.name}</span>
                   {badgeCount > 0 && (
-                    <span className="ml-auto bg-[#D35400] text-white text-[9px] font-black px-2 py-0.5 rounded-full min-w-[18px] text-center shadow-md animate-pulse border border-white/10">
+                    <span className="ml-auto bg-[#1E4D2B] text-white text-[9px] font-black px-2 py-0.5 rounded-full min-w-[18px] text-center shadow-md animate-pulse border border-white/10">
                       {badgeCount}
                     </span>
                   )}
@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="p-4 border-t border-white/10 bg-black/20">
             <button 
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-lg bg-black/25 text-[#FAF6EE]/70 border border-white/10 hover:bg-[#D35400] hover:text-white transition-all duration-200 font-bold uppercase tracking-wider text-[10px]"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-lg bg-black/25 text-[#FAF6EE]/70 border border-white/10 hover:bg-[#1E4D2B] hover:text-white transition-all duration-200 font-bold uppercase tracking-wider text-[10px]"
             >
               <LogOut size={14} />
               <span>Sign Out</span>
@@ -210,16 +210,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Main Container */}
         <div className="flex-grow flex flex-col overflow-hidden relative">
           {/* Mobile Header Bar */}
-          <header className="lg:hidden w-full bg-[#4A2E2B] text-zinc-150 px-6 py-4 flex justify-between items-center border-b border-white/10 z-30">
+          <header className="lg:hidden w-full bg-[#1E4D2B] text-zinc-150 px-6 py-4 flex justify-between items-center border-b border-white/10 z-30">
             <div className="flex items-center gap-3">
-              <img src="/bsd-logo.png" alt="Logo" className="w-8 h-8 object-contain p-0.5 bg-[#D35400]/10 rounded-full border border-[#D35400]/25" />
+              <img src="/bsd-logo.png" alt="Logo" className="w-8 h-8 object-contain p-0.5 bg-[#1E4D2B]/10 rounded-full border border-[#1E4D2B]/25" />
               <span className="font-display font-black uppercase text-xs tracking-wider text-[#FAF6EE]">
                 BSD Admin
               </span>
             </div>
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-zinc-300 hover:bg-[#D35400]/15 rounded-lg transition-colors"
+              className="p-2 text-zinc-300 hover:bg-[#1E4D2B]/15 rounded-lg transition-colors"
             >
               {mobileMenuOpen ? <X size={20} /> : <MenuIcon size={20} />}
             </button>
@@ -237,7 +237,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Mobile Drawer (Fallback Navigation) */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <div className="lg:hidden fixed inset-0 bg-[#4A2E2B]/95 z-40 backdrop-blur-md flex flex-col pt-24 px-6 pb-6">
+            <div className="lg:hidden fixed inset-0 bg-[#1E4D2B]/95 z-40 backdrop-blur-md flex flex-col pt-24 px-6 pb-6">
 
               <nav className="flex-grow flex flex-col gap-2 overflow-y-auto">
                 {navItems.map((item) => {
@@ -263,7 +263,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center justify-between px-5 py-3.5 rounded-xl transition-all font-bold uppercase tracking-wider text-xs border ${
                         isActive 
-                          ? 'bg-[#D35400] text-white border-[#D35400]/30' 
+                          ? 'bg-[#1E4D2B] text-white border-[#1E4D2B]/30' 
                           : 'text-[#FAF6EE]/75 border-transparent hover:bg-[#FAF6EE]/10 hover:text-white'
                       }`}
                     >
@@ -272,7 +272,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <span>{item.name}</span>
                       </div>
                       {badgeCount > 0 && (
-                        <span className="bg-[#D35400] text-white text-[10px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-md animate-pulse">
+                        <span className="bg-[#1E4D2B] text-white text-[10px] font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-md animate-pulse">
                           {badgeCount}
                         </span>
                       )}
@@ -286,7 +286,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     setMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl bg-black/25 text-zinc-300 border border-white/10 font-bold uppercase tracking-widest text-xs hover:bg-[#D35400]"
+                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl bg-black/25 text-zinc-300 border border-white/10 font-bold uppercase tracking-widest text-xs hover:bg-[#1E4D2B]"
                 >
                   <LogOut size={16} />
                   <span>Logout</span>

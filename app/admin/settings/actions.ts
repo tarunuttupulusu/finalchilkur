@@ -78,7 +78,7 @@ export async function updateCampaignSettings(formData: FormData) {
       value: JSON.stringify({
         bookingBadgeText: badgeText || 'Special Offer',
         bookingBadgeActive: badgeActive,
-        bookingBadgeColor: badgeColor || '#D35400'
+        bookingBadgeColor: badgeColor || '#1E4D2B'
       })
     },
     create: {
@@ -86,7 +86,7 @@ export async function updateCampaignSettings(formData: FormData) {
       value: JSON.stringify({
         bookingBadgeText: badgeText || 'Special Offer',
         bookingBadgeActive: badgeActive,
-        bookingBadgeColor: badgeColor || '#D35400'
+        bookingBadgeColor: badgeColor || '#1E4D2B'
       })
     }
   });

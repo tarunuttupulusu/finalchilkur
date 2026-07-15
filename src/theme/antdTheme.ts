@@ -2,8 +2,8 @@ import { ThemeConfig } from 'antd';
 
 export const antdTheme: ThemeConfig = {
   token: {
-    colorPrimary: '#D35400', // Brand Orange
-    colorBgLayout: '#FDF8F5', // Warm Cream brand canvas tone
+    colorPrimary: '#1E4D2B', // Brand Orange
+    colorBgLayout: '#F7E7CE', // Warm Cream brand canvas tone
     colorBgContainer: '#FFFFFF', // Pure White for components
     colorTextBase: '#2A2A2A', // Charcoal text
     borderRadius: 6, // Crispunified modern micro-borders
@@ -11,9 +11,9 @@ export const antdTheme: ThemeConfig = {
   },
   components: {
     Button: {
-      colorPrimary: '#D35400',
-      colorPrimaryHover: '#E67E22',
-      colorPrimaryActive: '#A04000',
+      colorPrimary: '#1E4D2B',
+      colorPrimaryHover: '#2D7240',
+      colorPrimaryActive: '#14331D',
       borderRadius: 6,
       controlHeight: 38,
       fontWeight: 700,
@@ -24,16 +24,16 @@ export const antdTheme: ThemeConfig = {
       borderRadius: 6,
     },
     Table: {
-      headerBg: '#4A2E2B', // Sider/Header Chocolate-Charcoal
-      headerColor: '#FDF8F5',
+      headerBg: '#1E4D2B', // Sider/Header Chocolate-Charcoal
+      headerColor: '#F7E7CE',
       borderRadius: 6,
     },
     Card: {
       borderRadius: 12,
     },
     Menu: {
-      itemBg: '#4A2E2B',
-      itemSelectedBg: '#D35400',
+      itemBg: '#1E4D2B',
+      itemSelectedBg: '#1E4D2B',
       itemColor: '#FAF6EE',
       itemSelectedColor: '#FFFFFF',
     }

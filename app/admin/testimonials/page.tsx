@@ -193,7 +193,7 @@ export default function TestimonialsCMS() {
             setEditingTestimonial({ id: null });
             resetForm();
           }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] font-bold uppercase tracking-wider text-[10px] shadow-sm border border-brand-accent/30 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] font-bold uppercase tracking-wider text-[10px] shadow-sm border border-brand-accent/30 transition-all"
         >
           <span>Add Patron Review</span>
         </button>
@@ -216,7 +216,7 @@ export default function TestimonialsCMS() {
                   onClick={() => setFilterMode(mode)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors border ${
                     filterMode === mode
-                      ? 'bg-brand-accent text-[#F6EFE3] border-brand-accent/30'
+                      ? 'bg-brand-accent text-[#F7E7CE] border-brand-accent/30'
                       : 'bg-white hover:bg-brand-bg/30 text-brand-dark/75 border-brand-dark/10'
                   }`}
                 >
@@ -395,7 +395,7 @@ export default function TestimonialsCMS() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] text-xs font-bold uppercase tracking-wider shadow-sm border border-brand-accent/30"
+                className="px-5 py-2.5 rounded-xl bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] text-xs font-bold uppercase tracking-wider shadow-sm border border-brand-accent/30"
               >
                 {saving ? 'Saving...' : editingTestimonial.id ? 'Save Changes' : 'Publish Review'}
               </button>

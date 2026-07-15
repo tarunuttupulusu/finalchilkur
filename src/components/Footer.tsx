@@ -28,7 +28,7 @@ export const Footer: React.FC = () => {
   }, []);
 
   return (
-    <footer className="bg-brand-dark text-[#F6EFE3]/80 border-t border-brand-gold/15 py-20 px-6 md:px-12 relative overflow-hidden font-sans">
+    <footer className="bg-brand-dark text-[#F7E7CE]/80 border-t border-brand-gold/15 py-20 px-6 md:px-12 relative overflow-hidden font-sans">
       {/* Decorative luxury gradient glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
@@ -47,7 +47,7 @@ export const Footer: React.FC = () => {
               BALAJI CHILUKUR DHABA
             </span>
           </Link>
-          <p className="text-sm leading-relaxed text-[#F6EFE3]/60">
+          <p className="text-sm leading-relaxed text-[#F7E7CE]/60">
             A tradition of pure vegetarian excellence. Savor the authentic taste of freshly ground spices, traditional family recipes, and heartfelt hospitality.
           </p>
           
@@ -122,15 +122,15 @@ export const Footer: React.FC = () => {
             <li className="flex items-start space-x-3">
               <Clock size={16} className="text-brand-gold shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-[#F6EFE3]">Lunch Service</p>
-                <p className="mt-1 text-[#F6EFE3]/60">11:00 AM – 4:00 PM</p>
+                <p className="font-bold text-[#F7E7CE]">Lunch Service</p>
+                <p className="mt-1 text-[#F7E7CE]/60">11:00 AM – 4:00 PM</p>
               </div>
             </li>
             <li className="flex items-start space-x-3">
               <Clock size={16} className="text-brand-gold shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-[#F6EFE3]">Dinner Service</p>
-                <p className="mt-1 text-[#F6EFE3]/60">6:30 PM – 11:00 PM</p>
+                <p className="font-bold text-[#F7E7CE]">Dinner Service</p>
+                <p className="mt-1 text-[#F7E7CE]/60">6:30 PM – 11:00 PM</p>
               </div>
             </li>
           </ul>
@@ -141,7 +141,7 @@ export const Footer: React.FC = () => {
           <h4 className="font-display text-lg font-bold tracking-wider text-brand-bg border-b border-brand-gold/15 pb-2">
             Our Branches
           </h4>
-          <ul className="space-y-4 text-[#F6EFE3]/70">
+          <ul className="space-y-4 text-[#F7E7CE]/70">
             {branches.length === 0 ? (
               <>
                 <li className="flex items-start space-x-3 group">
@@ -152,8 +152,8 @@ export const Footer: React.FC = () => {
                     rel="noreferrer"
                     className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
                   >
-                    <p className="font-bold text-[#F6EFE3] text-sm leading-none">Moinabad Branch (Primary)</p>
-                    <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Aziz Nagar, Himayat Sagar Rd, Moinabad</p>
+                    <p className="font-bold text-[#F7E7CE] text-sm leading-none">Moinabad Branch (Primary)</p>
+                    <p className="text-xs mt-1.5 text-[#F7E7CE]/60 leading-relaxed">Aziz Nagar, Himayat Sagar Rd, Moinabad</p>
                   </a>
                 </li>
                 
@@ -165,12 +165,12 @@ export const Footer: React.FC = () => {
                     rel="noreferrer"
                     className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
                   >
-                    <p className="font-bold text-[#F6EFE3] text-sm leading-none">Pragathi Nagar Branch</p>
-                    <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally</p>
+                    <p className="font-bold text-[#F7E7CE] text-sm leading-none">Pragathi Nagar Branch</p>
+                    <p className="text-xs mt-1.5 text-[#F7E7CE]/60 leading-relaxed">Opposite Pragathi Nagar Lake, Pragathi Nagar, Kukatpally</p>
                   </a>
                 </li>
                 
-                <li className="flex items-center space-x-3 pt-2 border-t border-[#F6EFE3]/10 group">
+                <li className="flex items-center space-x-3 pt-2 border-t border-[#F7E7CE]/10 group">
                   <Phone size={16} className="text-brand-gold shrink-0 group-hover:scale-110 transition-transform duration-300" />
                   <a href="tel:+919347104569" className="hover:text-brand-gold text-sm font-semibold transition-all duration-300 group-hover:translate-x-0.5 transform inline-block">+91 93471 04569</a>
                 </li>
@@ -188,15 +188,15 @@ export const Footer: React.FC = () => {
                         rel="noreferrer"
                         className="hover:text-brand-gold transition-colors block text-left group-hover:translate-x-0.5 transition-transform duration-300"
                       >
-                        <p className="font-bold text-[#F6EFE3] text-sm leading-none">{b.name}</p>
-                        <p className="text-xs mt-1.5 text-[#F6EFE3]/60 leading-relaxed">{b.address}</p>
+                        <p className="font-bold text-[#F7E7CE] text-sm leading-none">{b.name}</p>
+                        <p className="text-xs mt-1.5 text-[#F7E7CE]/60 leading-relaxed">{b.address}</p>
                       </a>
                     </li>
                   );
                 })}
                 
                 {branches.map((b, idx) => (
-                  <li key={`phone-${b.id}`} className={`flex items-center space-x-3 pt-2 group ${idx > 0 ? '' : 'border-t border-[#F6EFE3]/10'}`}>
+                  <li key={`phone-${b.id}`} className={`flex items-center space-x-3 pt-2 group ${idx > 0 ? '' : 'border-t border-[#F7E7CE]/10'}`}>
                     <Phone size={16} className="text-brand-gold shrink-0 group-hover:scale-110 transition-transform duration-300" />
                     <a href={`tel:${b.phone}`} className="hover:text-brand-gold text-sm font-semibold transition-all duration-300 group-hover:translate-x-0.5 transform inline-block">
                       {b.phone} ({b.name.replace(' Branch', '')})
@@ -210,7 +210,7 @@ export const Footer: React.FC = () => {
 
       </div>
 
-      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-[#F6EFE3]/10 flex flex-col sm:flex-row justify-between items-center text-xs text-[#F6EFE3]/40">
+      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-[#F7E7CE]/10 flex flex-col sm:flex-row justify-between items-center text-xs text-[#F7E7CE]/40">
         <p>© {currentYear} Balaji Chilkur Family Dhaba. All Rights Reserved.</p>
         <p className="mt-2 sm:mt-0">Designed and Developed to Perfection.</p>
       </div>

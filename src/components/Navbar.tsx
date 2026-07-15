@@ -13,7 +13,7 @@ export const Navbar: React.FC = () => {
   const [announcement, setAnnouncement] = useState<string | null>(null);
   const [badgeText, setBadgeText] = useState('Special Offer');
   const [badgeActive, setBadgeActive] = useState(true);
-  const [badgeColor, setBadgeColor] = useState('#D35400');
+  const [badgeColor, setBadgeColor] = useState('#1E4D2B');
   const [activeHash, setActiveHash] = useState('');
 
   const isHomepage = pathname === '/';
@@ -37,7 +37,7 @@ export const Navbar: React.FC = () => {
           const webSettings = data.settings.website_settings || {};
           setBadgeText(webSettings.bookingBadgeText || 'Special Offer');
           setBadgeActive(webSettings.bookingBadgeActive !== false);
-          setBadgeColor(webSettings.bookingBadgeColor || '#D35400');
+          setBadgeColor(webSettings.bookingBadgeColor || '#1E4D2B');
         }
       } catch (err) {
         console.error("Failed to load navbar announcement:", err);

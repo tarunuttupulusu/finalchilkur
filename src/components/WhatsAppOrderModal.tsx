@@ -81,7 +81,7 @@ export const WhatsAppOrderModal: React.FC<WhatsAppOrderModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="bg-[#F6EFE3] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative"
+          className="bg-[#F7E7CE] w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative"
         >
           {success ? (
             <div className="p-12 flex flex-col items-center justify-center text-center">

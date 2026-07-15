@@ -162,7 +162,7 @@ export const GalleryPage: React.FC = () => {
                 }}
                 className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
                   activeAlbum === album
-                    ? 'bg-brand-accent text-[#F6EFE3]'
+                    ? 'bg-brand-accent text-[#F7E7CE]'
                     : 'bg-brand-dark/5 text-brand-dark/70 hover:bg-brand-dark/10'
                 }`}
               >
@@ -204,7 +204,7 @@ export const GalleryPage: React.FC = () => {
                 {photo.menuCategory && (
                   <p className="text-[9px] font-bold uppercase tracking-widest text-brand-gold mb-1">{photo.menuCategory}</p>
                 )}
-                <p className="font-display font-bold text-[#F6EFE3] text-base leading-tight">{photo.title}</p>
+                <p className="font-display font-bold text-[#F7E7CE] text-base leading-tight">{photo.title}</p>
                 {photo.menuDishName && (
                   <span className="mt-2 flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-brand-gold/80">
                     View on Menu <ArrowRight size={10} />
@@ -270,7 +270,7 @@ export const GalleryPage: React.FC = () => {
                       {filteredPhotos[selectedPhotoIndex].menuCategory}
                     </p>
                   )}
-                  <p className="font-display text-[#F6EFE3] text-xl md:text-2xl font-black">
+                  <p className="font-display text-[#F7E7CE] text-xl md:text-2xl font-black">
                     {filteredPhotos[selectedPhotoIndex].title}
                   </p>
                   {filteredPhotos[selectedPhotoIndex].menuDishName && (
@@ -278,7 +278,7 @@ export const GalleryPage: React.FC = () => {
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => goToMenuItem(filteredPhotos[selectedPhotoIndex])}
-                      className="mt-5 flex items-center gap-2 mx-auto bg-brand-accent hover:bg-brand-gold text-[#F6EFE3] font-bold text-xs uppercase tracking-widest px-7 py-3 rounded-full shadow-lg transition-colors"
+                      className="mt-5 flex items-center gap-2 mx-auto bg-brand-accent hover:bg-brand-gold text-[#F7E7CE] font-bold text-xs uppercase tracking-widest px-7 py-3 rounded-full shadow-lg transition-colors"
                     >
                       View on Menu <ArrowRight size={14} />
                     </motion.button>

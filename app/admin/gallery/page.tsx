@@ -865,7 +865,7 @@ function AdminConfirmDeleteModal({ isOpen, onClose, onConfirm, title, message }:
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/45 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-brand-dark/5 space-y-4">
         <div>
-          <h3 className="font-display font-black text-lg text-[#4A2E2B]">{title}</h3>
+          <h3 className="font-display font-black text-lg text-[#1E4D2B]">{title}</h3>
           <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">{message}</p>
         </div>
 

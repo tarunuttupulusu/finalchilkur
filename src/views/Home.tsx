@@ -72,7 +72,7 @@ const CircularReviewCard: React.FC<CircularReviewCardProps> = ({ testimonial, on
               <Star 
                 key={i} 
                 size={12} 
-                className={i < testimonial.rating ? 'fill-current text-[#D35400]' : 'text-zinc-200'} 
+                className={i < testimonial.rating ? 'fill-current text-[#1E4D2B]' : 'text-zinc-200'} 
               />
             ))}
           </div>
@@ -88,7 +88,7 @@ const CircularReviewCard: React.FC<CircularReviewCardProps> = ({ testimonial, on
       {testimonial.role && testimonial.role !== 'Google Reviews' && testimonial.role !== 'Local Guide' && (
         <div className="mt-3.5 pt-2.5 border-t border-[#F5E6E3] flex justify-between items-center text-[9px] font-sans">
           <span className="text-zinc-400 font-bold uppercase tracking-wider">Recommended:</span>
-          <span className="text-[#D35400] font-extrabold">{testimonial.role}</span>
+          <span className="text-[#1E4D2B] font-extrabold">{testimonial.role}</span>
         </div>
       )}
     </motion.div>
@@ -133,7 +133,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ testimonial, onClose }) => {
       />
 
       <motion.div
-        className="relative z-10 bg-[#F6EFE3] rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl overflow-hidden border border-brand-dark/10"
+        className="relative z-10 bg-[#F7E7CE] rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl overflow-hidden border border-brand-dark/10"
         initial={{ scale: 0.85, opacity: 0, y: 40 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.85, opacity: 0, y: 40 }}
@@ -524,25 +524,25 @@ export const Home: React.FC = () => {
 
           {/* Hero Content Overlay */}
           <div className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col items-center pt-20">
-            <span className="text-[#F6EFE3] text-[9px] font-bold uppercase tracking-[0.25em] bg-brand-accent/20 border border-brand-accent/40 px-5 py-2 rounded-full backdrop-blur-md mb-8 animate-pulse font-sans">
+            <span className="text-[#F7E7CE] text-[9px] font-bold uppercase tracking-[0.25em] bg-brand-accent/20 border border-brand-accent/40 px-5 py-2 rounded-full backdrop-blur-md mb-8 animate-pulse font-sans">
               Balaji Chilkur Family Dhaba
             </span>
-            <h1 className="font-display text-4xl md:text-7xl font-semibold text-[#F6EFE3] leading-tight drop-shadow-2xl uppercase tracking-wider">
+            <h1 className="font-display text-4xl md:text-7xl font-semibold text-[#F7E7CE] leading-tight drop-shadow-2xl uppercase tracking-wider">
               {heroData.title}
             </h1>
-            <p className="text-xs md:text-sm text-[#F6EFE3]/70 font-sans uppercase tracking-[0.15em] max-w-2xl mx-auto leading-loose mt-6 drop-shadow-md">
+            <p className="text-xs md:text-sm text-[#F7E7CE]/70 font-sans uppercase tracking-[0.15em] max-w-2xl mx-auto leading-loose mt-6 drop-shadow-md">
               {heroData.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-5 mt-12">
               <Link
                 href={heroData.ctaLink}
-                className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-xs block"
+                className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-xs block"
               >
                 {heroData.ctaText}
               </Link>
               <Link
                 href={heroData.secondaryCtaLink}
-                className="w-full sm:w-auto bg-transparent hover:bg-[#F6EFE3]/10 border-2 border-[#F6EFE3] text-[#F6EFE3] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider transition-all text-xs block"
+                className="w-full sm:w-auto bg-transparent hover:bg-[#F7E7CE]/10 border-2 border-[#F7E7CE] text-[#F7E7CE] px-8 py-4.5 rounded-full font-bold uppercase tracking-wider transition-all text-xs block"
               >
                 {heroData.secondaryCtaText}
               </Link>
@@ -589,7 +589,7 @@ export const Home: React.FC = () => {
           <div className="flex justify-center mt-12">
             <Link 
               href="/menu" 
-              className="bg-brand-accent hover:bg-brand-accent/90 text-[#F6EFE3] px-8 py-4 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-sm flex items-center justify-center space-x-2"
+              className="bg-brand-accent hover:bg-brand-accent/90 text-[#F7E7CE] px-8 py-4 rounded-full font-bold uppercase tracking-wider shadow-lg shadow-brand-accent/25 transition-all text-sm flex items-center justify-center space-x-2"
             >
               <span>Explore Full Menu</span>
               <ArrowRight size={16} />
@@ -603,7 +603,7 @@ export const Home: React.FC = () => {
       {sectionsMap.offers && (
         <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Exclusive Indulgence</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#1E4D2B] font-display">Exclusive Indulgence</span>
             <h2 className="font-display text-3xl md:text-5xl font-semibold text-brand-dark mt-3">
               Limited Time Promotions
             </h2>
@@ -614,7 +614,7 @@ export const Home: React.FC = () => {
               <div 
                 key={offer.id}
                 onClick={() => navigate.push(offer.link)}
-                className="relative rounded-3xl overflow-hidden min-h-[320px] flex items-center bg-[#2B1B12] text-[#F6EFE3] group cursor-pointer border border-brand-gold/10 hover:border-brand-gold/25 transition-all duration-500 shadow-md"
+                className="relative rounded-3xl overflow-hidden min-h-[320px] flex items-center bg-[#1E4D2B] text-[#F7E7CE] group cursor-pointer border border-brand-gold/10 hover:border-brand-gold/25 transition-all duration-500 shadow-md"
               >
                 {/* Offer Image */}
                 <div className="absolute inset-0 z-0">
@@ -623,7 +623,7 @@ export const Home: React.FC = () => {
                     alt={offer.title}
                     className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#2B1B12] via-[#2B1B12]/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#1E4D2B] via-[#1E4D2B]/80 to-transparent" />
                 </div>
 
                 {/* Offer Content */}
@@ -631,10 +631,10 @@ export const Home: React.FC = () => {
                   <span className="text-[9px] font-bold uppercase tracking-widest bg-brand-gold/20 border border-brand-gold/45 text-brand-gold px-3 py-1 rounded-md">
                     {offer.badge}
                   </span>
-                  <h3 className="font-display text-2xl md:text-3xl font-semibold mt-5 text-[#F6EFE3] tracking-wide">
+                  <h3 className="font-display text-2xl md:text-3xl font-semibold mt-5 text-[#F7E7CE] tracking-wide">
                     {offer.title}
                   </h3>
-                  <p className="text-xs text-[#F6EFE3]/70 mt-3 font-sans leading-relaxed">
+                  <p className="text-xs text-[#F7E7CE]/70 mt-3 font-sans leading-relaxed">
                     {offer.description}
                   </p>
                   
@@ -654,7 +654,7 @@ export const Home: React.FC = () => {
                         e.stopPropagation();
                         navigate.push(offer.link);
                       }}
-                      className="text-[10px] font-bold uppercase tracking-widest bg-brand-gold hover:bg-brand-accent text-brand-dark hover:text-[#F6EFE3] px-6 py-3.5 rounded-full transition-colors duration-300 shadow-md"
+                      className="text-[10px] font-bold uppercase tracking-widest bg-brand-gold hover:bg-brand-accent text-brand-dark hover:text-[#F7E7CE] px-6 py-3.5 rounded-full transition-colors duration-300 shadow-md"
                     >
                       {offer.cta}
                     </button>
@@ -696,7 +696,7 @@ export const Home: React.FC = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="lg:col-span-7 flex flex-col justify-center"
             >
-              <span className="text-xs font-bold uppercase tracking-widest text-[#D35400] font-display">Pure vegetarian heritage</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#1E4D2B] font-display">Pure vegetarian heritage</span>
               <h2 className="font-display text-3xl md:text-5xl font-semibold text-brand-dark mt-3 leading-tight tracking-wide">
                 {(!aboutData.heading || aboutData.heading === 'Our Culinary Journey') ? 'A Tradition of Pure Vegetarian Excellence' : aboutData.heading}
               </h2>
@@ -737,7 +737,7 @@ export const Home: React.FC = () => {
               <div className="mt-10">
                 <Link 
                   href="/about" 
-                  className="inline-flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-[#D35400] hover:text-brand-dark transition-colors duration-300"
+                  className="inline-flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-[#1E4D2B] hover:text-brand-dark transition-colors duration-300"
                 >
                   <span>Our Story</span>
                   <ArrowRight size={16} />
@@ -795,7 +795,7 @@ export const Home: React.FC = () => {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-brand-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                      <p className="font-display font-bold text-[#F6EFE3] text-base leading-tight">
+                      <p className="font-display font-bold text-[#F7E7CE] text-base leading-tight">
                         {photo.title}
                       </p>
                     </div>
@@ -878,7 +878,7 @@ export const Home: React.FC = () => {
                     if (!isActive) {
                       (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
                       (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(212,175,55,0.12)';
-                      (e.currentTarget as HTMLDivElement).style.borderColor = '#D4AF37';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = '#90EE90';
                     }
                   }}
                   onMouseLeave={e => {
@@ -891,9 +891,9 @@ export const Home: React.FC = () => {
                   className="cursor-pointer rounded-full border flex items-center justify-center transition-all duration-300 h-12 px-6"
                   style={{
                     background: isActive ? '#FFF9F2' : '#ffffff',
-                    borderColor: isActive ? '#D4AF37' : 'rgba(30,20,10,0.10)',
+                    borderColor: isActive ? '#90EE90' : 'rgba(30,20,10,0.10)',
                     boxShadow: isActive
-                      ? '0 0 0 1.5px #D4AF37, 0 6px 20px rgba(212,175,55,0.12)'
+                      ? '0 0 0 1.5px #90EE90, 0 6px 20px rgba(212,175,55,0.12)'
                       : '0 2px 8px rgba(0,0,0,0.03)',
                     transform: 'translateY(0)',
                   } as React.CSSProperties}
@@ -902,7 +902,7 @@ export const Home: React.FC = () => {
                     className="font-display font-bold tracking-wide flex items-center justify-center gap-1.5 transition-colors duration-300 select-none"
                     style={{
                       fontSize: '0.85rem',
-                      color: isActive ? '#C1440E' : '#4a3728',
+                      color: isActive ? '#1E4D2B' : '#4a3728',
                       letterSpacing: '0.03em',
                       whiteSpace: 'nowrap',
                     }}

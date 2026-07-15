@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className="flex flex-col min-h-screen bg-brand-bg noise-overlay selection:bg-brand-accent selection:text-[#F6EFE3]">
+      <body className="flex flex-col min-h-screen bg-brand-bg noise-overlay selection:bg-brand-accent selection:text-[#F7E7CE]">
         <LayoutWrapper>
           {children}
         </LayoutWrapper>

@@ -176,7 +176,7 @@ export default function BackupCMS() {
               <button
                 onClick={() => setIsConfirmModalOpen(true)}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-dark hover:bg-brand-dark/95 text-[#F6EFE3] font-bold uppercase tracking-wider text-xs rounded-xl shadow-md disabled:opacity-50 transition-all"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-dark hover:bg-brand-dark/95 text-[#F7E7CE] font-bold uppercase tracking-wider text-xs rounded-xl shadow-md disabled:opacity-50 transition-all"
               >
                 {loading ? <Loader2 className="animate-spin" size={14} /> : <Download size={14} />}
                 <span>Download Database JSON Backup</span>
@@ -343,7 +343,7 @@ function AdminConfirmCredentialsModal({ isOpen, onClose, onConfirm, title, messa
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/45 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-brand-dark/5 space-y-4">
         <div>
-          <h3 className="font-display font-black text-lg text-[#4A2E2B]">{title}</h3>
+          <h3 className="font-display font-black text-lg text-[#1E4D2B]">{title}</h3>
           <p className="text-xs text-brand-dark/65 mt-1 leading-relaxed">{message}</p>
         </div>
 
@@ -369,7 +369,7 @@ function AdminConfirmCredentialsModal({ isOpen, onClose, onConfirm, title, messa
                     setSelectedTypes(dataOptions.map(o => o.key));
                   }
                 }}
-                className="text-[9px] text-[#D35400] hover:underline font-bold uppercase tracking-wider"
+                className="text-[9px] text-[#1E4D2B] hover:underline font-bold uppercase tracking-wider"
               >
                 {selectedTypes.length === dataOptions.length ? 'Deselect All' : 'Select All'}
               </button>
@@ -389,7 +389,7 @@ function AdminConfirmCredentialsModal({ isOpen, onClose, onConfirm, title, messa
                           setSelectedTypes(prev => [...prev, opt.key]);
                         }
                       }}
-                      className="rounded border-zinc-300 text-[#D35400] focus:ring-[#D35400] h-3.5 w-3.5"
+                      className="rounded border-zinc-300 text-[#1E4D2B] focus:ring-[#1E4D2B] h-3.5 w-3.5"
                     />
                     <span>{opt.label}</span>
                   </label>
@@ -436,7 +436,7 @@ function AdminConfirmCredentialsModal({ isOpen, onClose, onConfirm, title, messa
             <button
               type="submit"
               disabled={loading || selectedTypes.length === 0}
-              className="px-4 py-2 rounded-lg bg-[#D35400] hover:bg-[#D35400]/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 justify-center min-w-[110px] disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-[#1E4D2B] hover:bg-[#1E4D2B]/90 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 justify-center min-w-[110px] disabled:opacity-50"
             >
               {loading ? "Verifying..." : "Download"}
             </button>
