@@ -35,11 +35,18 @@ export async function proxy(request: NextRequest) {
 
   const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const sanitizedUrl = sanitizeUrl(originalUrl);
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const isValidUrl = sanitizedUrl.startsWith('http://') || sanitizedUrl.startsWith('https://');
+
+  if (!sanitizedUrl || !anonKey || !isValidUrl) {
+    console.warn('[Supabase Proxy] Missing or invalid URL or Anon Key. Bypassing proxy redirect checks.');
+    return response;
+  }
 
   // Create a supabase client specifically for middleware
   const supabase = createServerClient(
     sanitizedUrl,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    anonKey,
     {
 
       cookies: {
