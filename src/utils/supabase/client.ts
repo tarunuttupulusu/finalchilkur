@@ -36,9 +36,22 @@ export function createClient() {
   console.log('- Env Loaded Status:', !!originalUrl && !!anonKey);
   console.log('- Is Valid URL Scheme:', /^https?:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(sanitizedUrl));
 
+  if (!sanitizedUrl || !anonKey) {
+    console.warn('[Supabase Client] Missing URL or Anon Key. Returning dummy client for build-time prerendering.');
+    return {
+      auth: {
+        getUser: async () => ({ data: { user: null }, error: null }),
+        getSession: async () => ({ data: { session: null }, error: null }),
+        signOut: async () => ({ error: null }),
+        signInWithPassword: async () => ({ data: {}, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      }
+    } as any;
+  }
+
   return createBrowserClient(
     sanitizedUrl,
-    anonKey!
+    anonKey
   )
 }
 

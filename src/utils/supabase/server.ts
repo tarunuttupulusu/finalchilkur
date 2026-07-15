@@ -30,10 +30,24 @@ export async function createClient() {
   const cookieStore = await cookies()
   const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const sanitizedUrl = sanitizeUrl(originalUrl);
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!sanitizedUrl || !anonKey) {
+    console.warn('[Supabase Server] Missing URL or Anon Key. Returning dummy server client for build-time.');
+    return {
+      auth: {
+        getUser: async () => ({ data: { user: null }, error: null }),
+        getSession: async () => ({ data: { session: null }, error: null }),
+        signOut: async () => ({ error: null }),
+        signInWithPassword: async () => ({ data: {}, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      }
+    } as any;
+  }
 
   return createServerClient(
     sanitizedUrl,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    anonKey,
     {
       cookies: {
         getAll() {
