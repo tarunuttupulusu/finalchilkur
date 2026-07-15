@@ -62,7 +62,7 @@ export const Navbar: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname, isHomepage]);
+  }, [pathname]);
 
   useEffect(() => {
     const handleHashChange = () => {
