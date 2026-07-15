@@ -32,8 +32,10 @@ export async function createClient() {
   const sanitizedUrl = sanitizeUrl(originalUrl);
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!sanitizedUrl || !anonKey) {
-    console.warn('[Supabase Server] Missing URL or Anon Key. Returning dummy server client for build-time.');
+  const isValidUrl = sanitizedUrl.startsWith('http://') || sanitizedUrl.startsWith('https://');
+
+  if (!sanitizedUrl || !anonKey || !isValidUrl) {
+    console.warn('[Supabase Server] Missing or invalid URL or Anon Key. Returning dummy server client for build-time.');
     return {
       auth: {
         getUser: async () => ({ data: { user: null }, error: null }),

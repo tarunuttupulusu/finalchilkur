@@ -33,11 +33,10 @@ export function createClient() {
   console.log('[Supabase Client Client-Side Init]');
   console.log('- Raw URL from env:', originalUrl);
   console.log('- Sanitized URL used:', sanitizedUrl);
-  console.log('- Env Loaded Status:', !!originalUrl && !!anonKey);
-  console.log('- Is Valid URL Scheme:', /^https?:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(sanitizedUrl));
+  const isValidUrl = sanitizedUrl.startsWith('http://') || sanitizedUrl.startsWith('https://');
 
-  if (!sanitizedUrl || !anonKey) {
-    console.warn('[Supabase Client] Missing URL or Anon Key. Returning dummy client for build-time prerendering.');
+  if (!sanitizedUrl || !anonKey || !isValidUrl) {
+    console.warn('[Supabase Client] Missing or invalid URL or Anon Key. Returning dummy client for build-time prerendering.');
     return {
       auth: {
         getUser: async () => ({ data: { user: null }, error: null }),
