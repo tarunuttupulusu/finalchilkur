@@ -47,7 +47,7 @@ function SuccessContent() {
           <p className="font-mono text-3xl font-bold text-brand-dark tracking-wider">{bookingRef}</p>
         </div>
 
-        <div className="bg-[#F7E7CE] p-6 rounded-2xl w-full border border-brand-gold/30 relative overflow-hidden flex flex-col items-center shadow-inner">
+        <div className="bg-[#FFFFFF] p-6 rounded-2xl w-full border border-brand-gold/30 relative overflow-hidden flex flex-col items-center shadow-inner">
           <div className="absolute -top-4 -right-4 w-16 h-16 bg-brand-gold rounded-full opacity-20" />
           <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-brand-accent rounded-full opacity-10" />
           
@@ -85,7 +85,7 @@ function SuccessContent() {
 
 export default function ReservationSuccessPage() {
   return (
-    <div className="pt-28 pb-20 px-4 md:px-8 min-h-screen relative overflow-hidden flex items-center justify-center bg-[#F7E7CE]">
+    <div className="pt-28 pb-20 px-4 md:px-8 min-h-screen relative overflow-hidden flex items-center justify-center bg-[#FFFFFF]">
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

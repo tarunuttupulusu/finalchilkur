@@ -161,7 +161,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 gap-8">
         {/* Recent reservations panel */}
         <div className="bg-white rounded-3xl border border-brand-gold/10 shadow-md overflow-hidden">
-          <div className="p-6 md:p-8 border-b border-brand-dark/5 flex justify-between items-center bg-[#F7E7CE]/20">
+          <div className="p-6 md:p-8 border-b border-brand-dark/5 flex justify-between items-center bg-[#FFFFFF]/20">
             <div>
               <h2 className="font-display font-black text-lg text-brand-dark">Latest Reservations</h2>
               <p className="text-xs text-brand-dark/50">Realtime feed of recently booked tables</p>
@@ -177,7 +177,7 @@ export default async function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-brand-dark/5 text-[10px] font-black uppercase tracking-widest text-brand-dark/50 bg-[#F7E7CE]/10">
+                <tr className="border-b border-brand-dark/5 text-[10px] font-black uppercase tracking-widest text-brand-dark/50 bg-[#FFFFFF]/10">
                   <th className="p-5">Ref ID</th>
                   <th className="p-5">Customer</th>
                   <th className="p-5">Schedule</th>
@@ -192,7 +192,7 @@ export default async function AdminDashboard() {
                   </tr>
                 ) : (
                   recentReservations.map((res) => (
-                    <tr key={res.id} className="hover:bg-[#F7E7CE]/15 transition-colors">
+                    <tr key={res.id} className="hover:bg-[#FFFFFF]/15 transition-colors">
                       <td className="p-5 font-mono text-sm font-bold text-brand-dark">{res.bookingRef}</td>
                       <td className="p-5">
                         <div className="font-bold text-brand-dark">{res.customerName}</div>

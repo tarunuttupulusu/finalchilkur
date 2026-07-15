@@ -1,0 +1,50 @@
+.scroll-stack-scroller {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* Hide default scrollbar to keep it clean */
+.scroll-stack-scroller::-webkit-scrollbar {
+  display: none;
+}
+.scroll-stack-scroller {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scroll-stack-inner {
+  padding: 0 0.5rem 18rem;
+  min-height: auto;
+}
+
+.scroll-stack-card-wrapper {
+  position: relative;
+}
+
+.scroll-stack-card {
+  transform-origin: top center;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  height: auto; /* Fit to content dynamically */
+  width: 100%;
+  margin: 20px 0;
+  padding: 0; /* Let DishCard handle padding internally */
+  border-radius: 20px;
+  box-sizing: border-box;
+  /* Improve mobile performance */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  position: relative;
+}
+
+.scroll-stack-end {
+  width: 100%;
+  height: 1px;
+}

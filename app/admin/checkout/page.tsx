@@ -403,7 +403,7 @@ We look forward to serving you again.`;
   ];
 
   return (
-    <div className="space-y-8 animate-fadeIn font-sans max-w-7xl mx-auto" style={{ background: '#F7E7CE' }}>
+    <div className="space-y-8 animate-fadeIn font-sans max-w-7xl mx-auto" style={{ background: '#FFFFFF' }}>
       
       {/* Page Header Header */}
       <Card 

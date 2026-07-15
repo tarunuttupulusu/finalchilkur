@@ -48,7 +48,8 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const threshold = isHomepage ? window.innerHeight - 96 : 50;
+      if (window.scrollY > threshold) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -61,7 +62,7 @@ export const Navbar: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname]);
+  }, [pathname, isHomepage]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -149,22 +150,7 @@ export const Navbar: React.FC = () => {
             : 'bg-transparent'
         }`}
       >
-        {/* Top Announcement Bar - Visible only when not scrolled */}
-        <AnimatePresence>
-          {!isScrolled && announcement && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="bg-brand-dark text-brand-gold py-2 px-4 text-center text-[10px] font-bold tracking-widest uppercase border-b border-brand-gold/10 hidden sm:flex items-center justify-center gap-2"
-            >
-              <span>{announcement}</span>
-              <Link href="/reserve" className="underline hover:text-white transition-colors ml-1 font-extrabold">
-                Reserve Now
-              </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
 
         <div className={`w-full px-6 flex justify-between items-center transition-all duration-300 ${
           isScrolled ? 'py-3' : 'py-5'
@@ -225,14 +211,6 @@ export const Navbar: React.FC = () => {
             
             {/* Premium CTA Button with Floating Badge */}
             <div className="relative group">
-              {badgeActive && (
-                <span 
-                  className="absolute -top-3 right-4 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none scale-90 group-hover:scale-95 transition-transform duration-300"
-                  style={{ backgroundColor: badgeColor }}
-                >
-                  {badgeText}
-                </span>
-              )}
               <Link 
                 href="/reserve" 
                 className="flex items-center space-x-2 bg-brand-gold hover:bg-brand-gold/90 text-brand-dark transition-all duration-300 text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-full shadow-lg shadow-brand-gold/30 hover:scale-[1.02]"
@@ -246,14 +224,6 @@ export const Navbar: React.FC = () => {
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center space-x-3">
             <div className="relative">
-              {badgeActive && (
-                <span 
-                  className="absolute -top-2.5 right-1 text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full shadow z-10 scale-90 select-none"
-                  style={{ backgroundColor: badgeColor }}
-                >
-                  {badgeText}
-                </span>
-              )}
               <Link 
                 href="/reserve" 
                 className="flex items-center space-x-1 bg-brand-gold text-brand-dark transition-colors duration-300 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-lg"
@@ -311,15 +281,6 @@ export const Navbar: React.FC = () => {
                 <span>Call +91 93471 04569</span>
               </a>
               
-              <div className="relative w-full">
-                {badgeActive && (
-                  <span 
-                    className="absolute -top-2.5 right-6 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md z-10 border border-brand-bg select-none"
-                    style={{ backgroundColor: badgeColor }}
-                  >
-                    {badgeText}
-                  </span>
-                )}
                 <Link 
                   href="/reserve" 
                   onClick={() => setIsOpen(false)}
@@ -328,7 +289,6 @@ export const Navbar: React.FC = () => {
                   <Calendar size={16} />
                   <span>Book a Table</span>
                 </Link>
-              </div>
 
               <Link 
                 href="/menu" 

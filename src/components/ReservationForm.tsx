@@ -52,7 +52,7 @@ export const ReservationForm = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-[#F7E7CE] rounded-3xl shadow-2xl overflow-hidden border border-brand-dark/10">
+    <div className="w-full max-w-2xl mx-auto bg-[#FFFFFF] rounded-3xl shadow-2xl overflow-hidden border border-brand-dark/10">
       <div className="bg-brand-dark p-8 text-center relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10">
           <PartyPopper size={120} className="text-brand-gold" />
@@ -183,7 +183,7 @@ export const ReservationForm = () => {
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={loading}
-          className="w-full py-4 bg-brand-accent text-white font-bold uppercase tracking-widest rounded-xl shadow-[0_6px_0_0_#903008] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#903008] active:translate-y-[6px] active:shadow-[0_0px_0_0_#903008] transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 bg-brand-accent text-white font-bold uppercase tracking-widest rounded-xl shadow-[0_6px_0_0_#12301A] hover:translate-y-[2px] hover:shadow-[0_4px_0_0_#12301A] active:translate-y-[6px] active:shadow-[0_0px_0_0_#12301A] transition-all flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

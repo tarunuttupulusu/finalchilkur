@@ -27,9 +27,10 @@ export interface Dish {
 interface DishCardProps {
   dish: Dish;
   onOrderClick?: (dish: Dish) => void;
+  isCompact?: boolean;
 }
 
-export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
+export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick, isCompact }) => {
   const navigate = useRouter();
 
   const handleOrder = (e: React.MouseEvent) => {
@@ -50,14 +51,14 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
       whileHover={dish.isOutOfStock ? {} : { y: -8 }}
-      className={`group relative bg-[#F7E7CE] rounded-2xl overflow-hidden border border-brand-dark/10 shadow-sm transition-shadow flex flex-col h-full ${
+      className={`group relative bg-[#F5FFFA] rounded-2xl overflow-hidden border border-brand-dark/10 shadow-sm transition-shadow flex flex-col h-full ${
         dish.isOutOfStock ? 'opacity-60 grayscale cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'
       }`}
     >
       {/* Popular / Veg badges */}
       <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
         {dish.isPopular && !dish.isOutOfStock && (
-          <span className="flex items-center space-x-1 bg-brand-accent text-[#F7E7CE] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
+          <span className="flex items-center space-x-1 bg-brand-accent text-[#FFFFFF] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
             <Flame size={10} className="fill-current" />
             <span>Popular</span>
           </span>
@@ -78,7 +79,7 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
           loading="lazy"
         />
         {/* Dark overlay on hover */}
-        <div className="absolute inset-0 bg-brand-dark/10 group-hover:bg-brand-dark/20 transition-colors duration-300" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
         
         {/* Sold out overlay */}
         {dish.isOutOfStock && (
@@ -91,34 +92,34 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-grow">
+      <div className={`${isCompact ? 'p-4 lg:p-6 xl:p-5' : 'p-6'} flex flex-col flex-grow`}>
         {/* Rating and Category */}
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-xs uppercase font-semibold tracking-wider text-brand-olive font-sans">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className={`uppercase font-semibold tracking-wider text-brand-olive font-sans ${isCompact ? 'text-[10px] lg:text-xs xl:text-[10px]' : 'text-xs'}`}>
             {dish.category}
           </span>
           {dish.rating && (
             <div className="flex items-center space-x-1 text-brand-gold">
-              <Star size={12} className="fill-current" />
-              <span className="text-xs font-semibold text-brand-dark">{dish.rating}</span>
+              <Star size={11} className="fill-current" />
+              <span className={`font-semibold text-brand-dark ${isCompact ? 'text-[10px] lg:text-xs xl:text-[10px]' : 'text-xs'}`}>{dish.rating}</span>
             </div>
           )}
         </div>
 
         {/* Title */}
-        <div className="mb-2">
-          <h3 className="font-display text-xl font-extrabold text-brand-dark group-hover:text-brand-accent transition-colors duration-300">
+        <div className="mb-1.5">
+          <h3 className={`font-display font-extrabold text-brand-dark group-hover:text-brand-accent transition-colors duration-300 ${isCompact ? 'text-base lg:text-xl xl:text-lg' : 'text-xl'}`}>
             {dish.name}
           </h3>
           {dish.teluguName && (
-            <p className="font-telugu text-sm text-brand-accent/80 font-medium">
+            <p className={`font-telugu text-brand-accent/80 font-medium ${isCompact ? 'text-xs lg:text-sm xl:text-xs' : 'text-sm'}`}>
               {dish.teluguName}
             </p>
           )}
         </div>
 
         {/* Description */}
-        <p className="text-sm font-sans text-brand-dark/70 leading-relaxed mb-6 flex-grow">
+        <p className={`font-sans text-brand-dark/70 leading-relaxed flex-grow ${isCompact ? 'text-xs lg:text-sm xl:text-xs mb-4 lg:mb-6 xl:mb-4' : 'text-sm mb-6'}`}>
           {dish.description}
         </p>
 
@@ -137,7 +138,7 @@ export const DishCard: React.FC<DishCardProps> = ({ dish, onOrderClick }) => {
           ) : (
             <button 
               onClick={handleOrder}
-              className="relative px-5 py-2.5 bg-brand-accent text-[#F7E7CE] font-bold text-[10px] tracking-widest uppercase rounded-xl border border-brand-accent/50 shadow-[0_4px_0_0_#903008] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#903008] active:translate-y-[4px] active:shadow-[0_0px_0_0_#903008] transition-all flex items-center gap-1.5 select-none"
+              className="relative px-5 py-2.5 bg-brand-accent text-[#FFFFFF] font-bold text-[10px] tracking-widest uppercase rounded-xl border border-brand-accent/50 shadow-[0_4px_0_0_#12301A] hover:translate-y-[2px] hover:shadow-[0_2px_0_0_#12301A] active:translate-y-[4px] active:shadow-[0_0px_0_0_#12301A] transition-all flex items-center gap-1.5 select-none"
             >
               <ShoppingBag size={12} />
               <span>Order Now</span>

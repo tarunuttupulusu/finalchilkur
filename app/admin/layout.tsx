@@ -132,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
     <AntdProvider>
-      <div className="flex h-screen bg-[#F7E7CE] overflow-hidden font-sans selection:bg-[#1E4D2B] selection:text-[#F7E7CE]">
+      <div className="flex h-screen bg-[#FFFFFF] overflow-hidden font-sans selection:bg-[#1E4D2B] selection:text-[#FFFFFF]">
         {/* Desktop Sidebar (Deep Chocolate-Charcoal #1E4D2B) */}
         <aside className="w-72 bg-[#1E4D2B] text-zinc-150 flex flex-col border-r border-brand-dark/10 shadow-md z-30 hidden lg:flex font-sans">
           {/* Header Branding */}

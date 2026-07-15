@@ -374,7 +374,7 @@ export default function AuditLogsCMS() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs font-sans">
               <thead>
-                <tr className="bg-brand-dark text-[#F7E7CE] font-display font-bold uppercase tracking-wider border-b border-brand-dark/15">
+                <tr className="bg-brand-dark text-[#FFFFFF] font-display font-bold uppercase tracking-wider border-b border-brand-dark/15">
                   <th className="p-4 pl-6 text-[10px]">Admin User</th>
                   <th className="p-4 text-[10px]">Action</th>
                   <th className="p-4 text-[10px]">Detailed Description</th>

@@ -24,7 +24,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="flex flex-col min-h-screen bg-brand-bg noise-overlay selection:bg-brand-accent selection:text-[#F7E7CE]">
+      <div className="flex flex-col min-h-screen bg-brand-bg noise-overlay selection:bg-brand-accent selection:text-[#FFFFFF]">
         <Navbar />
         <main className="flex-grow">
           <Routes>

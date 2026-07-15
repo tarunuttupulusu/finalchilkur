@@ -163,14 +163,14 @@ async function main() {
     {
       key: 'homepage_hero',
       value: JSON.stringify({
-        title: 'Authentic Indian Cuisine',
+        title: "PURE VEG, SO RICH YOU WON'T MISS THE MEAT",
         subtitle: 'Experience the rich flavors of traditional pure vegetarian recipes cooked with love and passion.',
-        videoUrl: 'https://www.youtube-nocookie.com/embed/VRKIM1pytu8?autoplay=1&mute=1&loop=1&playlist=VRKIM1pytu8&playsinline=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&vq=hd1080',
+        videoUrl: 'https://res.cloudinary.com/dvueuxjap/video/upload/v1784104163/WhatsApp_Video_2026-07-14_at_6.19.52_PM_pb2lyv.mp4',
         ctaText: 'Reserve A Table',
         ctaLink: '/reserve',
         secondaryCtaText: 'Order Online',
         secondaryCtaLink: '/menu',
-        draftTitle: 'Authentic Indian Cuisine',
+        draftTitle: "PURE VEG, SO RICH YOU WON'T MISS THE MEAT",
         draftSubtitle: 'Experience the rich flavors of traditional pure vegetarian recipes cooked with love and passion.',
         isPublished: true
       })

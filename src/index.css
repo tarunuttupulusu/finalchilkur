@@ -3,7 +3,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-bg: #F7E7CE;
+  --color-brand-bg: #FFFFFF;
   --color-brand-dark: #1E4D2B;
   --color-brand-accent: #1E4D2B;
   --color-brand-gold: #90EE90;
@@ -20,22 +20,22 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F7E7CE;
+  background: #FFFFFF;
 }
 ::-webkit-scrollbar-thumb {
   background: #1E4D2B;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #903008;
+  background: #12301A;
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; - Removed to prevent conflicts with Lenis smooth scrolling */
 }
 
 body {
-  background-color: #F7E7CE;
+  background-color: #FFFFFF;
   color: #1E4D2B;
   font-family: "Inter", sans-serif;
   overflow-x: hidden;

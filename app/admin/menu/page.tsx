@@ -957,7 +957,7 @@ export default function MenuCMS() {
                         <button
                           type="button"
                           onClick={() => setDishImage('')}
-                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black text-[#F7E7CE] rounded-lg transition-colors"
+                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black text-[#FFFFFF] rounded-lg transition-colors"
                         >
                           <X size={14} />
                         </button>

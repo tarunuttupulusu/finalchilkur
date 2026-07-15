@@ -81,7 +81,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
         
         {branches.map((b, index) => (
           <div key={b.id} className="bg-white rounded-3xl border border-brand-gold/10 shadow-md overflow-hidden">
-            <div className="p-6 md:p-8 border-b border-brand-dark/5 bg-[#F7E7CE]/25 flex items-center justify-between">
+            <div className="p-6 md:p-8 border-b border-brand-dark/5 bg-[#FFFFFF]/25 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Store className="text-brand-accent" size={20} />
                 <div>
@@ -118,7 +118,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                       type="text"
                       required
                       defaultValue={b.name}
-                      className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
+                      className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
                     />
                   </div>
                 </div>
@@ -134,7 +134,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                       type="text"
                       required
                       defaultValue={b.phone}
-                      className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
+                      className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
                     />
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                     required
                     defaultValue={b.address}
                     rows={3}
-                    className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all resize-none"
+                    className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all resize-none"
                   />
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                   type="text"
                   required
                   placeholder="e.g. Hyderabad Hitec Branch"
-                  className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
+                  className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
                 />
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                   type="text"
                   required
                   placeholder="e.g. +91 98765 43210"
-                  className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
+                  className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                 required
                 placeholder="e.g. Plot No. 12, Phase II, Madhapur, Hyderabad, Telangana 500081"
                 rows={3}
-                className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all resize-none"
+                className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 pl-12 pr-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all resize-none"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function SettingsClient({ branches, websiteSettings }: SettingsCl
                 type="text"
                 defaultValue={websiteSettings.bookingBadgeText || 'Special Offer'}
                 placeholder="e.g. Special Offer, Book & Save, 10% OFF"
-                className="w-full bg-[#F7E7CE]/25 border border-brand-dark/10 rounded-xl py-3 px-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
+                className="w-full bg-[#FFFFFF]/25 border border-brand-dark/10 rounded-xl py-3 px-4 text-brand-dark font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold transition-all"
               />
               <span className="text-[10px] text-brand-dark/40 block ml-1">Fallback is "Special Offer" if left empty.</span>
             </div>

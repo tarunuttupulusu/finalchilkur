@@ -176,7 +176,7 @@ export default function BackupCMS() {
               <button
                 onClick={() => setIsConfirmModalOpen(true)}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-dark hover:bg-brand-dark/95 text-[#F7E7CE] font-bold uppercase tracking-wider text-xs rounded-xl shadow-md disabled:opacity-50 transition-all"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-brand-dark hover:bg-brand-dark/95 text-[#FFFFFF] font-bold uppercase tracking-wider text-xs rounded-xl shadow-md disabled:opacity-50 transition-all"
               >
                 {loading ? <Loader2 className="animate-spin" size={14} /> : <Download size={14} />}
                 <span>Download Database JSON Backup</span>

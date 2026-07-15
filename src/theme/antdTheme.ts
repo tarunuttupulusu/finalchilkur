@@ -3,7 +3,7 @@ import { ThemeConfig } from 'antd';
 export const antdTheme: ThemeConfig = {
   token: {
     colorPrimary: '#1E4D2B', // Brand Orange
-    colorBgLayout: '#F7E7CE', // Warm Cream brand canvas tone
+    colorBgLayout: '#FFFFFF', // Warm Cream brand canvas tone
     colorBgContainer: '#FFFFFF', // Pure White for components
     colorTextBase: '#2A2A2A', // Charcoal text
     borderRadius: 6, // Crispunified modern micro-borders
@@ -25,7 +25,7 @@ export const antdTheme: ThemeConfig = {
     },
     Table: {
       headerBg: '#1E4D2B', // Sider/Header Chocolate-Charcoal
-      headerColor: '#F7E7CE',
+      headerColor: '#FFFFFF',
       borderRadius: 6,
     },
     Card: {

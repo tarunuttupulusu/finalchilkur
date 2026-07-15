@@ -178,7 +178,7 @@ export const ContactPage: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 items-stretch">
           {/* Details Column */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-8 bg-brand-dark text-[#F7E7CE] p-8 md:p-12 rounded-2xl transition-all duration-500">
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-8 bg-brand-dark text-[#FFFFFF] p-8 md:p-12 rounded-2xl transition-all duration-500">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-gold">Direct Lines</span>
               <h2 className="font-display text-2xl md:text-3xl font-extrabold mt-3 mb-8">
@@ -189,7 +189,7 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <MapPin className="text-brand-gold mt-1 shrink-0" size={20} />
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#F7E7CE]/50">Address</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#FFFFFF]/50">Address</h4>
                     <p className="text-sm mt-1 leading-relaxed">{branch.address}</p>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export const ContactPage: React.FC = () => {
                   <div className="flex items-start space-x-4">
                     <Phone className="text-brand-gold mt-1 shrink-0" size={18} />
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-[#F7E7CE]/50">Phone</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-[#FFFFFF]/50">Phone</h4>
                       <a href={`tel:${branch.phone.replace(/\s+/g, '')}`} className="text-sm font-semibold hover:text-brand-gold mt-1 block">
                         {branch.phone}
                       </a>
@@ -209,7 +209,7 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <Clock className="text-brand-gold mt-1 shrink-0" size={18} />
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#F7E7CE]/50">Hours of Operation</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#FFFFFF]/50">Hours of Operation</h4>
                     <p className="text-sm mt-1">Daily: {branch.openingTime || '11:00'} AM – {branch.closingTime || '23:00'} PM</p>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <Mail className="text-brand-gold mt-1 shrink-0" size={18} />
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#F7E7CE]/50">Email Support</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#FFFFFF]/50">Email Support</h4>
                     <p className="text-sm mt-1">contact@balajisantoshdhaba.com</p>
                   </div>
                 </div>
@@ -225,9 +225,9 @@ export const ContactPage: React.FC = () => {
             </div>
 
             {branch.rating && (
-              <div className="pt-8 border-t border-[#F7E7CE]/15">
+              <div className="pt-8 border-t border-[#FFFFFF]/15">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-brand-gold">Google Rating</h4>
-                <p className="font-display text-2xl font-black text-[#F7E7CE] mt-1">{branch.rating}</p>
+                <p className="font-display text-2xl font-black text-[#FFFFFF] mt-1">{branch.rating}</p>
               </div>
             )}
           </div>
